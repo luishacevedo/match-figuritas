@@ -14,12 +14,17 @@
         button:hover { background-color: #004370; }
         .btn-green { background-color: #28a745; }
         .btn-green:hover { background-color: #218838; }
+        .btn-yellow { background-color: #ffc107; color: #333; margin-bottom: 15px;}
+        .btn-yellow:hover { background-color: #e0a800; }
+        .btn-amigo { background-color: #17a2b8; width: auto; font-size: 13px; padding: 8px 12px; margin-right: 5px; margin-bottom: 5px;}
+        .btn-amigo:hover { background-color: #138496; }
         .resultados { margin-top: 20px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none;}
         h3 { color: #333; border-bottom: 2px solid #005c98; padding-bottom: 5px; margin-top: 0;}
         .match-list { margin-bottom: 20px; }
         .team-row { margin: 5px 0; }
         .team-name { font-weight: bold; margin-right: 10px; }
-        .status { text-align: center; font-weight: bold; margin-top: 10px; color: #005c98; }
+        .status { text-align: center; font-weight: bold; margin-top: 10px; color: #005c98; font-size: 14px;}
+        .amigos-rapidos { margin-top: 10px; display: flex; flex-wrap: wrap; }
     </style>
 </head>
 <body>
@@ -33,6 +38,11 @@
             <label><b>Mi Usuario (Ej: Luis2026):</b></label>
             <input type="text" id="miUsuario" placeholder="Inventá un nombre único...">
             
+            <button class="btn-yellow" onclick="cargarMiPerfil()">⬇️ Cargar mi perfil guardado</button>
+            
+            <label><b>Mis Amigos Habituales (separados por coma):</b></label>
+            <input type="text" id="misAmigos" placeholder="Ej: Guada, Pilar, FedeQatar">
+
             <label><b>Pegá tu texto de la App acá:</b></label>
             <textarea id="miLista" placeholder="Pegá tu lista de faltantes y repetidas..."></textarea>
             
@@ -42,14 +52,19 @@
 
         <div class="box">
             <h3>🤝 Buscar Amigo</h3>
-            <label><b>Usuario de tu amigo/a:</b></label>
-            <input type="text" id="amigoUsuario" placeholder="Ej: FedeQatar">
             
-            <button onclick="cargarYComparar()">🔍 Cargar su lista y Comparar</button>
+            <div id="botonesAmigos" class="amigos-rapidos">
+                </div>
+
+            <label style="margin-top: 15px; display: block;"><b>Buscar otro usuario manualmente:</b></label>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="amigoUsuario" placeholder="Ej: FedeQatar" style="margin-top:0;">
+                <button onclick="cargarYComparar()" style="margin-top:0; width: auto; white-space: nowrap;">🔍 Buscar</button>
+            </div>
             
-            <label style="display:block; margin-top:15px; font-size: 12px; color: gray;">(Opcional) Texto de la App de tu amigo:</label>
-            <textarea id="amigoLista" placeholder="Si no tiene usuario, pegá su texto acá y usá el botón de abajo..." style="height: 60px;"></textarea>
-            <button style="background-color: #6c757d;" onclick="compararListasLocales()">Comparar sin nube</button>
+            <label style="display:block; margin-top:20px; font-size: 12px; color: gray;">(Opcional) Texto de la App de tu amigo:</label>
+            <textarea id="amigoLista" placeholder="Si no tiene usuario, pegá su texto acá y usá el botón de abajo..." style="height: 60px; font-size: 11px;"></textarea>
+            <button style="background-color: #6c757d; padding: 8px;" onclick="compararListasLocales()">Comparar sin nube</button>
             <div id="statusAmigo" class="status"></div>
         </div>
     </div>
@@ -63,11 +78,10 @@
     </div>
 
     <script type="module">
-        // Importar Firebase (Versión Modular)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-        // Tus credenciales (Sacadas de tu captura)
+        // Tus credenciales
         const firebaseConfig = {
             apiKey: "AIzaSyAPGcn1zq1NPTrfcAZ1a1xLIjZ6IwDwMoY",
             authDomain: "match-figuritas-app.firebaseapp.com",
@@ -78,11 +92,10 @@
             appId: "1:13972953348:web:2d60c62f4bd2e5e0ac5851"
         };
 
-        // Inicializar
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // --- FUNCIONES DE LÓGICA ---
+        // --- LÓGICA DE TEXTO ---
         function parsearTexto(texto) {
             let datos = { faltan: {}, repetidas: {} };
             let seccionActual = null;
@@ -126,7 +139,7 @@
             if (!hayMatches) div.innerHTML = '<p style="color: gray; font-style: italic;">No hay coincidencias.</p>';
         }
 
-        function ejecutarComparacion(textoMio, textoAmigo) {
+        function ejecutarComparacion(textoMio, textoAmigo, nombreAmigo = "TU AMIGO") {
             let misDatos = parsearTexto(textoMio);
             let amigoDatos = parsearTexto(textoAmigo);
             
@@ -135,13 +148,66 @@
 
             renderizarResultados('meSirven', meSirven);
             renderizarResultados('leSirven', leSirven);
+            
+            // Actualizar títulos con el nombre
+            document.querySelectorAll('#resultados h3')[0].innerHTML = `✅ A VOS te sirven de las repetidas de ${nombreAmigo}:`;
+            document.querySelectorAll('#resultados h3')[1].innerHTML = `🎁 A ${nombreAmigo} le sirven de tus repetidas:`;
+            
             document.getElementById('resultados').style.display = 'block';
         }
 
-        // --- FUNCIONES EXPORTADAS PARA LOS BOTONES ---
+        function renderizarBotonesAmigos() {
+            let container = document.getElementById('botonesAmigos');
+            container.innerHTML = '';
+            let amigosTexto = document.getElementById('misAmigos').value;
+            if (!amigosTexto) return;
+            
+            let amigos = amigosTexto.split(',').map(a => a.trim()).filter(a => a !== "");
+            amigos.forEach(amigo => {
+                let btn = document.createElement('button');
+                btn.className = 'btn-amigo';
+                btn.innerText = `🆚 Comparar con ${amigo}`;
+                btn.onclick = () => {
+                    document.getElementById('amigoUsuario').value = amigo;
+                    window.cargarYComparar();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // --- BOTONES ---
+        window.cargarMiPerfil = async function() {
+            let usuario = document.getElementById('miUsuario').value.trim();
+            let status = document.getElementById('statusMiNube');
+            if (!usuario) { alert("Ingresá tu usuario primero para poder cargar tu perfil."); return; }
+
+            status.style.color = "#005c98";
+            status.innerText = "Cargando...";
+
+            try {
+                const snapshot = await get(child(ref(db), `usuarios/${usuario}`));
+                if (snapshot.exists()) {
+                    let datos = snapshot.val();
+                    document.getElementById('miLista').value = datos.textoOriginal || "";
+                    document.getElementById('misAmigos').value = datos.amigos || "";
+                    renderizarBotonesAmigos();
+                    status.style.color = "green";
+                    status.innerText = "¡Perfil cargado!";
+                } else {
+                    status.style.color = "red";
+                    status.innerText = "No se encontró tu perfil. Guardalo primero.";
+                }
+            } catch (error) {
+                status.style.color = "red";
+                status.innerText = "Error al cargar.";
+                console.error(error);
+            }
+        };
+
         window.guardarMisDatos = async function() {
             let usuario = document.getElementById('miUsuario').value.trim();
             let texto = document.getElementById('miLista').value.trim();
+            let amigos = document.getElementById('misAmigos').value.trim();
             let status = document.getElementById('statusMiNube');
 
             if (!usuario || !texto) {
@@ -149,12 +215,15 @@
                 return;
             }
 
+            status.style.color = "#005c98";
             status.innerText = "Guardando...";
             try {
                 await set(ref(db, 'usuarios/' + usuario), {
                     textoOriginal: texto,
+                    amigos: amigos,
                     ultimaActualizacion: new Date().toLocaleString()
                 });
+                renderizarBotonesAmigos();
                 status.style.color = "green";
                 status.innerText = "¡Guardado con éxito en la nube!";
             } catch (error) {
@@ -165,13 +234,12 @@
         };
 
         window.cargarYComparar = async function() {
-            let usuarioMio = document.getElementById('miUsuario').value.trim();
             let textoMio = document.getElementById('miLista').value.trim();
             let usuarioAmigo = document.getElementById('amigoUsuario').value.trim();
             let status = document.getElementById('statusAmigo');
 
             if (!textoMio) {
-                alert("Primero pegá tu propia lista en la caja de la izquierda para poder comparar.");
+                alert("Primero cargá o pegá tu propia lista en la caja de la izquierda.");
                 return;
             }
             if (!usuarioAmigo) {
@@ -180,21 +248,20 @@
             }
 
             status.style.color = "#005c98";
-            status.innerText = "Buscando en la nube...";
+            status.innerText = `Buscando a ${usuarioAmigo}...`;
 
             try {
-                const dbRef = ref(db);
-                const snapshot = await get(child(dbRef, `usuarios/${usuarioAmigo}`));
+                const snapshot = await get(child(ref(db), `usuarios/${usuarioAmigo}`));
                 
                 if (snapshot.exists()) {
                     let datosAmigo = snapshot.val();
-                    document.getElementById('amigoLista').value = datosAmigo.textoOriginal; // Lo pega visualmente
-                    ejecutarComparacion(textoMio, datosAmigo.textoOriginal);
+                    document.getElementById('amigoLista').value = datosAmigo.textoOriginal;
+                    ejecutarComparacion(textoMio, datosAmigo.textoOriginal, usuarioAmigo);
                     status.style.color = "green";
-                    status.innerText = "¡Lista de " + usuarioAmigo + " cargada!";
+                    status.innerText = `¡Lista de ${usuarioAmigo} cargada!`;
                 } else {
                     status.style.color = "red";
-                    status.innerText = "No se encontró el usuario '" + usuarioAmigo + "'.";
+                    status.innerText = `No se encontró el usuario '${usuarioAmigo}'.`;
                 }
             } catch (error) {
                 status.style.color = "red";
@@ -210,7 +277,7 @@
                 alert("Faltan datos para comparar.");
                 return;
             }
-            ejecutarComparacion(textoMio, textoAmigo);
+            ejecutarComparacion(textoMio, textoAmigo, "TU AMIGO");
             document.getElementById('statusAmigo').innerText = "";
         };
     </script>
