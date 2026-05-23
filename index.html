@@ -114,7 +114,7 @@
         <h3 id="tituloLeSirven">🎁 Le sirven:</h3>
         <div id="leSirven"></div>
         
-        <button id="btnCopiarWhatsApp" class="btn-wsp">📲 Copiar listado para enviar por WhatsApp</button>
+        <button id="btnCopiarWhatsApp" class="btn-wsp">📲 Compartir Match por WhatsApp</button>
     </div>
 
     <div class="footer">
@@ -148,7 +148,6 @@
         document.getElementById('btnCompararLocal').addEventListener('click', compararListasLocales);
         document.getElementById('btnLimpiar').addEventListener('click', limpiarBuscador);
         
-        // Botones de compartir actualizados
         document.getElementById('btnCompartirPublico').addEventListener('click', compartirWhatsAppPublico);
         document.getElementById('btnCopiarPrivado').addEventListener('click', () => copiarLink('linkPrivado', 'btnCopiarPrivado', '#6c757d', true));
         document.getElementById('btnCopiarWhatsApp').addEventListener('click', copiarTextoWhatsApp);
@@ -246,16 +245,16 @@
             document.getElementById('linkPrivado').value = urlBase + '?u=' + encodeURIComponent(usuario);
         }
 
-        // NUEVAS FUNCIONES DE COMPARTIR Y ACCESO DIRECTO
         function compartirWhatsAppPublico() {
             let link = document.getElementById('linkCompartir').value;
             if (!link) { alert("Primero guardá o cargá tu perfil para generar tu link."); return; }
             
             let texto = `⚽ ¡Hola! Fijate si nos sirven figuritas para cambiar.\n\nEntrá a mi link, cruzá tus repetidas con las mías automáticamente y veamos el Match acá:\n👉 ${link}`;
             
-            navigator.clipboard.writeText(texto).then(() => {
-                window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
-            });
+            // Abrimos WhatsApp de forma síncrona
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
+            // Intentamos copiar en segundo plano por las dudas
+            navigator.clipboard.writeText(texto).catch(e => console.log("Copia secundaria falló", e));
         }
 
         function copiarLink(inputId, btnId, colorOriginal, esPrivado = false) {
@@ -309,12 +308,15 @@
             texto += `\n🎁 *${cantLe} figuritas para ${ultimoNombreAmigo} de ${miUsuario.toUpperCase()}:*\n` + formatearDiccionario(ultimoMatchLeSirven);
             texto += `\n🔍 _Cruzá tus repetidas acá:_ https://luishacevedo.github.io/match-figuritas/`;
 
-            navigator.clipboard.writeText(texto).then(() => {
-                let btnWsp = document.getElementById('btnCopiarWhatsApp');
-                btnWsp.innerText = "¡Mensaje copiado! Pegalo en tu chat ✅";
-                btnWsp.style.backgroundColor = "#128C7E";
-                setTimeout(() => { btnWsp.innerText = "📲 Copiar listado para enviar por WhatsApp"; btnWsp.style.backgroundColor = "#25D366"; }, 3000);
-            });
+            // Abrimos WhatsApp directamente
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
+            // Intentamos copiar al portapapeles por las dudas
+            navigator.clipboard.writeText(texto).catch(e => console.log(e));
+
+            let btnWsp = document.getElementById('btnCopiarWhatsApp');
+            btnWsp.innerText = "¡Abriendo WhatsApp! ✅";
+            btnWsp.style.backgroundColor = "#128C7E";
+            setTimeout(() => { btnWsp.innerText = "📲 Compartir Match por WhatsApp"; btnWsp.style.backgroundColor = "#25D366"; }, 3000);
         }
 
         async function cargarMiPerfil() {
