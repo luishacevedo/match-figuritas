@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match de Figuritas</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; max-width: 800px; margin: auto; }
+        .container { display: flex; gap: 20px; flex-wrap: wrap; }
+        .box { flex: 1; min-width: 300px; }
+        textarea { width: 100%; height: 200px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-family: monospace; resize: vertical;}
+        button { background-color: #005c98; color: white; border: none; padding: 15px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 20px; font-weight: bold;}
+        button:hover { background-color: #004370; }
+        .resultados { margin-top: 30px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none;}
+        h3 { color: #333; border-bottom: 2px solid #005c98; padding-bottom: 5px;}
+        .match-list { margin-bottom: 20px; }
+        .team-row { margin: 5px 0; }
+        .team-name { font-weight: bold; margin-right: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>⚽ Match de Figuritas</h2>
+    <p>Pegá el texto que genera la app (con los faltantes y repetidas) para ver qué pueden intercambiar.</p>
+
+    <div class="container">
+        <div class="box">
+            <label><b>Mi Lista (Texto de la App):</b></label>
+            <textarea id="miLista" placeholder="Pegá tu lista acá..."></textarea>
+        </div>
+        <div class="box">
+            <label><b>Lista de mi Amigo/a:</b></label>
+            <textarea id="amigoLista" placeholder="Pegá la lista de la otra persona acá..."></textarea>
+        </div>
+    </div>
+
+    <button onclick="compararListas()">Comparar Figuritas</button>
+
+    <div id="resultados" class="resultados">
+        <h3>✅ Te sirven de sus repetidas:</h3>
+        <div id="meSirven" class="match-list"></div>
+
+        <h3>🎁 Le sirven de tus repetidas:</h3>
+        <div id="leSirven" class="match-list"></div>
+    </div>
+
+    <script>
+        function parsearTexto(texto) {
+            let datos = { faltan: {}, repetidas: {} };
+            let seccionActual = null;
+            let lineas = texto.split('\n');
+
+            lineas.forEach(linea => {
+                if (linea.includes('Me faltan')) {
+                    seccionActual = 'faltan';
+                } else if (linea.includes('Repetidas')) {
+                    seccionActual = 'repetidas';
+                } else if (seccionActual && linea.includes(':')) {
+                    let partes = linea.split(':');
+                    let equipo = partes[0].trim(); // Ej: MEX 🇲🇽
+                    let numeros = partes[1].split(',').map(n => n.trim()).filter(n => n !== "");
+                    
+                    if (equipo && numeros.length > 0) {
+                        datos[seccionActual][equipo] = numeros;
+                    }
+                }
+            });
+            return datos;
+        }
+
+        function encontrarInterseccion(buscadas, ofrecidas) {
+            let matches = {};
+            for (let equipo in buscadas) {
+                if (ofrecidas[equipo]) {
+                    // Buscar números en común
+                    let comunes = buscadas[equipo].filter(num => ofrecidas[equipo].includes(num));
+                    if (comunes.length > 0) {
+                        matches[equipo] = comunes;
+                    }
+                }
+            }
+            return matches;
+        }
+
+        function renderizarResultados(divId, datos) {
+            let div = document.getElementById(divId);
+            div.innerHTML = '';
+            let hayMatches = false;
+
+            for (let equipo in datos) {
+                hayMatches = true;
+                let fila = document.createElement('div');
+                fila.className = 'team-row';
+                fila.innerHTML = `<span class="team-name">${equipo}:</span> ${datos[equipo].join(', ')}`;
+                div.appendChild(fila);
+            }
+
+            if (!hayMatches) {
+                div.innerHTML = '<p style="color: gray; font-style: italic;">No hay coincidencias.</p>';
+            }
+        }
+
+        function compararListas() {
+            let textoMio = document.getElementById('miLista').value;
+            let textoAmigo = document.getElementById('amigoLista').value;
+
+            if (!textoMio || !textoAmigo) {
+                alert("Por favor, pegá ambas listas para poder comparar.");
+                return;
+            }
+
+            let misDatos = parsearTexto(textoMio);
+            let amigoDatos = parsearTexto(textoAmigo);
+
+            // Lo que yo necesito vs lo que él tiene repetido
+            let meSirven = encontrarInterseccion(misDatos.faltan, amigoDatos.repetidas);
+            
+            // Lo que él necesita vs lo que yo tengo repetido
+            let leSirven = encontrarInterseccion(amigoDatos.faltan, misDatos.repetidas);
+
+            renderizarResultados('meSirven', meSirven);
+            renderizarResultados('leSirven', leSirven);
+
+            document.getElementById('resultados').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
