@@ -23,6 +23,7 @@
         .btn-secondary { background-color: var(--secondary); }
         .btn-yellow { background-color: var(--yellow); color: #333; }
         .btn-wsp { background-color: var(--wsp); font-size: 16px; margin-top: 20px; padding: 15px;}
+        .btn-wsp-small { background-color: var(--wsp); color: white; }
         .btn-amigo { background-color: #17a2b8; width: auto; font-size: 13px; padding: 8px 12px; margin-right: 5px; margin-bottom: 5px; display: inline-block;}
         
         .resultados { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-top: 20px; display: none; border: 1px solid #e9ecef;}
@@ -68,17 +69,19 @@
             <div id="statusMiNube" class="status"></div>
 
             <div style="margin-top: 20px; border-top: 1px solid #dee2e6; padding-top: 15px;">
-                <label style="font-size: 13px; color: #495057;"><b>📢 Link para compartir a otros:</b></label>
+                <label style="font-size: 13px; color: #495057;"><b>📢 Compartir mi link público:</b></label>
                 <div style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 15px;">
                     <input type="text" id="linkCompartir" readonly style="margin: 0; font-size: 12px; background: #e9ecef; color: #495057;">
-                    <button id="btnCopiarPublico" class="btn-primary" style="margin: 0; width: auto; font-size: 12px;">📋 Copiar Link</button>
+                    <button id="btnCompartirPublico" class="btn-wsp-small" style="margin: 0; width: auto; font-size: 12px; padding: 10px;">📲 WhatsApp</button>
                 </div>
 
-                <label style="font-size: 13px; color: #dc3545;"><b>🔒 Link Privado (Guardar en Favoritos):</b></label>
+                <label style="font-size: 13px; color: #dc3545;"><b>🔒 Mi Link Privado (Tus favoritos):</b></label>
                 <div style="display: flex; gap: 5px; margin-top: 5px;">
                     <input type="text" id="linkPrivado" readonly style="margin: 0; font-size: 12px; background: #f8d7da; color: #721c24; border-color: #f5c6cb;">
-                    <button id="btnCopiarPrivado" class="btn-secondary" style="margin: 0; width: auto; font-size: 12px;">📋 Copiar Privado</button>
+                    <button id="btnCopiarPrivado" class="btn-secondary" style="margin: 0; width: auto; font-size: 12px; padding: 10px;">📋 Copiar</button>
                 </div>
+                
+                <button id="btnInstalar" class="btn-yellow" style="margin-top: 15px; font-size: 13px;">📱 Crear acceso directo en Android</button>
             </div>
         </div>
 
@@ -123,7 +126,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-        // CONFIGURACIÓN DE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAPGcn1zq1NPTrfcAZ1a1xLIjZ6IwDwMoY",
             authDomain: "match-figuritas-app.firebaseapp.com",
@@ -136,24 +138,22 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // VARIABLES GLOBALES PARA RESULTADOS
         let ultimoMatchMeSirven = {};
         let ultimoMatchLeSirven = {};
         let ultimoNombreAmigo = "";
 
-        // ASIGNACIÓN DE EVENTOS A LOS BOTONES
         document.getElementById('btnCargarPerfil').addEventListener('click', cargarMiPerfil);
         document.getElementById('btnGuardarNube').addEventListener('click', guardarMisDatos);
         document.getElementById('btnBuscarAmigo').addEventListener('click', cargarYComparar);
         document.getElementById('btnCompararLocal').addEventListener('click', compararListasLocales);
         document.getElementById('btnLimpiar').addEventListener('click', limpiarBuscador);
         
-        document.getElementById('btnCopiarPublico').addEventListener('click', () => copiarLink('linkCompartir', 'btnCopiarPublico', '#005c98', false));
+        // Botones de compartir actualizados
+        document.getElementById('btnCompartirPublico').addEventListener('click', compartirWhatsAppPublico);
         document.getElementById('btnCopiarPrivado').addEventListener('click', () => copiarLink('linkPrivado', 'btnCopiarPrivado', '#6c757d', true));
-        
         document.getElementById('btnCopiarWhatsApp').addEventListener('click', copiarTextoWhatsApp);
+        document.getElementById('btnInstalar').addEventListener('click', mostrarInstruccionesAndroid);
 
-        // FUNCIONES DE LÓGICA Y TEXTO
         function parsearTexto(texto) {
             let datos = { faltan: {}, repetidas: {} };
             let seccionActual = null;
@@ -221,7 +221,6 @@
             document.getElementById('resultados').style.display = 'block';
         }
 
-        // FUNCIONES DE INTERFAZ Y FIREBASE
         function renderizarBotonesAmigos() {
             let container = document.getElementById('botonesAmigos');
             container.innerHTML = '';
@@ -247,6 +246,18 @@
             document.getElementById('linkPrivado').value = urlBase + '?u=' + encodeURIComponent(usuario);
         }
 
+        // NUEVAS FUNCIONES DE COMPARTIR Y ACCESO DIRECTO
+        function compartirWhatsAppPublico() {
+            let link = document.getElementById('linkCompartir').value;
+            if (!link) { alert("Primero guardá o cargá tu perfil para generar tu link."); return; }
+            
+            let texto = `⚽ ¡Hola! Fijate si nos sirven figuritas para cambiar.\n\nEntrá a mi link, cruzá tus repetidas con las mías automáticamente y veamos el Match acá:\n👉 ${link}`;
+            
+            navigator.clipboard.writeText(texto).then(() => {
+                window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+            });
+        }
+
         function copiarLink(inputId, btnId, colorOriginal, esPrivado = false) {
             let inputLink = document.getElementById(inputId);
             if (!inputLink.value) { alert("Primero guardá o cargá tu perfil para generar el link."); return; }
@@ -267,6 +278,15 @@
                     btn.style.backgroundColor = colorOriginal; 
                 }, 2000);
             });
+        }
+
+        function mostrarInstruccionesAndroid() {
+            let linkPrivado = document.getElementById('linkPrivado').value;
+            if(!linkPrivado) {
+                alert("Primero guardá o cargá tu perfil para generar tu usuario.");
+                return;
+            }
+            alert("Para instalar la Web App en Android:\n\n1. Asegurate de abrir tu 'Link Privado' en Chrome.\n2. Tocá los 3 puntitos (⋮) arriba a la derecha del navegador.\n3. Elegí 'Agregar a la pantalla principal'.\n\n¡Listo! Te quedará el ícono en tu celular y siempre abrirá con tu usuario cargado.");
         }
 
         function formatearDiccionario(datos) {
