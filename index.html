@@ -29,7 +29,13 @@
         .btn-yellow { background-color: var(--yellow); color: #333; }
         .btn-wsp { background-color: var(--wsp); box-shadow: 0 4px 6px rgba(37,211,102,0.3); }
         .btn-wsp-small { background-color: var(--wsp); color: white; }
-        .btn-amigo { background-color: #17a2b8; width: auto; font-size: 12px; padding: 6px 10px; margin-right: 5px; margin-bottom: 5px; display: inline-block; }
+        
+        /* BOTONES DE AMIGOS CON CRUZ DE BORRAR */
+        .amigo-wrapper { display: inline-flex; align-items: stretch; background-color: #17a2b8; border-radius: 6px; overflow: hidden; margin-right: 6px; margin-bottom: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+        .btn-amigo-match { background: transparent; border: none; color: white; padding: 6px 10px; font-size: 13px; cursor: pointer; font-weight: bold; width: auto; margin: 0; border-radius: 0; }
+        .btn-amigo-match:hover { background: rgba(0,0,0,0.1); }
+        .btn-amigo-delete { background: rgba(0,0,0,0.15); border: none; color: white; padding: 6px 8px; font-size: 12px; cursor: pointer; width: auto; margin: 0; border-radius: 0; display: flex; align-items: center; }
+        .btn-amigo-delete:hover { background: var(--danger); }
         
         /* LAYOUTS FLEXIBLES */
         .flex-row { display: flex; gap: 8px; margin-bottom: 15px; align-items: stretch; }
@@ -119,14 +125,16 @@
             
             <div id="botonesAmigos" style="margin-bottom: 15px;"></div>
             
-            <label>☁️ Buscar amigo en la nube:</label>
+            <label>☁️ Nombre a buscar o guardar:</label>
             <div class="flex-row">
                 <input type="text" id="amigoUsuario" placeholder="Ej: FedeQatar">
                 <button id="btnBuscarAmigo" class="btn-primary">🔍 Buscar</button>
             </div>
             
-            <label>✍️ O pegar su lista manualmente:</label>
+            <label>✍️ Pegar su lista manualmente:</label>
             <textarea id="amigoLista" placeholder="Pegá la lista de tu amigo acá..."></textarea>
+            
+            <button id="btnGuardarAmigoNuevo" class="btn-success" style="padding: 8px; font-size: 13px; margin-bottom: 10px; margin-top: 0;">💾 Guardar lista como Amigo Frecuente</button>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px;">
                 <button id="btnCompararLocal" class="btn-primary">⚖️ Comparar</button>
@@ -186,6 +194,9 @@
         
         document.getElementById('btnCopiarPortapapeles').addEventListener('click', copiarTextoPortapapeles);
         document.getElementById('btnCopiarWhatsApp').addEventListener('click', abrirWhatsAppConTexto);
+        
+        // NUEVO EVENTO PARA GUARDAR AMIGO
+        document.getElementById('btnGuardarAmigoNuevo').addEventListener('click', guardarAmigoNuevo);
 
         function parsearTexto(texto) {
             let datos = { faltan: {}, repetidas: {} };
@@ -216,7 +227,6 @@
             return matches;
         }
 
-        // FUNCIÓN DE CLASIFICACIÓN CON EQUIPOS (NRO 13) INTEGRADOS
         function obtenerDesglose(datos) {
             let c = { especiales: 0, escudos: 0, equipos: 0, jugadores: 0 };
             for (let equipo in datos) {
@@ -226,13 +236,9 @@
                 } else {
                     numeros.forEach(num => {
                         let val = parseInt(num);
-                        if (val === 1) {
-                            c.escudos++;
-                        } else if (val === 13) {
-                            c.equipos++;
-                        } else {
-                            c.jugadores++;
-                        }
+                        if (val === 1) { c.escudos++; } 
+                        else if (val === 13) { c.equipos++; } 
+                        else { c.jugadores++; }
                     });
                 }
             }
@@ -287,6 +293,7 @@
             }
         }
 
+        // REDISEÑO: BOTONES DE AMIGOS CON CRUZ DE BORRAR
         function renderizarBotonesAmigos() {
             let container = document.getElementById('botonesAmigos');
             container.innerHTML = '';
@@ -295,15 +302,92 @@
             
             let amigos = amigosTexto.split(',').map(a => a.trim()).filter(a => a !== "");
             amigos.forEach(amigo => {
-                let btn = document.createElement('button');
-                btn.className = 'btn-amigo';
-                btn.innerText = `🆚 ${amigo}`;
-                btn.onclick = () => {
+                let wrapper = document.createElement('div');
+                wrapper.className = 'amigo-wrapper';
+                
+                let btnMatch = document.createElement('button');
+                btnMatch.className = 'btn-amigo-match';
+                btnMatch.innerText = `🆚 ${amigo}`;
+                btnMatch.onclick = () => {
                     document.getElementById('amigoUsuario').value = amigo;
                     cargarYComparar();
                 };
-                container.appendChild(btn);
+                
+                let btnDelete = document.createElement('button');
+                btnDelete.className = 'btn-amigo-delete';
+                btnDelete.innerText = '✖';
+                btnDelete.onclick = () => eliminarAmigoFrecuente(amigo);
+
+                wrapper.appendChild(btnMatch);
+                wrapper.appendChild(btnDelete);
+                container.appendChild(wrapper);
             });
+        }
+
+        // NUEVA FUNCIÓN: ELIMINAR AMIGO
+        function eliminarAmigoFrecuente(amigoAEliminar) {
+            if(confirm(`¿Estás seguro de que querés borrar a ${amigoAEliminar} de tus amigos frecuentes?`)) {
+                let misAmigosInput = document.getElementById('misAmigos');
+                let amigosActuales = misAmigosInput.value.split(',').map(a => a.trim()).filter(a => a !== "" && a !== amigoAEliminar);
+                misAmigosInput.value = amigosActuales.join(', ');
+                
+                let miUsuario = document.getElementById('miUsuario').value.trim();
+                if(miUsuario) {
+                    let miTexto = document.getElementById('miLista').value.trim();
+                    set(ref(db, 'usuarios/' + miUsuario), {
+                        textoOriginal: miTexto,
+                        amigos: misAmigosInput.value,
+                        ultimaActualizacion: new Date().toLocaleString()
+                    }).then(() => {
+                        renderizarBotonesAmigos();
+                    });
+                } else {
+                    renderizarBotonesAmigos();
+                }
+            }
+        }
+
+        // NUEVA FUNCIÓN: GUARDAR AMIGO NUEVO
+        async function guardarAmigoNuevo() {
+            let miUsuario = document.getElementById('miUsuario').value.trim();
+            let amigoUsuario = document.getElementById('amigoUsuario').value.trim();
+            let amigoTexto = document.getElementById('amigoLista').value.trim();
+            let status = document.getElementById('statusAmigo');
+
+            if (!miUsuario) { alert("Para agregar amigos frecuentes, primero cargá o inventá tu propio 'Usuario' en la izquierda."); return; }
+            if (!amigoUsuario || !amigoTexto) { alert("Escribí el nombre del amigo arriba y pegá su lista acá abajo para poder guardarlo."); return; }
+
+            status.style.color = "#005c98"; status.innerText = "Guardando amigo...";
+
+            try {
+                // 1. Guardar la lista en la nube a nombre del amigo
+                await set(ref(db, 'usuarios/' + amigoUsuario), {
+                    textoOriginal: amigoTexto,
+                    amigos: "",
+                    ultimaActualizacion: new Date().toLocaleString()
+                });
+
+                // 2. Agregarlo a mi caja de amigos
+                let misAmigosInput = document.getElementById('misAmigos');
+                let amigosActuales = misAmigosInput.value.split(',').map(a => a.trim()).filter(a => a !== "");
+                if (!amigosActuales.includes(amigoUsuario)) {
+                    amigosActuales.push(amigoUsuario);
+                    misAmigosInput.value = amigosActuales.join(', ');
+                    
+                    // 3. Actualizar MI perfil en la nube para que quede guardado
+                    let miTexto = document.getElementById('miLista').value.trim();
+                    await set(ref(db, 'usuarios/' + miUsuario), {
+                        textoOriginal: miTexto,
+                        amigos: misAmigosInput.value,
+                        ultimaActualizacion: new Date().toLocaleString()
+                    });
+                }
+
+                renderizarBotonesAmigos();
+                status.style.color = "green"; status.innerText = `¡${amigoUsuario} guardado y agregado a tus amigos!`;
+            } catch (error) {
+                status.style.color = "red"; status.innerText = "Error al guardar.";
+            }
         }
 
         function actualizarLinkDirecto(usuario) {
