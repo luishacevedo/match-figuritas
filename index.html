@@ -38,7 +38,16 @@
 </head>
 <body>
 
-    <h2 style="text-align: center; color: #333; margin-bottom: 30px;">⚽ Match de Figuritas Mundial 2026</h2>
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2 style="color: #333; margin-bottom: 5px;">
+            <a href="#" onclick="window.location.href=window.location.pathname; return false;" style="text-decoration: none; color: #333; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">
+                ⚽ Match de Figuritas Mundial 2026 ⚽
+            </a>
+        </h2>
+        <p style="font-size: 14px; color: #6c757d; margin-top: 0;">
+            Con el poder de <a href="https://www.figuritas.app/es/descargar" target="_blank" style="color: var(--primary); font-weight: bold; text-decoration: none;">Figuritas App</a> (Herramienta externa no oficial)
+        </p>
+    </div>
 
     <div class="grid">
         <div class="box">
@@ -62,13 +71,13 @@
                 <label style="font-size: 13px; color: #495057;"><b>📢 Link para compartir a otros:</b></label>
                 <div style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 15px;">
                     <input type="text" id="linkCompartir" readonly style="margin: 0; font-size: 12px; background: #e9ecef; color: #495057;">
-                    <button id="btnCopiarPublico" class="btn-primary" style="margin: 0; width: auto; font-size: 12px;">📋 Copiar</button>
+                    <button id="btnCopiarPublico" class="btn-primary" style="margin: 0; width: auto; font-size: 12px;">📋 Copiar Link</button>
                 </div>
 
                 <label style="font-size: 13px; color: #dc3545;"><b>🔒 Link Privado (Guardar en Favoritos):</b></label>
                 <div style="display: flex; gap: 5px; margin-top: 5px;">
                     <input type="text" id="linkPrivado" readonly style="margin: 0; font-size: 12px; background: #f8d7da; color: #721c24; border-color: #f5c6cb;">
-                    <button id="btnCopiarPrivado" class="btn-secondary" style="margin: 0; width: auto; font-size: 12px;">📋 Copiar</button>
+                    <button id="btnCopiarPrivado" class="btn-secondary" style="margin: 0; width: auto; font-size: 12px;">📋 Copiar Privado</button>
                 </div>
             </div>
         </div>
@@ -107,8 +116,7 @@
 
     <div class="footer">
         <p>Herramienta web gratuita para potenciar tus intercambios.</p>
-        <p>¿No tenés tu lista en texto? <a href="https://www.figuritas.app/es/descargar" target="_blank">Descargá la App Oficial</a></p>
-        <p style="margin-top: 15px;">Contacto: <a href="https://web.telegram.org/k/#@luishacevedo" target="_blank">Telegram @luishacevedo</a> | <a href="TU_LINKEDIN_AQUI" target="_blank">LinkedIn</a></p>
+        <p style="margin-top: 15px;">Contacto: <a href="https://web.telegram.org/k/#@luishacevedo" target="_blank">Telegram @luishacevedo</a></p>
     </div>
 
     <script type="module">
@@ -139,8 +147,10 @@
         document.getElementById('btnBuscarAmigo').addEventListener('click', cargarYComparar);
         document.getElementById('btnCompararLocal').addEventListener('click', compararListasLocales);
         document.getElementById('btnLimpiar').addEventListener('click', limpiarBuscador);
-        document.getElementById('btnCopiarPublico').addEventListener('click', () => copiarLink('linkCompartir', 'btnCopiarPublico', '#005c98'));
-        document.getElementById('btnCopiarPrivado').addEventListener('click', () => copiarLink('linkPrivado', 'btnCopiarPrivado', '#6c757d'));
+        
+        document.getElementById('btnCopiarPublico').addEventListener('click', () => copiarLink('linkCompartir', 'btnCopiarPublico', '#005c98', false));
+        document.getElementById('btnCopiarPrivado').addEventListener('click', () => copiarLink('linkPrivado', 'btnCopiarPrivado', '#6c757d', true));
+        
         document.getElementById('btnCopiarWhatsApp').addEventListener('click', copiarTextoWhatsApp);
 
         // FUNCIONES DE LÓGICA Y TEXTO
@@ -237,16 +247,25 @@
             document.getElementById('linkPrivado').value = urlBase + '?u=' + encodeURIComponent(usuario);
         }
 
-        function copiarLink(inputId, btnId, colorOriginal) {
+        function copiarLink(inputId, btnId, colorOriginal, esPrivado = false) {
             let inputLink = document.getElementById(inputId);
             if (!inputLink.value) { alert("Primero guardá o cargá tu perfil para generar el link."); return; }
             inputLink.select();
             inputLink.setSelectionRange(0, 99999);
+            
             navigator.clipboard.writeText(inputLink.value).then(() => {
+                if (esPrivado) {
+                    alert("¡Link Privado copiado!\n\n⚠️ ADVERTENCIA: NO compartas este link. Si se lo pasás a alguien, esa persona podrá modificar o borrar tu lista de figuritas en la nube. Guardalo solo en tus favoritos.");
+                }
+                
                 let btn = document.getElementById(btnId);
                 btn.innerText = "¡Copiado!";
                 btn.style.backgroundColor = "#28a745";
-                setTimeout(() => { btn.innerText = "📋 Copiar"; btn.style.backgroundColor = colorOriginal; }, 2000);
+                
+                setTimeout(() => { 
+                    btn.innerText = esPrivado ? "📋 Copiar Privado" : "📋 Copiar Link"; 
+                    btn.style.backgroundColor = colorOriginal; 
+                }, 2000);
             });
         }
 
@@ -379,7 +398,7 @@
                 await cargarMiPerfil();
             }
 
-            // 2. Link Público (Traer lista del amigo sin forzar error si el usuario local está vacío)
+            // 2. Link Público
             if (urlParams.get('buscar')) {
                 let userAmigo = urlParams.get('buscar');
                 document.getElementById('amigoUsuario').value = userAmigo;
