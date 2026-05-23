@@ -145,7 +145,7 @@
     </div>
 
     <div id="resultados" class="resultados">
-        <h3 id="tituloMeSirven">✅ Te sirven:</h3>
+        <h3 id="tituloMeSirven">✅ Me sirven:</h3>
         <div id="meSirven" style="margin-bottom: 20px;"></div>
         
         <h3 id="tituloLeSirven">🎁 Le sirven:</h3>
@@ -283,7 +283,7 @@
             renderizarResultados('meSirven', ultimoMatchMeSirven);
             renderizarResultados('leSirven', ultimoMatchLeSirven);
             
-            document.getElementById('tituloMeSirven').innerHTML = `✅ Te sirven ${textoMeSirven} de ${nombreAmigo}:`;
+            document.getElementById('tituloMeSirven').innerHTML = `✅ Me sirven ${textoMeSirven} de ${nombreAmigo}:`;
             document.getElementById('tituloLeSirven').innerHTML = `🎁 A ${nombreAmigo} le sirven ${textoLeSirven} tuyas:`;
             
             document.getElementById('resultados').style.display = 'block';
