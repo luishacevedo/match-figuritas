@@ -82,7 +82,7 @@
             </a>
         </h2>
         <p style="font-size: 13px; color: #6c757d; margin-top: 0;">
-            Con el poder de <a href="https://www.figuritas.app/es/descargar" target="_blank">Figuritas App</a> (App externa)
+            Complemento inspirado en <a href="https://www.figuritas.app/es/descargar" target="_blank">Figuritas App</a> (App externa)
         </p>
     </div>
 
@@ -420,34 +420,46 @@
             alert("Para instalar en Android:\n\n1. Abrí tu 'Link Privado' en Chrome.\n2. Tocá los 3 puntitos (⋮) arriba a la derecha.\n3. Elegí 'Agregar a la pantalla principal'.\n\n¡Listo! Tendrás el ícono en tu celu.");
         }
 
-        function formatearDiccionario(datos) {
+        // Nueva lógica de formato: usa asteriscos solo si es para WhatsApp
+        function formatearDiccionario(datos, esWhatsApp) {
             let texto = "";
             let hayDatos = false;
             for (let equipo in datos) {
                 hayDatos = true;
-                texto += `• *${equipo}:* ${datos[equipo].join(', ')}\n`;
+                if (esWhatsApp) {
+                    texto += `• *${equipo}:* ${datos[equipo].join(', ')}\n`;
+                } else {
+                    texto += `• ${equipo}: ${datos[equipo].join(', ')}\n`;
+                }
             }
             return hayDatos ? texto : "Nada por ahora 😢\n";
         }
 
-        function generarTextoResultados() {
+        function generarTextoResultados(esWhatsApp = false) {
             let miUsuario = document.getElementById('miUsuario').value.trim() || "MÍ";
             let textoMeSirven = obtenerDesglose(ultimoMatchMeSirven);
             let textoLeSirven = obtenerDesglose(ultimoMatchLeSirven);
-            
-            // Agregamos la lógica para levantar el link público generado en la pantalla
             let linkPublico = document.getElementById('linkCompartir').value || "https://luishacevedo.github.io/match-figuritas/";
             
-            let texto = `⚽ *MATCH DE FIGURITAS* ⚽\n\n`;
-            texto += `✅ *A mí (${miUsuario.toUpperCase()}) me sirven de ${ultimoNombreAmigo}:*\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven)}`;
-            texto += `\n🎁 *A ${ultimoNombreAmigo} le sirven de las mías:*\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven)}`;
-            texto += `\n🔍 _Cruzá tus repetidas conmigo acá:_\n👉 ${linkPublico}`;
+            let texto = "";
+
+            if (esWhatsApp) {
+                texto = `⚽ *MATCH DE FIGURITAS* ⚽\n\n`;
+                texto += `✅ *A mí (${miUsuario.toUpperCase()}) me sirven de ${ultimoNombreAmigo}:*\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, true)}`;
+                texto += `\n🎁 *A ${ultimoNombreAmigo} le sirven de las mías:*\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, true)}`;
+                texto += `\n🔍 _Cruzá tus repetidas conmigo acá:_\n👉 ${linkPublico}`;
+            } else {
+                texto = `⚽ MATCH DE FIGURITAS ⚽\n\n`;
+                texto += `✅ A mí (${miUsuario.toUpperCase()}) me sirven de ${ultimoNombreAmigo}:\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, false)}`;
+                texto += `\n🎁 A ${ultimoNombreAmigo} le sirven de las mías:\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, false)}`;
+                texto += `\n🔍 Cruzá tus repetidas conmigo acá:\n👉 ${linkPublico}`;
+            }
             
             return texto;
         }
 
         function copiarTextoPortapapeles() {
-            let texto = generarTextoResultados();
+            let texto = generarTextoResultados(false); // Falso = Sin asteriscos
             navigator.clipboard.writeText(texto).then(() => {
                 let btn = document.getElementById('btnCopiarPortapapeles');
                 btn.innerText = "¡Copiado! ✅";
@@ -457,7 +469,7 @@
         }
 
         function abrirWhatsAppConTexto() {
-            let texto = generarTextoResultados();
+            let texto = generarTextoResultados(true); // Verdadero = Con asteriscos
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
