@@ -198,6 +198,14 @@
         
         document.getElementById('btnGuardarAmigoNuevo').addEventListener('click', guardarAmigoNuevo);
 
+        // NUEVA LÓGICA PARA LIMPIAR EMOJIS Y SÍMBOLOS RAROS
+        function limpiarNombreEquipo(textoRaw) {
+            // Elimina asteriscos, comillas, guiones, emojis y espacios al final
+            return textoRaw.replace(/[*"'-]/g, '') 
+                           .replace(/[\u{1F300}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F1E6}-\u{1F1FF}]/gu, '')
+                           .trim();
+        }
+
         function parsearTexto(texto) {
             let datos = { faltan: {}, repetidas: {} };
             let seccionActual = null;
@@ -208,11 +216,33 @@
                 else if (linea.includes('Repetidas')) { seccionActual = 'repetidas'; } 
                 else if (seccionActual && linea.includes(':')) {
                     let partes = linea.split(':');
-                    let equipo = partes[0].trim();
+                    
+                    // Aca aplicamos la limpieza para que siempre lea bien las siglas
+                    let equipoOriginal = partes[0];
+                    let equipoLimpio = limpiarNombreEquipo(equipoOriginal);
+                    
                     let numeros = partes[1].split(',').map(n => n.trim()).filter(n => n !== "");
-                    if (equipo && numeros.length > 0) { datos[seccionActual][equipo] = numeros; }
+                    
+                    if (equipoLimpio && numeros.length > 0) { 
+                        // Si ya existe la sigla (ej: FWC aparece dos veces), junta los arrays
+                        if (datos[seccionActual][equipoLimpio]) {
+                            datos[seccionActual][equipoLimpio] = datos[seccionActual][equipoLimpio].concat(numeros);
+                        } else {
+                            datos[seccionActual][equipoLimpio] = numeros; 
+                        }
+                    }
                 }
             });
+            
+            // Ordenar los números de cada equipo de menor a mayor y sacar duplicados
+            for(let seccion in datos) {
+                for(let equipo in datos[seccion]) {
+                    let numerosUnicos = [...new Set(datos[seccion][equipo])];
+                    numerosUnicos.sort((a,b) => parseInt(a) - parseInt(b));
+                    datos[seccion][equipo] = numerosUnicos;
+                }
+            }
+            
             return datos;
         }
 
@@ -420,7 +450,6 @@
             alert("Para instalar en Android:\n\n1. Abrí tu 'Link Privado' en Chrome.\n2. Tocá los 3 puntitos (⋮) arriba a la derecha.\n3. Elegí 'Agregar a la pantalla principal'.\n\n¡Listo! Tendrás el ícono en tu celu.");
         }
 
-        // Nueva lógica de formato: usa asteriscos solo si es para WhatsApp
         function formatearDiccionario(datos, esWhatsApp) {
             let texto = "";
             let hayDatos = false;
@@ -459,7 +488,7 @@
         }
 
         function copiarTextoPortapapeles() {
-            let texto = generarTextoResultados(false); // Falso = Sin asteriscos
+            let texto = generarTextoResultados(false); 
             navigator.clipboard.writeText(texto).then(() => {
                 let btn = document.getElementById('btnCopiarPortapapeles');
                 btn.innerText = "¡Copiado! ✅";
@@ -469,7 +498,7 @@
         }
 
         function abrirWhatsAppConTexto() {
-            let texto = generarTextoResultados(true); // Verdadero = Con asteriscos
+            let texto = generarTextoResultados(true); 
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
