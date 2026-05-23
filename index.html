@@ -10,7 +10,7 @@
         .box { flex: 1; min-width: 300px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
         textarea { width: 100%; height: 150px; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-family: monospace; resize: vertical; box-sizing: border-box; margin-top: 5px;}
         input[type="text"] { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; margin-top: 5px; margin-bottom: 10px;}
-        button { background-color: #005c98; color: white; border: none; padding: 10px 15px; font-size: 15px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 5px;}
+        button { background-color: #005c98; color: white; border: none; padding: 10px 15px; font-size: 15px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 5px; transition: background-color 0.2s;}
         button:hover { background-color: #004370; }
         .btn-green { background-color: #28a745; }
         .btn-green:hover { background-color: #218838; }
@@ -50,6 +50,22 @@
             
             <button id="btnGuardarNube" class="btn-green">☁️ Guardar mis figuritas en la nube</button>
             <div id="statusMiNube" class="status"></div>
+
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                
+                <label style="font-size: 13px; color: #555;"><b>📢 Link para compartir (Tus amigos ven tu lista):</b></label>
+                <div style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 15px;">
+                    <input type="text" id="linkCompartir" readonly style="margin: 0; font-size: 12px; background-color: #e9ecef; color: #495057;" placeholder="Generá tu perfil primero...">
+                    <button id="btnCopiarPublico" style="margin: 0; width: auto; background-color: #17a2b8; font-size: 12px; padding: 8px 12px; white-space: nowrap;">📋 Copiar</button>
+                </div>
+
+                <label style="font-size: 13px; color: #dc3545;"><b>🔒 Link Privado (Solo para vos - Favoritos):</b></label>
+                <p style="font-size: 11px; color: #dc3545; margin: 3px 0;">⚠️ NO lo compartas. Da acceso a modificar tu lista.</p>
+                <div style="display: flex; gap: 5px; margin-top: 5px;">
+                    <input type="text" id="linkPrivado" readonly style="margin: 0; font-size: 12px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;" placeholder="Generá tu perfil primero...">
+                    <button id="btnCopiarPrivado" style="margin: 0; width: auto; background-color: #6c757d; font-size: 12px; padding: 8px 12px; white-space: nowrap;">📋 Copiar</button>
+                </div>
+            </div>
         </div>
 
         <div class="box">
@@ -179,6 +195,37 @@
             });
         }
 
+        function actualizarLinkDirecto(usuario) {
+            let urlBase = window.location.origin + window.location.pathname;
+            
+            // Link Público
+            document.getElementById('linkCompartir').value = urlBase + '?buscar=' + encodeURIComponent(usuario);
+            
+            // Link Privado
+            document.getElementById('linkPrivado').value = urlBase + '?u=' + encodeURIComponent(usuario);
+        }
+
+        function copiarLink(inputId, btnId, colorOriginal) {
+            let inputLink = document.getElementById(inputId);
+            if (!inputLink.value) {
+                alert("Primero guardá o cargá tu perfil para generar el link.");
+                return;
+            }
+            inputLink.select();
+            inputLink.setSelectionRange(0, 99999);
+            
+            navigator.clipboard.writeText(inputLink.value).then(() => {
+                let btn = document.getElementById(btnId);
+                btn.innerText = "¡Copiado!";
+                btn.style.backgroundColor = "#28a745";
+                
+                setTimeout(() => {
+                    btn.innerText = "📋 Copiar";
+                    btn.style.backgroundColor = colorOriginal;
+                }, 2000);
+            });
+        }
+
         // --- FUNCIONES PRINCIPALES ---
         async function cargarMiPerfil() {
             let usuario = document.getElementById('miUsuario').value.trim();
@@ -195,6 +242,7 @@
                     document.getElementById('miLista').value = datos.textoOriginal || "";
                     document.getElementById('misAmigos').value = datos.amigos || "";
                     renderizarBotonesAmigos();
+                    actualizarLinkDirecto(usuario);
                     status.style.color = "green";
                     status.innerText = "¡Perfil cargado!";
                 } else {
@@ -228,6 +276,7 @@
                     ultimaActualizacion: new Date().toLocaleString()
                 });
                 renderizarBotonesAmigos();
+                actualizarLinkDirecto(usuario);
                 status.style.color = "green";
                 status.innerText = "¡Guardado con éxito en la nube!";
             } catch (error) {
@@ -298,14 +347,44 @@
         document.getElementById('btnBuscarAmigo').addEventListener('click', cargarYComparar);
         document.getElementById('btnCompararLocal').addEventListener('click', compararListasLocales);
         document.getElementById('btnLimpiar').addEventListener('click', limpiarBuscador);
+        
+        document.getElementById('btnCopiarPublico').addEventListener('click', () => copiarLink('linkCompartir', 'btnCopiarPublico', '#17a2b8'));
+        document.getElementById('btnCopiarPrivado').addEventListener('click', () => copiarLink('linkPrivado', 'btnCopiarPrivado', '#6c757d'));
 
         // --- CARGA AUTOMÁTICA POR URL ---
-        window.onload = function() {
+        window.onload = async function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const userQuery = urlParams.get('u');
-            if (userQuery) {
-                document.getElementById('miUsuario').value = userQuery;
+            
+            // 1. Link Privado: Carga tu perfil completo
+            const userMio = urlParams.get('u');
+            if (userMio) {
+                document.getElementById('miUsuario').value = userMio;
                 cargarMiPerfil();
+            }
+
+            // 2. Link Público: Carga la lista del amigo para que lo veas al instante
+            const userAmigo = urlParams.get('buscar');
+            if (userAmigo) {
+                document.getElementById('amigoUsuario').value = userAmigo;
+                let status = document.getElementById('statusAmigo');
+                status.style.color = "#005c98";
+                status.innerText = `Cargando lista de ${userAmigo}...`;
+                
+                try {
+                    const snapshot = await get(child(ref(db), `usuarios/${userAmigo}`));
+                    if (snapshot.exists()) {
+                        let datosAmigo = snapshot.val();
+                        document.getElementById('amigoLista').value = datosAmigo.textoOriginal;
+                        status.style.color = "green";
+                        status.innerText = `¡Lista de ${userAmigo} descargada! Ingresá tu perfil a la izquierda para comparar.`;
+                    } else {
+                        status.style.color = "red";
+                        status.innerText = `No se encontró el usuario '${userAmigo}'.`;
+                    }
+                } catch (error) {
+                    status.style.color = "red";
+                    status.innerText = "Error al descargar lista compartida.";
+                }
             }
         };
     </script>
