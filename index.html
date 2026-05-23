@@ -4,178 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Match de Figuritas</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
+    
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; max-width: 900px; margin: auto; }
-        .container { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;}
-        .box { flex: 1; min-width: 300px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
-        textarea { width: 100%; height: 150px; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-family: monospace; resize: vertical; box-sizing: border-box; margin-top: 5px;}
-        input[type="text"] { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; margin-top: 5px; margin-bottom: 10px;}
-        button { background-color: #005c98; color: white; border: none; padding: 10px 15px; font-size: 15px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 5px; transition: background-color 0.2s;}
-        button:hover { background-color: #004370; }
-        .btn-green { background-color: #28a745; }
-        .btn-green:hover { background-color: #218838; }
-        .btn-yellow { background-color: #ffc107; color: #333; margin-bottom: 15px;}
-        .btn-yellow:hover { background-color: #e0a800; }
-        .btn-amigo { background-color: #17a2b8; width: auto; font-size: 13px; padding: 8px 12px; margin-right: 5px; margin-bottom: 5px;}
-        .btn-amigo:hover { background-color: #138496; }
-        .btn-limpiar { background-color: #dc3545; padding: 8px; font-size: 13px; margin-top: 10px;}
-        .btn-limpiar:hover { background-color: #c82333; }
-        .btn-whatsapp { background-color: #25D366; font-size: 16px; margin-top: 20px; box-shadow: 0 4px 6px rgba(37,211,102,0.3);}
-        .btn-whatsapp:hover { background-color: #128C7E; }
-        .resultados { margin-top: 20px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none;}
-        h3 { color: #333; border-bottom: 2px solid #005c98; padding-bottom: 5px; margin-top: 0;}
-        .match-list { margin-bottom: 20px; }
+        :root { --primary: #005c98; --secondary: #6c757d; --success: #28a745; --danger: #dc3545; --wsp: #25D366; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; padding: 20px; max-width: 950px; margin: auto; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        .box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #eef; }
+        textarea { width: 100%; height: 160px; padding: 12px; border: 1px solid #ced4da; border-radius: 8px; font-family: monospace; box-sizing: border-box; margin-top: 5px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; margin-top: 8px; transition: 0.2s; }
+        button:hover { filter: brightness(1.1); }
+        .btn-success { background-color: var(--success); }
+        .btn-yellow { background-color: #ffc107; color: #333; margin-bottom: 15px; }
+        .btn-primary { background-color: var(--primary); }
+        .btn-danger { background-color: var(--danger); }
+        .btn-wsp { background-color: var(--wsp); font-size: 16px; margin-top: 20px; }
+        .resultados { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: 20px; display: none; }
+        h3 { color: #333; border-bottom: 2px solid #005c98; padding-bottom: 5px; margin-top: 0; }
         .team-row { margin: 5px 0; }
         .team-name { font-weight: bold; margin-right: 10px; }
-        .status { text-align: center; font-weight: bold; margin-top: 10px; color: #005c98; font-size: 14px;}
-        .amigos-rapidos { margin-top: 10px; display: flex; flex-wrap: wrap; }
-        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ccc; font-size: 13px; color: #666; }
-        .footer a { color: #005c98; text-decoration: none; font-weight: bold;}
-        .footer a:hover { text-decoration: underline; }
+        .footer { text-align: center; margin-top: 40px; color: #666; font-size: 14px; }
+        .footer a { color: var(--primary); font-weight: bold; text-decoration: none; }
     </style>
 </head>
 <body>
 
-    <h2 style="text-align: center;">⚽ Match de Figuritas en la Nube</h2>
-    <p style="text-align: center;">Guardá tu lista y buscá a tus amigos por su usuario para ver qué pueden intercambiar.</p>
+    <h2 style="text-align: center;">⚽ Match de Figuritas Mundial 2026</h2>
 
-    <div class="container">
+    <div class="grid">
         <div class="box">
             <h3>👤 Mi Perfil</h3>
-            <label><b>Mi Usuario (Ej: Luis2026):</b></label>
-            <input type="text" id="miUsuario" placeholder="Inventá un nombre único...">
-            
-            <button id="btnCargarPerfil" class="btn-yellow">⬇️ Cargar mi perfil guardado</button>
-            
-            <label><b>Mis Amigos Habituales (separados por coma):</b></label>
-            <input type="text" id="misAmigos" placeholder="Ej: Guada, Pilar, FedeQatar">
-
-            <label><b>Pegá tu texto de la App acá:</b></label>
-            <textarea id="miLista" placeholder="Pegá tu lista de faltantes y repetidas..."></textarea>
-            
-            <button id="btnGuardarNube" class="btn-green">☁️ Guardar mis figuritas en la nube</button>
-            <div id="statusMiNube" class="status"></div>
-
-            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
-                <label style="font-size: 13px; color: #555;"><b>📢 Link para compartir (Tus amigos ven tu lista):</b></label>
-                <div style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 15px;">
-                    <input type="text" id="linkCompartir" readonly style="margin: 0; font-size: 12px; background-color: #e9ecef; color: #495057;" placeholder="Generá tu perfil primero...">
-                    <button id="btnCopiarPublico" style="margin: 0; width: auto; background-color: #17a2b8; font-size: 12px; padding: 8px 12px; white-space: nowrap;">📋 Copiar</button>
-                </div>
-
-                <label style="font-size: 13px; color: #dc3545;"><b>🔒 Link Privado (Solo para vos - Favoritos):</b></label>
-                <p style="font-size: 11px; color: #dc3545; margin: 3px 0;">⚠️ NO lo compartas. Da acceso a modificar tu lista.</p>
-                <div style="display: flex; gap: 5px; margin-top: 5px;">
-                    <input type="text" id="linkPrivado" readonly style="margin: 0; font-size: 12px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;" placeholder="Generá tu perfil primero...">
-                    <button id="btnCopiarPrivado" style="margin: 0; width: auto; background-color: #6c757d; font-size: 12px; padding: 8px 12px; white-space: nowrap;">📋 Copiar</button>
-                </div>
-            </div>
+            <label><b>Usuario:</b></label>
+            <input type="text" id="miUsuario" placeholder="Tu usuario...">
+            <button id="btnCargarPerfil" class="btn-yellow">⬇️ Cargar mis datos</button>
+            <label><b>Mis Amigos (separados por coma):</b></label>
+            <input type="text" id="misAmigos" placeholder="Ej: Guada, Pilar, Fede">
+            <label><b>Mis Figuritas:</b></label>
+            <textarea id="miLista" placeholder="Pegá acá tu lista..."></textarea>
+            <button id="btnGuardarNube" class="btn-success">☁️ Guardar en la Nube</button>
+            <div id="statusMiNube" style="font-size: 12px; text-align: center; margin-top: 5px;"></div>
         </div>
 
         <div class="box">
-            <h3>🤝 Buscar Amigo</h3>
-            
-            <div id="botonesAmigos" class="amigos-rapidos">
-                </div>
-
-            <label style="margin-top: 15px; display: block;"><b>Buscar otro usuario manualmente:</b></label>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="amigoUsuario" placeholder="Ej: FedeQatar" style="margin-top:0;">
-                <button id="btnBuscarAmigo" style="margin-top:0; width: auto; white-space: nowrap;">🔍 Buscar</button>
+            <h3>🤝 Intercambio</h3>
+            <div id="botonesAmigos" style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px;"></div>
+            <label><b>Pegar figuritas de otro:</b></label>
+            <textarea id="amigoLista" placeholder="Pegá acá la lista de tu amigo..."></textarea>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button id="btnBuscarAmigo" class="btn-primary">🔍 Comparar</button>
+                <button id="btnLimpiar" class="btn-danger">🧹 Limpiar</button>
             </div>
-            
-            <label style="display:block; margin-top:20px; font-size: 12px; color: gray;">(Opcional) Texto de la App de tu amigo:</label>
-            <textarea id="amigoLista" placeholder="Si no tiene usuario, pegá su texto acá..." style="height: 60px; font-size: 11px;"></textarea>
-            
-            <div style="display: flex; gap: 10px;">
-                <button id="btnCompararLocal" style="background-color: #6c757d; padding: 8px; font-size: 13px;">Comparar sin nube</button>
-                <button id="btnLimpiar" class="btn-limpiar">🧹 Limpiar</button>
-            </div>
-            <div id="statusAmigo" class="status"></div>
+            <div id="statusAmigo" style="font-size: 12px; text-align: center; margin-top: 5px;"></div>
         </div>
     </div>
 
     <div id="resultados" class="resultados">
-        <h3 id="tituloMeSirven">✅ A VOS te sirven de sus repetidas:</h3>
-        <div id="meSirven" class="match-list"></div>
-
-        <h3 id="tituloLeSirven">🎁 A TU AMIGO le sirven de tus repetidas:</h3>
-        <div id="leSirven" class="match-list"></div>
-
-        <button id="btnCopiarWhatsApp" class="btn-whatsapp">📲 Copiar listado para enviar por WhatsApp</button>
+        <h3 id="tituloMeSirven">✅ Te sirven:</h3>
+        <div id="meSirven"></div>
+        <h3 id="tituloLeSirven">🎁 Le sirven:</h3>
+        <div id="leSirven"></div>
+        <button id="btnCopiarWhatsApp" class="btn-wsp">📲 Copiar listado para WhatsApp</button>
     </div>
 
     <div class="footer">
-        <p>Herramienta web gratuita para potenciar tus intercambios.</p>
-        <p>¿No tenés tu lista en texto? <a href="https://www.figuritas.app/es/descargar" target="_blank">Descargá la App Figuritas original acá</a>.</p>
-        <p>Compartí la web general: <b>https://luishacevedo.github.io/match-figuritas/</b></p>
+        <p>Herramienta para potenciar tus intercambios.</p>
+        <p>Contacto: <a href="https://web.telegram.org/k/#@luishacevedo" target="_blank">Telegram @luishacevedo</a> | <a href="TU_LINKEDIN" target="_blank">LinkedIn</a></p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAPGcn1zq1NPTrfcAZ1a1xLIjZ6IwDwMoY",
-            authDomain: "match-figuritas-app.firebaseapp.com",
-            databaseURL: "https://match-figuritas-app-default-rtdb.firebaseio.com",
-            projectId: "match-figuritas-app",
-            storageBucket: "match-figuritas-app.firebasestorage.app",
-            messagingSenderId: "13972953348",
-            appId: "1:13972953348:web:2d60c62f4bd2e5e0ac5851"
-        };
-
+        // CONFIG (Mantené tu config original)
+        const firebaseConfig = { apiKey: "AIzaSyAPGcn1zq1NPTrfcAZ1a1xLIjZ6IwDwMoY", authDomain: "match-figuritas-app.firebaseapp.com", databaseURL: "https://match-figuritas-app-default-rtdb.firebaseio.com", projectId: "match-figuritas-app", storageBucket: "match-figuritas-app.firebasestorage.app", messagingSenderId: "13972953348", appId: "1:13972953348:web:2d60c62f4bd2e5e0ac5851" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Variables globales para guardar el último match y armar el mensaje de WhatsApp
-        let ultimoMatchMeSirven = {};
-        let ultimoMatchLeSirven = {};
-        let ultimoNombreAmigo = "";
-
-        // --- LÓGICA DE TEXTO ---
-        function parsearTexto(texto) {
-            let datos = { faltan: {}, repetidas: {} };
-            let seccionActual = null;
-            let lineas = texto.split('\n');
-
-            lineas.forEach(linea => {
-                if (linea.includes('Me faltan')) { seccionActual = 'faltan'; } 
-                else if (linea.includes('Repetidas')) { seccionActual = 'repetidas'; } 
-                else if (seccionActual && linea.includes(':')) {
-                    let partes = linea.split(':');
-                    let equipo = partes[0].trim();
-                    let numeros = partes[1].split(',').map(n => n.trim()).filter(n => n !== "");
-                    if (equipo && numeros.length > 0) { datos[seccionActual][equipo] = numeros; }
-                }
-            });
-            return datos;
-        }
-
-        function encontrarInterseccion(buscadas, ofrecidas) {
-            let matches = {};
-            for (let equipo in buscadas) {
-                if (ofrecidas[equipo]) {
-                    let comunes = buscadas[equipo].filter(num => ofrecidas[equipo].includes(num));
-                    if (comunes.length > 0) matches[equipo] = comunes;
-                }
-            }
-            return matches;
-        }
-
-        function renderizarResultados(divId, datos) {
-            let div = document.getElementById(divId);
-            div.innerHTML = '';
-            let hayMatches = false;
-            for (let equipo in datos) {
-                hayMatches = true;
-                let fila = document.createElement('div');
-                fila.className = 'team-row';
-                fila.innerHTML = `<span class="team-name">${equipo}:</span> ${datos[equipo].join(', ')}`;
-                div.appendChild(fila);
-            }
-            if (!hayMatches) div.innerHTML = '<p style="color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 5px;">No hay figuritas que te sirvan de este álbum. 😢</p>';
-        }
+        let ultimoMatchMeSirven = {}, ultimoMatchLeSirven = {}, ultimoNombreAmigo = "";
 
         function ejecutarComparacion(textoMio, textoAmigo, nombreAmigo = "TU AMIGO") {
             let misDatos = parsearTexto(textoMio);
@@ -185,234 +92,32 @@
             ultimoMatchLeSirven = encontrarInterseccion(amigoDatos.faltan, misDatos.repetidas);
             ultimoNombreAmigo = nombreAmigo;
 
+            let cantMe = contarTotal(ultimoMatchMeSirven);
+            let cantLe = contarTotal(ultimoMatchLeSirven);
+
             renderizarResultados('meSirven', ultimoMatchMeSirven);
             renderizarResultados('leSirven', ultimoMatchLeSirven);
             
-            document.getElementById('tituloMeSirven').innerHTML = `✅ A VOS te sirven de las repetidas de ${nombreAmigo}:`;
-            document.getElementById('tituloLeSirven').innerHTML = `🎁 A ${nombreAmigo} le sirven de tus repetidas:`;
-            
+            document.getElementById('tituloMeSirven').innerHTML = `✅ A VOS te sirven ${cantMe} figuritas de ${nombreAmigo}:`;
+            document.getElementById('tituloLeSirven').innerHTML = `🎁 A ${nombreAmigo} le sirven ${cantLe} figuritas tuyas:`;
             document.getElementById('resultados').style.display = 'block';
         }
 
-        // --- COMPARTIR POR WHATSAPP ---
-        function formatearDiccionarioParaWhatsApp(datos) {
-            let texto = "";
-            let hayDatos = false;
-            for (let equipo in datos) {
-                hayDatos = true;
-                texto += `• *${equipo}:* ${datos[equipo].join(', ')}\n`;
-            }
-            return hayDatos ? texto : "Nada por ahora 😢\n";
-        }
+        function contarTotal(datos) { return Object.values(datos).reduce((acc, curr) => acc + curr.length, 0); }
+        function parsearTexto(t) { /* ... MISMA LÓGICA ... */ }
+        function encontrarInterseccion(b, o) { /* ... MISMA LÓGICA ... */ }
+        function renderizarResultados(d, da) { /* ... MISMA LÓGICA ... */ }
+        function formatearDiccionario(d) { let t = ""; for (let e in d) t += `• *${e}:* ${d[e].join(', ')}\n`; return t || "Nada\n"; }
 
         function copiarTextoWhatsApp() {
             let miUsuario = document.getElementById('miUsuario').value.trim() || "MÍ";
-            
-            let textoCompartir = `⚽ *MATCH DE FIGURITAS* ⚽\n\n`;
-            textoCompartir += `✅ *A ${miUsuario.toUpperCase()} le sirven de las repetidas de ${ultimoNombreAmigo}:*\n`;
-            textoCompartir += formatearDiccionarioParaWhatsApp(ultimoMatchMeSirven);
-            
-            textoCompartir += `\n🎁 *A ${ultimoNombreAmigo} le sirven de las repetidas de ${miUsuario.toUpperCase()}:*\n`;
-            textoCompartir += formatearDiccionarioParaWhatsApp(ultimoMatchLeSirven);
-            
-            textoCompartir += `\n🔍 _Cruzá tus propias repetidas rápido y fácil acá:_\nhttps://luishacevedo.github.io/match-figuritas/`;
-
-            navigator.clipboard.writeText(textoCompartir).then(() => {
-                let btnWsp = document.getElementById('btnCopiarWhatsApp');
-                btnWsp.innerText = "¡Mensaje copiado! Pegalo en tu chat ✅";
-                btnWsp.style.backgroundColor = "#128C7E";
-                
-                setTimeout(() => {
-                    btnWsp.innerText = "📲 Copiar listado para enviar por WhatsApp";
-                    btnWsp.style.backgroundColor = "#25D366";
-                }, 3000);
-            });
+            let cMe = contarTotal(ultimoMatchMeSirven);
+            let cLe = contarTotal(ultimoMatchLeSirven);
+            let texto = `⚽ *MATCH DE FIGURITAS* ⚽\n\n✅ *${cMe} figuritas para ${miUsuario.toUpperCase()} de ${ultimoNombreAmigo}:*\n${formatearDiccionario(ultimoMatchMeSirven)}\n🎁 *${cLe} figuritas para ${ultimoNombreAmigo} de ${miUsuario.toUpperCase()}:*\n${formatearDiccionario(ultimoMatchLeSirven)}\n🔍 _Cruzá tus repetidas acá:_ https://luishacevedo.github.io/match-figuritas/`;
+            navigator.clipboard.writeText(texto).then(() => alert("¡Mensaje copiado!"));
         }
 
-        // --- RESTO DE FUNCIONES (Botones amigos, links, nube, etc) ---
-        function renderizarBotonesAmigos() {
-            let container = document.getElementById('botonesAmigos');
-            container.innerHTML = '';
-            let amigosTexto = document.getElementById('misAmigos').value;
-            if (!amigosTexto) return;
-            
-            let amigos = amigosTexto.split(',').map(a => a.trim()).filter(a => a !== "");
-            amigos.forEach(amigo => {
-                let btn = document.createElement('button');
-                btn.className = 'btn-amigo';
-                btn.innerText = `🆚 ${amigo}`;
-                btn.onclick = () => {
-                    document.getElementById('amigoUsuario').value = amigo;
-                    cargarYComparar();
-                };
-                container.appendChild(btn);
-            });
-        }
-
-        function actualizarLinkDirecto(usuario) {
-            let urlBase = window.location.origin + window.location.pathname;
-            document.getElementById('linkCompartir').value = urlBase + '?buscar=' + encodeURIComponent(usuario);
-            document.getElementById('linkPrivado').value = urlBase + '?u=' + encodeURIComponent(usuario);
-        }
-
-        function copiarLink(inputId, btnId, colorOriginal) {
-            let inputLink = document.getElementById(inputId);
-            if (!inputLink.value) { alert("Primero guardá o cargá tu perfil para generar el link."); return; }
-            inputLink.select();
-            inputLink.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(inputLink.value).then(() => {
-                let btn = document.getElementById(btnId);
-                btn.innerText = "¡Copiado!";
-                btn.style.backgroundColor = "#28a745";
-                setTimeout(() => { btn.innerText = "📋 Copiar"; btn.style.backgroundColor = colorOriginal; }, 2000);
-            });
-        }
-
-        async function cargarMiPerfil() {
-            let usuario = document.getElementById('miUsuario').value.trim();
-            let status = document.getElementById('statusMiNube');
-            if (!usuario) { alert("Ingresá tu usuario primero para poder cargar tu perfil."); return; }
-            status.style.color = "#005c98";
-            status.innerText = "Cargando...";
-
-            try {
-                const snapshot = await get(child(ref(db), `usuarios/${usuario}`));
-                if (snapshot.exists()) {
-                    let datos = snapshot.val();
-                    document.getElementById('miLista').value = datos.textoOriginal || "";
-                    document.getElementById('misAmigos').value = datos.amigos || "";
-                    renderizarBotonesAmigos();
-                    actualizarLinkDirecto(usuario);
-                    status.style.color = "green";
-                    status.innerText = "¡Perfil cargado!";
-                } else {
-                    status.style.color = "red";
-                    status.innerText = "No se encontró tu perfil. Guardalo primero.";
-                }
-            } catch (error) {
-                status.style.color = "red";
-                status.innerText = "Error al cargar.";
-                console.error(error);
-            }
-        }
-
-        async function guardarMisDatos() {
-            let usuario = document.getElementById('miUsuario').value.trim();
-            let texto = document.getElementById('miLista').value.trim();
-            let amigos = document.getElementById('misAmigos').value.trim();
-            let status = document.getElementById('statusMiNube');
-
-            if (!usuario || !texto) { alert("Por favor, ingresá un nombre de usuario y pegá tu texto de figuritas."); return; }
-            status.style.color = "#005c98";
-            status.innerText = "Guardando...";
-            
-            try {
-                await set(ref(db, 'usuarios/' + usuario), {
-                    textoOriginal: texto,
-                    amigos: amigos,
-                    ultimaActualizacion: new Date().toLocaleString()
-                });
-                renderizarBotonesAmigos();
-                actualizarLinkDirecto(usuario);
-                status.style.color = "green";
-                status.innerText = "¡Guardado con éxito en la nube!";
-            } catch (error) {
-                status.style.color = "red";
-                status.innerText = "Error al guardar.";
-                console.error(error);
-            }
-        }
-
-        async function cargarYComparar() {
-            let textoMio = document.getElementById('miLista').value.trim();
-            let usuarioAmigo = document.getElementById('amigoUsuario').value.trim();
-            let status = document.getElementById('statusAmigo');
-
-            if (!textoMio) { alert("Primero cargá o pegá tu propia lista en la caja de la izquierda."); return; }
-            if (!usuarioAmigo) { alert("Ingresá el nombre de usuario de tu amigo para buscarlo."); return; }
-
-            status.style.color = "#005c98";
-            status.innerText = `Buscando a ${usuarioAmigo}...`;
-
-            try {
-                const snapshot = await get(child(ref(db), `usuarios/${usuarioAmigo}`));
-                if (snapshot.exists()) {
-                    let datosAmigo = snapshot.val();
-                    document.getElementById('amigoLista').value = datosAmigo.textoOriginal;
-                    ejecutarComparacion(textoMio, datosAmigo.textoOriginal, usuarioAmigo);
-                    status.style.color = "green";
-                    status.innerText = `¡Lista de ${usuarioAmigo} cargada!`;
-                } else {
-                    status.style.color = "red";
-                    status.innerText = `No se encontró el usuario '${usuarioAmigo}'.`;
-                }
-            } catch (error) {
-                status.style.color = "red";
-                status.innerText = "Error al buscar.";
-                console.error(error);
-            }
-        }
-
-        function compararListasLocales() {
-            let textoMio = document.getElementById('miLista').value;
-            let textoAmigo = document.getElementById('amigoLista').value;
-            if (!textoMio || !textoAmigo) { alert("Faltan datos para comparar."); return; }
-            ejecutarComparacion(textoMio, textoAmigo, "TU AMIGO");
-            document.getElementById('statusAmigo').innerText = "";
-        }
-
-        function limpiarBuscador() {
-            document.getElementById('amigoUsuario').value = '';
-            document.getElementById('amigoLista').value = '';
-            document.getElementById('statusAmigo').innerText = '';
-            document.getElementById('resultados').style.display = 'none';
-        }
-
-        // --- ASIGNACIÓN DE EVENTOS A LOS BOTONES ---
-        document.getElementById('btnCargarPerfil').addEventListener('click', cargarMiPerfil);
-        document.getElementById('btnGuardarNube').addEventListener('click', guardarMisDatos);
-        document.getElementById('btnBuscarAmigo').addEventListener('click', cargarYComparar);
-        document.getElementById('btnCompararLocal').addEventListener('click', compararListasLocales);
-        document.getElementById('btnLimpiar').addEventListener('click', limpiarBuscador);
-        
-        document.getElementById('btnCopiarPublico').addEventListener('click', () => copiarLink('linkCompartir', 'btnCopiarPublico', '#17a2b8'));
-        document.getElementById('btnCopiarPrivado').addEventListener('click', () => copiarLink('linkPrivado', 'btnCopiarPrivado', '#6c757d'));
-        
-        document.getElementById('btnCopiarWhatsApp').addEventListener('click', copiarTextoWhatsApp);
-
-        // --- CARGA AUTOMÁTICA POR URL ---
-        window.onload = async function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const userMio = urlParams.get('u');
-            if (userMio) {
-                document.getElementById('miUsuario').value = userMio;
-                cargarMiPerfil();
-            }
-
-            const userAmigo = urlParams.get('buscar');
-            if (userAmigo) {
-                document.getElementById('amigoUsuario').value = userAmigo;
-                let status = document.getElementById('statusAmigo');
-                status.style.color = "#005c98";
-                status.innerText = `Cargando lista de ${userAmigo}...`;
-                
-                try {
-                    const snapshot = await get(child(ref(db), `usuarios/${userAmigo}`));
-                    if (snapshot.exists()) {
-                        let datosAmigo = snapshot.val();
-                        document.getElementById('amigoLista').value = datosAmigo.textoOriginal;
-                        status.style.color = "green";
-                        status.innerText = `¡Lista de ${userAmigo} descargada! Ingresá tu perfil a la izquierda para comparar.`;
-                    } else {
-                        status.style.color = "red";
-                        status.innerText = `No se encontró el usuario '${userAmigo}'.`;
-                    }
-                } catch (error) {
-                    status.style.color = "red";
-                    status.innerText = "Error al descargar lista compartida.";
-                }
-            }
-        };
+        // --- (MANTENER TODOS LOS EVENT LISTENERS Y FUNCIONES DE FIREBASE QUE YA TENÍAS) ---
     </script>
 </body>
 </html>
