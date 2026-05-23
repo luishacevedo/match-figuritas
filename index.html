@@ -29,6 +29,7 @@
         .btn-yellow { background-color: var(--yellow); color: #333; }
         .btn-wsp { background-color: var(--wsp); box-shadow: 0 4px 6px rgba(37,211,102,0.3); }
         .btn-wsp-small { background-color: var(--wsp); color: white; }
+        .btn-amigo { background-color: #17a2b8; width: auto; font-size: 12px; padding: 6px 10px; margin-right: 5px; margin-bottom: 5px; display: inline-block; }
         
         /* BOTONES DE AMIGOS CON CRUZ DE BORRAR */
         .amigo-wrapper { display: inline-flex; align-items: stretch; background-color: #17a2b8; border-radius: 6px; overflow: hidden; margin-right: 6px; margin-bottom: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
@@ -195,7 +196,6 @@
         document.getElementById('btnCopiarPortapapeles').addEventListener('click', copiarTextoPortapapeles);
         document.getElementById('btnCopiarWhatsApp').addEventListener('click', abrirWhatsAppConTexto);
         
-        // NUEVO EVENTO PARA GUARDAR AMIGO
         document.getElementById('btnGuardarAmigoNuevo').addEventListener('click', guardarAmigoNuevo);
 
         function parsearTexto(texto) {
@@ -293,7 +293,6 @@
             }
         }
 
-        // REDISEÑO: BOTONES DE AMIGOS CON CRUZ DE BORRAR
         function renderizarBotonesAmigos() {
             let container = document.getElementById('botonesAmigos');
             container.innerHTML = '';
@@ -324,7 +323,6 @@
             });
         }
 
-        // NUEVA FUNCIÓN: ELIMINAR AMIGO
         function eliminarAmigoFrecuente(amigoAEliminar) {
             if(confirm(`¿Estás seguro de que querés borrar a ${amigoAEliminar} de tus amigos frecuentes?`)) {
                 let misAmigosInput = document.getElementById('misAmigos');
@@ -347,7 +345,6 @@
             }
         }
 
-        // NUEVA FUNCIÓN: GUARDAR AMIGO NUEVO
         async function guardarAmigoNuevo() {
             let miUsuario = document.getElementById('miUsuario').value.trim();
             let amigoUsuario = document.getElementById('amigoUsuario').value.trim();
@@ -360,21 +357,18 @@
             status.style.color = "#005c98"; status.innerText = "Guardando amigo...";
 
             try {
-                // 1. Guardar la lista en la nube a nombre del amigo
                 await set(ref(db, 'usuarios/' + amigoUsuario), {
                     textoOriginal: amigoTexto,
                     amigos: "",
                     ultimaActualizacion: new Date().toLocaleString()
                 });
 
-                // 2. Agregarlo a mi caja de amigos
                 let misAmigosInput = document.getElementById('misAmigos');
                 let amigosActuales = misAmigosInput.value.split(',').map(a => a.trim()).filter(a => a !== "");
                 if (!amigosActuales.includes(amigoUsuario)) {
                     amigosActuales.push(amigoUsuario);
                     misAmigosInput.value = amigosActuales.join(', ');
                     
-                    // 3. Actualizar MI perfil en la nube para que quede guardado
                     let miTexto = document.getElementById('miLista').value.trim();
                     await set(ref(db, 'usuarios/' + miUsuario), {
                         textoOriginal: miTexto,
@@ -441,10 +435,13 @@
             let textoMeSirven = obtenerDesglose(ultimoMatchMeSirven);
             let textoLeSirven = obtenerDesglose(ultimoMatchLeSirven);
             
+            // Agregamos la lógica para levantar el link público generado en la pantalla
+            let linkPublico = document.getElementById('linkCompartir').value || "https://luishacevedo.github.io/match-figuritas/";
+            
             let texto = `⚽ *MATCH DE FIGURITAS* ⚽\n\n`;
-            texto += `✅ *Para ${miUsuario.toUpperCase()} de ${ultimoNombreAmigo}:*\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven)}`;
-            texto += `\n🎁 *Para ${ultimoNombreAmigo} de ${miUsuario.toUpperCase()}:*\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven)}`;
-            texto += `\n🔍 _Cruzá tus repetidas acá:_ https://luishacevedo.github.io/match-figuritas/`;
+            texto += `✅ *A mí (${miUsuario.toUpperCase()}) me sirven de ${ultimoNombreAmigo}:*\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven)}`;
+            texto += `\n🎁 *A ${ultimoNombreAmigo} le sirven de las mías:*\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven)}`;
+            texto += `\n🔍 _Cruzá tus repetidas conmigo acá:_\n👉 ${linkPublico}`;
             
             return texto;
         }
