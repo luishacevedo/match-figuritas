@@ -160,7 +160,7 @@
 
     <div class="footer">
         <p>Herramienta web gratuita para potenciar tus intercambios.</p>
-        <p style="margin-top: 10px;">Contacto: <a href="https://web.telegram.org/k/#@luishacevedo" target="_blank">Telegram @luishacevedo</a></p>
+        <p style="margin-top: 10px;">Contacto: <a href="https://t.me/luishacevedo" target="_blank">Telegram @luishacevedo</a></p>
     </div>
 
     <script type="module">
@@ -198,9 +198,7 @@
         
         document.getElementById('btnGuardarAmigoNuevo').addEventListener('click', guardarAmigoNuevo);
 
-        // NUEVA LÓGICA PARA LIMPIAR EMOJIS Y SÍMBOLOS RAROS
         function limpiarNombreEquipo(textoRaw) {
-            // Elimina asteriscos, comillas, guiones, emojis y espacios al final
             return textoRaw.replace(/[*"'-]/g, '') 
                            .replace(/[\u{1F300}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F1E6}-\u{1F1FF}]/gu, '')
                            .trim();
@@ -217,14 +215,12 @@
                 else if (seccionActual && linea.includes(':')) {
                     let partes = linea.split(':');
                     
-                    // Aca aplicamos la limpieza para que siempre lea bien las siglas
                     let equipoOriginal = partes[0];
                     let equipoLimpio = limpiarNombreEquipo(equipoOriginal);
                     
                     let numeros = partes[1].split(',').map(n => n.trim()).filter(n => n !== "");
                     
                     if (equipoLimpio && numeros.length > 0) { 
-                        // Si ya existe la sigla (ej: FWC aparece dos veces), junta los arrays
                         if (datos[seccionActual][equipoLimpio]) {
                             datos[seccionActual][equipoLimpio] = datos[seccionActual][equipoLimpio].concat(numeros);
                         } else {
@@ -234,7 +230,6 @@
                 }
             });
             
-            // Ordenar los números de cada equipo de menor a mayor y sacar duplicados
             for(let seccion in datos) {
                 for(let equipo in datos[seccion]) {
                     let numerosUnicos = [...new Set(datos[seccion][equipo])];
