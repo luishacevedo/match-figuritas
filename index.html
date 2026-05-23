@@ -27,13 +27,17 @@
         .btn-danger { background-color: var(--danger); }
         .btn-secondary { background-color: var(--secondary); }
         .btn-yellow { background-color: var(--yellow); color: #333; }
-        .btn-wsp { background-color: var(--wsp); font-size: 15px; margin-top: 15px; padding: 12px; box-shadow: 0 4px 6px rgba(37,211,102,0.3); }
+        .btn-wsp { background-color: var(--wsp); box-shadow: 0 4px 6px rgba(37,211,102,0.3); }
+        .btn-wsp-small { background-color: var(--wsp); color: white; }
         .btn-amigo { background-color: #17a2b8; width: auto; font-size: 12px; padding: 6px 10px; margin-right: 5px; margin-bottom: 5px; display: inline-block; }
         
         /* LAYOUTS FLEXIBLES */
         .flex-row { display: flex; gap: 8px; margin-bottom: 15px; align-items: stretch; }
         .flex-row input { margin-bottom: 0; flex: 1; }
         .flex-row button { width: auto; white-space: nowrap; margin: 0; padding: 0 15px; }
+        
+        .botones-resultados { display: flex; gap: 15px; margin-top: 25px; }
+        .botones-resultados button { padding: 12px; font-size: 15px; }
 
         /* RESULTADOS Y TEXTOS */
         .resultados { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-top: 20px; display: none; border: 1px solid #e9ecef;}
@@ -56,6 +60,7 @@
             input, button { font-size: 13px; padding: 10px; }
             textarea { font-size: 12px; height: 110px; }
             .flex-row button { padding: 0 10px; }
+            .botones-resultados { flex-direction: column; gap: 10px; }
             .resultados { padding: 15px; }
             .team-row { font-size: 13px; }
         }
@@ -96,13 +101,13 @@
                 <label style="color: var(--primary);">📢 Link Público (Para compartir):</label>
                 <div class="flex-row">
                     <input type="text" id="linkCompartir" readonly style="background: #e9ecef; font-size: 11px;">
-                    <button id="btnCompartirPublico" style="background: var(--wsp); color: white;">📲 WhatsApp</button>
+                    <button id="btnCompartirPublico" class="btn-wsp-small" style="padding: 0 10px;">📲 WhatsApp</button>
                 </div>
 
                 <label style="color: var(--danger);">🔒 Link Privado (Tus favoritos):</label>
                 <div class="flex-row" style="margin-bottom: 10px;">
                     <input type="text" id="linkPrivado" readonly style="background: #f8d7da; border-color: #f5c6cb; font-size: 11px;">
-                    <button id="btnCopiarPrivado" class="btn-secondary">📋 Copiar</button>
+                    <button id="btnCopiarPrivado" class="btn-secondary" style="padding: 0 10px;">📋 Copiar</button>
                 </div>
                 
                 <button id="btnInstalar" class="btn-yellow">📱 Instalar App en Android</button>
@@ -138,7 +143,10 @@
         <h3 id="tituloLeSirven">🎁 Le sirven:</h3>
         <div id="leSirven"></div>
         
-        <button id="btnCopiarWhatsApp" class="btn-wsp">📲 Enviar Match por WhatsApp</button>
+        <div class="botones-resultados">
+            <button id="btnCopiarPortapapeles" class="btn-primary">📋 Copiar Texto</button>
+            <button id="btnCopiarWhatsApp" class="btn-wsp">📲 Enviar por WhatsApp</button>
+        </div>
     </div>
 
     <div class="footer">
@@ -174,8 +182,10 @@
         
         document.getElementById('btnCompartirPublico').addEventListener('click', compartirWhatsAppPublico);
         document.getElementById('btnCopiarPrivado').addEventListener('click', () => copiarLink('linkPrivado', 'btnCopiarPrivado', '#6c757d', true));
-        document.getElementById('btnCopiarWhatsApp').addEventListener('click', copiarTextoWhatsApp);
         document.getElementById('btnInstalar').addEventListener('click', mostrarInstruccionesAndroid);
+        
+        document.getElementById('btnCopiarPortapapeles').addEventListener('click', copiarTextoPortapapeles);
+        document.getElementById('btnCopiarWhatsApp').addEventListener('click', abrirWhatsAppConTexto);
 
         function parsearTexto(texto) {
             let datos = { faltan: {}, repetidas: {} };
@@ -243,7 +253,6 @@
             
             document.getElementById('resultados').style.display = 'block';
             
-            // Scrollear hacia los resultados en móviles
             if(window.innerWidth <= 768) {
                 document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
             }
@@ -314,7 +323,7 @@
             return hayDatos ? texto : "Nada por ahora 😢\n";
         }
 
-        function copiarTextoWhatsApp() {
+        function generarTextoResultados() {
             let miUsuario = document.getElementById('miUsuario').value.trim() || "MÍ";
             let cantMe = contarTotal(ultimoMatchMeSirven);
             let cantLe = contarTotal(ultimoMatchLeSirven);
@@ -323,7 +332,22 @@
             texto += `✅ *${cantMe} figuritas para ${miUsuario.toUpperCase()} de ${ultimoNombreAmigo}:*\n` + formatearDiccionario(ultimoMatchMeSirven);
             texto += `\n🎁 *${cantLe} figuritas para ${ultimoNombreAmigo} de ${miUsuario.toUpperCase()}:*\n` + formatearDiccionario(ultimoMatchLeSirven);
             texto += `\n🔍 _Cruzá tus repetidas acá:_ https://luishacevedo.github.io/match-figuritas/`;
+            
+            return texto;
+        }
 
+        function copiarTextoPortapapeles() {
+            let texto = generarTextoResultados();
+            navigator.clipboard.writeText(texto).then(() => {
+                let btn = document.getElementById('btnCopiarPortapapeles');
+                btn.innerText = "¡Copiado! ✅";
+                btn.style.backgroundColor = "#28a745";
+                setTimeout(() => { btn.innerText = "📋 Copiar Texto"; btn.style.backgroundColor = "var(--primary)"; }, 3000);
+            });
+        }
+
+        function abrirWhatsAppConTexto() {
+            let texto = generarTextoResultados();
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
