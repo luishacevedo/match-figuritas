@@ -7,24 +7,22 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
     
     <style>
-        :root { --primary: #005c98; --secondary: #6c757d; --success: #28a745; --danger: #dc3545; --wsp: #25D366; }
+        :root { --primary: #005c98; --success: #28a745; --danger: #dc3545; --yellow: #ffc107; --wsp: #25D366; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; padding: 20px; max-width: 950px; margin: auto; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
-        .box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #eef; }
-        textarea { width: 100%; height: 160px; padding: 12px; border: 1px solid #ced4da; border-radius: 8px; font-family: monospace; box-sizing: border-box; margin-top: 5px; }
-        input { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; }
+        .box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        textarea { width: 100%; height: 160px; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-family: monospace; box-sizing: border-box; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; }
         button { width: 100%; padding: 12px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; margin-top: 8px; transition: 0.2s; }
         button:hover { filter: brightness(1.1); }
         .btn-success { background-color: var(--success); }
-        .btn-yellow { background-color: #ffc107; color: #333; margin-bottom: 15px; }
+        .btn-yellow { background-color: var(--yellow); color: #333; }
         .btn-primary { background-color: var(--primary); }
         .btn-danger { background-color: var(--danger); }
         .btn-wsp { background-color: var(--wsp); font-size: 16px; margin-top: 20px; }
         .resultados { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: 20px; display: none; }
         h3 { color: #333; border-bottom: 2px solid #005c98; padding-bottom: 5px; margin-top: 0; }
-        .team-row { margin: 5px 0; }
-        .team-name { font-weight: bold; margin-right: 10px; }
         .footer { text-align: center; margin-top: 40px; color: #666; font-size: 14px; }
         .footer a { color: var(--primary); font-weight: bold; text-decoration: none; }
     </style>
@@ -39,12 +37,21 @@
             <label><b>Usuario:</b></label>
             <input type="text" id="miUsuario" placeholder="Tu usuario...">
             <button id="btnCargarPerfil" class="btn-yellow">⬇️ Cargar mis datos</button>
-            <label><b>Mis Amigos (separados por coma):</b></label>
-            <input type="text" id="misAmigos" placeholder="Ej: Guada, Pilar, Fede">
+            <label><b>Mis Amigos:</b></label>
+            <input type="text" id="misAmigos" placeholder="Ej: Guada, Pilar">
             <label><b>Mis Figuritas:</b></label>
             <textarea id="miLista" placeholder="Pegá acá tu lista..."></textarea>
             <button id="btnGuardarNube" class="btn-success">☁️ Guardar en la Nube</button>
-            <div id="statusMiNube" style="font-size: 12px; text-align: center; margin-top: 5px;"></div>
+            
+            <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 10px;">
+                <label style="font-size: 12px;"><b>📢 Compartir:</b></label>
+                <input type="text" id="linkCompartir" readonly style="font-size: 11px; background: #eee;">
+                <button id="btnCopiarPublico" class="btn-primary" style="padding: 6px;">📋 Copiar Link</button>
+                
+                <label style="font-size: 12px; color: red;"><b>🔒 Privado (No compartir):</b></label>
+                <input type="text" id="linkPrivado" readonly style="font-size: 11px; background: #fee;">
+                <button id="btnCopiarPrivado" class="btn-primary" style="padding: 6px; background: #6c757d;">📋 Copiar Privado</button>
+            </div>
         </div>
 
         <div class="box">
@@ -56,7 +63,7 @@
                 <button id="btnBuscarAmigo" class="btn-primary">🔍 Comparar</button>
                 <button id="btnLimpiar" class="btn-danger">🧹 Limpiar</button>
             </div>
-            <div id="statusAmigo" style="font-size: 12px; text-align: center; margin-top: 5px;"></div>
+            <div id="statusAmigo" style="text-align:center; font-size:12px; margin-top:10px;"></div>
         </div>
     </div>
 
@@ -69,55 +76,124 @@
     </div>
 
     <div class="footer">
-        <p>Herramienta para potenciar tus intercambios.</p>
-        <p>Contacto: <a href="https://web.telegram.org/k/#@luishacevedo" target="_blank">Telegram @luishacevedo</a> | <a href="TU_LINKEDIN" target="_blank">LinkedIn</a></p>
+        <p>Contacto: <a href="https://web.telegram.org/k/#@luishacevedo" target="_blank">Telegram @luishacevedo</a> | <a href="TU_LINKEDIN_AQUI" target="_blank">LinkedIn</a></p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-        // CONFIG (Mantené tu config original)
         const firebaseConfig = { apiKey: "AIzaSyAPGcn1zq1NPTrfcAZ1a1xLIjZ6IwDwMoY", authDomain: "match-figuritas-app.firebaseapp.com", databaseURL: "https://match-figuritas-app-default-rtdb.firebaseio.com", projectId: "match-figuritas-app", storageBucket: "match-figuritas-app.firebasestorage.app", messagingSenderId: "13972953348", appId: "1:13972953348:web:2d60c62f4bd2e5e0ac5851" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
         let ultimoMatchMeSirven = {}, ultimoMatchLeSirven = {}, ultimoNombreAmigo = "";
 
+        document.getElementById('btnCargarPerfil').onclick = cargarMiPerfil;
+        document.getElementById('btnGuardarNube').onclick = guardarMisDatos;
+        document.getElementById('btnBuscarAmigo').onclick = cargarYComparar;
+        document.getElementById('btnLimpiar').onclick = limpiarBuscador;
+        document.getElementById('btnCopiarPublico').onclick = () => copiarLink('linkCompartir', 'btnCopiarPublico', '#005c98');
+        document.getElementById('btnCopiarPrivado').onclick = () => copiarLink('linkPrivado', 'btnCopiarPrivado', '#6c757d');
+        document.getElementById('btnCopiarWhatsApp').onclick = copiarTextoWhatsApp;
+
         function ejecutarComparacion(textoMio, textoAmigo, nombreAmigo = "TU AMIGO") {
             let misDatos = parsearTexto(textoMio);
             let amigoDatos = parsearTexto(textoAmigo);
-            
             ultimoMatchMeSirven = encontrarInterseccion(misDatos.faltan, amigoDatos.repetidas);
             ultimoMatchLeSirven = encontrarInterseccion(amigoDatos.faltan, misDatos.repetidas);
             ultimoNombreAmigo = nombreAmigo;
-
-            let cantMe = contarTotal(ultimoMatchMeSirven);
-            let cantLe = contarTotal(ultimoMatchLeSirven);
-
+            let cMe = contarTotal(ultimoMatchMeSirven);
+            let cLe = contarTotal(ultimoMatchLeSirven);
             renderizarResultados('meSirven', ultimoMatchMeSirven);
             renderizarResultados('leSirven', ultimoMatchLeSirven);
-            
-            document.getElementById('tituloMeSirven').innerHTML = `✅ A VOS te sirven ${cantMe} figuritas de ${nombreAmigo}:`;
-            document.getElementById('tituloLeSirven').innerHTML = `🎁 A ${nombreAmigo} le sirven ${cantLe} figuritas tuyas:`;
+            document.getElementById('tituloMeSirven').innerHTML = `✅ Te sirven ${cMe} de ${nombreAmigo}:`;
+            document.getElementById('tituloLeSirven').innerHTML = `🎁 A ${nombreAmigo} le sirven ${cLe} tuyas:`;
             document.getElementById('resultados').style.display = 'block';
         }
 
-        function contarTotal(datos) { return Object.values(datos).reduce((acc, curr) => acc + curr.length, 0); }
-        function parsearTexto(t) { /* ... MISMA LÓGICA ... */ }
-        function encontrarInterseccion(b, o) { /* ... MISMA LÓGICA ... */ }
-        function renderizarResultados(d, da) { /* ... MISMA LÓGICA ... */ }
-        function formatearDiccionario(d) { let t = ""; for (let e in d) t += `• *${e}:* ${d[e].join(', ')}\n`; return t || "Nada\n"; }
-
-        function copiarTextoWhatsApp() {
-            let miUsuario = document.getElementById('miUsuario').value.trim() || "MÍ";
-            let cMe = contarTotal(ultimoMatchMeSirven);
-            let cLe = contarTotal(ultimoMatchLeSirven);
-            let texto = `⚽ *MATCH DE FIGURITAS* ⚽\n\n✅ *${cMe} figuritas para ${miUsuario.toUpperCase()} de ${ultimoNombreAmigo}:*\n${formatearDiccionario(ultimoMatchMeSirven)}\n🎁 *${cLe} figuritas para ${ultimoNombreAmigo} de ${miUsuario.toUpperCase()}:*\n${formatearDiccionario(ultimoMatchLeSirven)}\n🔍 _Cruzá tus repetidas acá:_ https://luishacevedo.github.io/match-figuritas/`;
-            navigator.clipboard.writeText(texto).then(() => alert("¡Mensaje copiado!"));
+        function contarTotal(d) { return Object.values(d).reduce((a, c) => a + c.length, 0); }
+        function parsearTexto(t) {
+            let d = { faltan: {}, repetidas: {} }; let s = null;
+            t.split('\n').forEach(l => {
+                if (l.includes('Me faltan')) s = 'faltan';
+                else if (l.includes('Repetidas')) s = 'repetidas';
+                else if (s && l.includes(':')) { let p = l.split(':'); d[s][p[0].trim()] = p[1].split(',').map(n => n.trim()).filter(n => n); }
+            }); return d;
         }
-
-        // --- (MANTENER TODOS LOS EVENT LISTENERS Y FUNCIONES DE FIREBASE QUE YA TENÍAS) ---
+        function encontrarInterseccion(b, o) {
+            let m = {}; for (let k in b) if (o[k]) { let c = b[k].filter(n => o[k].includes(n)); if (c.length) m[k] = c; } return m;
+        }
+        function renderizarResultados(id, d) {
+            let div = document.getElementById(id); div.innerHTML = '';
+            for (let k in d) div.innerHTML += `<div class="team-row"><b>${k}:</b> ${d[k].join(', ')}</div>`;
+            if (!Object.keys(d).length) div.innerHTML = 'Nada por ahora 😢';
+        }
+        function copiarTextoWhatsApp() {
+            let u = document.getElementById('miUsuario').value.trim() || "MÍ";
+            let t = `⚽ MATCH FIGUS\n\n✅ ${contarTotal(ultimoMatchMeSirven)} para ${u.toUpperCase()} de ${ultimoNombreAmigo}:\n` + formatear(ultimoMatchMeSirven);
+            t += `\n🎁 ${contarTotal(ultimoMatchLeSirven)} para ${ultimoNombreAmigo} de ${u.toUpperCase()}:\n` + formatear(ultimoMatchLeSirven);
+            t += `\n🔍 Cruzá tus repetidas acá: https://luishacevedo.github.io/match-figuritas/`;
+            navigator.clipboard.writeText(t).then(() => alert("¡Mensaje copiado!"));
+        }
+        function formatear(d) { let t = ""; for (let k in d) t += `• ${k}: ${d[k].join(', ')}\n`; return t || "Nada\n"; }
+        function copiarLink(id, b, c) { let i = document.getElementById(id); i.select(); navigator.clipboard.writeText(i.value).then(() => alert("Copiado")); }
+        async function cargarMiPerfil() {
+            let u = document.getElementById('miUsuario').value.trim();
+            let s = document.getElementById('statusMiNube');
+            try {
+                const snap = await get(child(ref(db), `usuarios/${u}`));
+                if (snap.exists()) {
+                    let d = snap.val();
+                    document.getElementById('miLista').value = d.textoOriginal || "";
+                    document.getElementById('misAmigos').value = d.amigos || "";
+                    renderizarBotones();
+                    document.getElementById('linkCompartir').value = window.location.origin + window.location.pathname + '?buscar=' + encodeURIComponent(u);
+                    document.getElementById('linkPrivado').value = window.location.origin + window.location.pathname + '?u=' + encodeURIComponent(u);
+                    s.innerText = "¡Perfil cargado!";
+                } else alert("Usuario no encontrado.");
+            } catch (e) { alert("Error."); }
+        }
+        async function guardarMisDatos() {
+            let u = document.getElementById('miUsuario').value.trim();
+            let t = document.getElementById('miLista').value.trim();
+            let a = document.getElementById('misAmigos').value.trim();
+            try {
+                await set(ref(db, 'usuarios/' + u), { textoOriginal: t, amigos: a });
+                renderizarBotones();
+                document.getElementById('linkCompartir').value = window.location.origin + window.location.pathname + '?buscar=' + encodeURIComponent(u);
+                document.getElementById('linkPrivado').value = window.location.origin + window.location.pathname + '?u=' + encodeURIComponent(u);
+                alert("Guardado!");
+            } catch (e) { alert("Error."); }
+        }
+        function renderizarBotones() {
+            let cont = document.getElementById('botonesAmigos'); cont.innerHTML = '';
+            document.getElementById('misAmigos').value.split(',').forEach(a => {
+                let b = document.createElement('button'); b.className = 'btn-amigo'; b.innerText = '🆚 ' + a.trim();
+                b.onclick = () => { document.getElementById('amigoUsuario').value = a.trim(); cargarYComparar(); };
+                cont.appendChild(b);
+            });
+        }
+        async function cargarYComparar() {
+            let u = document.getElementById('amigoUsuario').value.trim();
+            try {
+                const snap = await get(child(ref(db), `usuarios/${u}`));
+                if (snap.exists()) {
+                    document.getElementById('amigoLista').value = snap.val().textoOriginal;
+                    ejecutarComparacion(document.getElementById('miLista').value, snap.val().textoOriginal, u);
+                } else alert("Usuario no encontrado.");
+            } catch (e) { alert("Error."); }
+        }
+        function limpiarBuscador() {
+            document.getElementById('amigoUsuario').value = '';
+            document.getElementById('amigoLista').value = '';
+            document.getElementById('resultados').style.display = 'none';
+        }
+        window.onload = async function() {
+            const p = new URLSearchParams(window.location.search);
+            if (p.get('u')) { document.getElementById('miUsuario').value = p.get('u'); cargarMiPerfil(); }
+            if (p.get('buscar')) { document.getElementById('amigoUsuario').value = p.get('buscar'); cargarYComparar(); }
+        };
     </script>
 </body>
 </html>
