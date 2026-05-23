@@ -18,6 +18,8 @@
         .btn-yellow:hover { background-color: #e0a800; }
         .btn-amigo { background-color: #17a2b8; width: auto; font-size: 13px; padding: 8px 12px; margin-right: 5px; margin-bottom: 5px;}
         .btn-amigo:hover { background-color: #138496; }
+        .btn-limpiar { background-color: #dc3545; padding: 8px; font-size: 13px; margin-top: 10px;}
+        .btn-limpiar:hover { background-color: #c82333; }
         .resultados { margin-top: 20px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none;}
         h3 { color: #333; border-bottom: 2px solid #005c98; padding-bottom: 5px; margin-top: 0;}
         .match-list { margin-bottom: 20px; }
@@ -63,8 +65,12 @@
             </div>
             
             <label style="display:block; margin-top:20px; font-size: 12px; color: gray;">(Opcional) Texto de la App de tu amigo:</label>
-            <textarea id="amigoLista" placeholder="Si no tiene usuario, pegá su texto acá y usá el botón de abajo..." style="height: 60px; font-size: 11px;"></textarea>
-            <button style="background-color: #6c757d; padding: 8px;" onclick="compararListasLocales()">Comparar sin nube</button>
+            <textarea id="amigoLista" placeholder="Si no tiene usuario, pegá su texto acá..." style="height: 60px; font-size: 11px;"></textarea>
+            
+            <div style="display: flex; gap: 10px;">
+                <button style="background-color: #6c757d; padding: 8px; font-size: 13px;" onclick="compararListasLocales()">Comparar sin nube</button>
+                <button class="btn-limpiar" onclick="limpiarBuscador()">🧹 Limpiar</button>
+            </div>
             <div id="statusAmigo" class="status"></div>
         </div>
     </div>
@@ -81,7 +87,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-        // Tus credenciales
         const firebaseConfig = {
             apiKey: "AIzaSyAPGcn1zq1NPTrfcAZ1a1xLIjZ6IwDwMoY",
             authDomain: "match-figuritas-app.firebaseapp.com",
@@ -94,6 +99,16 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+
+        // --- CARGA AUTOMÁTICA POR URL ---
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userQuery = urlParams.get('u');
+            if (userQuery) {
+                document.getElementById('miUsuario').value = userQuery;
+                window.cargarMiPerfil();
+            }
+        };
 
         // --- LÓGICA DE TEXTO ---
         function parsearTexto(texto) {
@@ -149,7 +164,6 @@
             renderizarResultados('meSirven', meSirven);
             renderizarResultados('leSirven', leSirven);
             
-            // Actualizar títulos con el nombre
             document.querySelectorAll('#resultados h3')[0].innerHTML = `✅ A VOS te sirven de las repetidas de ${nombreAmigo}:`;
             document.querySelectorAll('#resultados h3')[1].innerHTML = `🎁 A ${nombreAmigo} le sirven de tus repetidas:`;
             
@@ -166,7 +180,7 @@
             amigos.forEach(amigo => {
                 let btn = document.createElement('button');
                 btn.className = 'btn-amigo';
-                btn.innerText = `🆚 Comparar con ${amigo}`;
+                btn.innerText = `🆚 ${amigo}`;
                 btn.onclick = () => {
                     document.getElementById('amigoUsuario').value = amigo;
                     window.cargarYComparar();
@@ -176,6 +190,13 @@
         }
 
         // --- BOTONES ---
+        window.limpiarBuscador = function() {
+            document.getElementById('amigoUsuario').value = '';
+            document.getElementById('amigoLista').value = '';
+            document.getElementById('statusAmigo').innerText = '';
+            document.getElementById('resultados').style.display = 'none';
+        };
+
         window.cargarMiPerfil = async function() {
             let usuario = document.getElementById('miUsuario').value.trim();
             let status = document.getElementById('statusMiNube');
@@ -261,25 +282,4 @@
                     status.innerText = `¡Lista de ${usuarioAmigo} cargada!`;
                 } else {
                     status.style.color = "red";
-                    status.innerText = `No se encontró el usuario '${usuarioAmigo}'.`;
-                }
-            } catch (error) {
-                status.style.color = "red";
-                status.innerText = "Error al buscar.";
-                console.error(error);
-            }
-        };
-
-        window.compararListasLocales = function() {
-            let textoMio = document.getElementById('miLista').value;
-            let textoAmigo = document.getElementById('amigoLista').value;
-            if (!textoMio || !textoAmigo) {
-                alert("Faltan datos para comparar.");
-                return;
-            }
-            ejecutarComparacion(textoMio, textoAmigo, "TU AMIGO");
-            document.getElementById('statusAmigo').innerText = "";
-        };
-    </script>
-</body>
-</html>
+                    status.innerText = `No se encontró el usuario '${
