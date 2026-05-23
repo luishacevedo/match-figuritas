@@ -40,7 +40,7 @@
             <label><b>Mi Usuario (Ej: Luis2026):</b></label>
             <input type="text" id="miUsuario" placeholder="Inventá un nombre único...">
             
-            <button class="btn-yellow" onclick="cargarMiPerfil()">⬇️ Cargar mi perfil guardado</button>
+            <button id="btnCargarPerfil" class="btn-yellow">⬇️ Cargar mi perfil guardado</button>
             
             <label><b>Mis Amigos Habituales (separados por coma):</b></label>
             <input type="text" id="misAmigos" placeholder="Ej: Guada, Pilar, FedeQatar">
@@ -48,7 +48,7 @@
             <label><b>Pegá tu texto de la App acá:</b></label>
             <textarea id="miLista" placeholder="Pegá tu lista de faltantes y repetidas..."></textarea>
             
-            <button class="btn-green" onclick="guardarMisDatos()">☁️ Guardar mis figuritas en la nube</button>
+            <button id="btnGuardarNube" class="btn-green">☁️ Guardar mis figuritas en la nube</button>
             <div id="statusMiNube" class="status"></div>
         </div>
 
@@ -61,15 +61,15 @@
             <label style="margin-top: 15px; display: block;"><b>Buscar otro usuario manualmente:</b></label>
             <div style="display: flex; gap: 10px;">
                 <input type="text" id="amigoUsuario" placeholder="Ej: FedeQatar" style="margin-top:0;">
-                <button onclick="cargarYComparar()" style="margin-top:0; width: auto; white-space: nowrap;">🔍 Buscar</button>
+                <button id="btnBuscarAmigo" style="margin-top:0; width: auto; white-space: nowrap;">🔍 Buscar</button>
             </div>
             
             <label style="display:block; margin-top:20px; font-size: 12px; color: gray;">(Opcional) Texto de la App de tu amigo:</label>
             <textarea id="amigoLista" placeholder="Si no tiene usuario, pegá su texto acá..." style="height: 60px; font-size: 11px;"></textarea>
             
             <div style="display: flex; gap: 10px;">
-                <button style="background-color: #6c757d; padding: 8px; font-size: 13px;" onclick="compararListasLocales()">Comparar sin nube</button>
-                <button class="btn-limpiar" onclick="limpiarBuscador()">🧹 Limpiar</button>
+                <button id="btnCompararLocal" style="background-color: #6c757d; padding: 8px; font-size: 13px;">Comparar sin nube</button>
+                <button id="btnLimpiar" class="btn-limpiar">🧹 Limpiar</button>
             </div>
             <div id="statusAmigo" class="status"></div>
         </div>
@@ -99,16 +99,6 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-
-        // --- CARGA AUTOMÁTICA POR URL ---
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const userQuery = urlParams.get('u');
-            if (userQuery) {
-                document.getElementById('miUsuario').value = userQuery;
-                window.cargarMiPerfil();
-            }
-        };
 
         // --- LÓGICA DE TEXTO ---
         function parsearTexto(texto) {
@@ -183,21 +173,14 @@
                 btn.innerText = `🆚 ${amigo}`;
                 btn.onclick = () => {
                     document.getElementById('amigoUsuario').value = amigo;
-                    window.cargarYComparar();
+                    cargarYComparar();
                 };
                 container.appendChild(btn);
             });
         }
 
-        // --- BOTONES ---
-        window.limpiarBuscador = function() {
-            document.getElementById('amigoUsuario').value = '';
-            document.getElementById('amigoLista').value = '';
-            document.getElementById('statusAmigo').innerText = '';
-            document.getElementById('resultados').style.display = 'none';
-        };
-
-        window.cargarMiPerfil = async function() {
+        // --- FUNCIONES PRINCIPALES ---
+        async function cargarMiPerfil() {
             let usuario = document.getElementById('miUsuario').value.trim();
             let status = document.getElementById('statusMiNube');
             if (!usuario) { alert("Ingresá tu usuario primero para poder cargar tu perfil."); return; }
@@ -223,9 +206,9 @@
                 status.innerText = "Error al cargar.";
                 console.error(error);
             }
-        };
+        }
 
-        window.guardarMisDatos = async function() {
+        async function guardarMisDatos() {
             let usuario = document.getElementById('miUsuario').value.trim();
             let texto = document.getElementById('miLista').value.trim();
             let amigos = document.getElementById('misAmigos').value.trim();
@@ -252,9 +235,9 @@
                 status.innerText = "Error al guardar.";
                 console.error(error);
             }
-        };
+        }
 
-        window.cargarYComparar = async function() {
+        async function cargarYComparar() {
             let textoMio = document.getElementById('miLista').value.trim();
             let usuarioAmigo = document.getElementById('amigoUsuario').value.trim();
             let status = document.getElementById('statusAmigo');
@@ -282,4 +265,49 @@
                     status.innerText = `¡Lista de ${usuarioAmigo} cargada!`;
                 } else {
                     status.style.color = "red";
-                    status.innerText = `No se encontró el usuario '${
+                    status.innerText = `No se encontró el usuario '${usuarioAmigo}'.`;
+                }
+            } catch (error) {
+                status.style.color = "red";
+                status.innerText = "Error al buscar.";
+                console.error(error);
+            }
+        }
+
+        function compararListasLocales() {
+            let textoMio = document.getElementById('miLista').value;
+            let textoAmigo = document.getElementById('amigoLista').value;
+            if (!textoMio || !textoAmigo) {
+                alert("Faltan datos para comparar.");
+                return;
+            }
+            ejecutarComparacion(textoMio, textoAmigo, "TU AMIGO");
+            document.getElementById('statusAmigo').innerText = "";
+        }
+
+        function limpiarBuscador() {
+            document.getElementById('amigoUsuario').value = '';
+            document.getElementById('amigoLista').value = '';
+            document.getElementById('statusAmigo').innerText = '';
+            document.getElementById('resultados').style.display = 'none';
+        }
+
+        // --- ASIGNACIÓN DE EVENTOS A LOS BOTONES ---
+        document.getElementById('btnCargarPerfil').addEventListener('click', cargarMiPerfil);
+        document.getElementById('btnGuardarNube').addEventListener('click', guardarMisDatos);
+        document.getElementById('btnBuscarAmigo').addEventListener('click', cargarYComparar);
+        document.getElementById('btnCompararLocal').addEventListener('click', compararListasLocales);
+        document.getElementById('btnLimpiar').addEventListener('click', limpiarBuscador);
+
+        // --- CARGA AUTOMÁTICA POR URL ---
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userQuery = urlParams.get('u');
+            if (userQuery) {
+                document.getElementById('miUsuario').value = userQuery;
+                cargarMiPerfil();
+            }
+        };
+    </script>
+</body>
+</html>
