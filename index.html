@@ -216,8 +216,37 @@
             return matches;
         }
 
-        function contarTotal(datos) {
-            return Object.values(datos).reduce((acc, curr) => acc + curr.length, 0);
+        // FUNCIÓN DE CLASIFICACIÓN CON EQUIPOS (NRO 13) INTEGRADOS
+        function obtenerDesglose(datos) {
+            let c = { especiales: 0, escudos: 0, equipos: 0, jugadores: 0 };
+            for (let equipo in datos) {
+                let numeros = datos[equipo];
+                if (equipo.includes('FWC') || equipo.includes('CC')) {
+                    c.especiales += numeros.length;
+                } else {
+                    numeros.forEach(num => {
+                        let val = parseInt(num);
+                        if (val === 1) {
+                            c.escudos++;
+                        } else if (val === 13) {
+                            c.equipos++;
+                        } else {
+                            c.jugadores++;
+                        }
+                    });
+                }
+            }
+            
+            let total = c.especiales + c.escudos + c.equipos + c.jugadores;
+            if (total === 0) return "0 figuritas";
+
+            let detalles = [];
+            if (c.especiales > 0) detalles.push(`${c.especiales} 🌟 Especiales`);
+            if (c.escudos > 0) detalles.push(`${c.escudos} 🛡️ Escudos`);
+            if (c.equipos > 0) detalles.push(`${c.equipos} 👥 Equipos`);
+            if (c.jugadores > 0) detalles.push(`${c.jugadores} 🏃 Jugadores`);
+
+            return `${total} figuritas (${detalles.join(', ')})`;
         }
 
         function renderizarResultados(divId, datos) {
@@ -242,14 +271,14 @@
             ultimoMatchLeSirven = encontrarInterseccion(amigoDatos.faltan, misDatos.repetidas);
             ultimoNombreAmigo = nombreAmigo;
 
-            let cantMeSirven = contarTotal(ultimoMatchMeSirven);
-            let cantLeSirven = contarTotal(ultimoMatchLeSirven);
+            let textoMeSirven = obtenerDesglose(ultimoMatchMeSirven);
+            let textoLeSirven = obtenerDesglose(ultimoMatchLeSirven);
 
             renderizarResultados('meSirven', ultimoMatchMeSirven);
             renderizarResultados('leSirven', ultimoMatchLeSirven);
             
-            document.getElementById('tituloMeSirven').innerHTML = `✅ Te sirven ${cantMeSirven} de ${nombreAmigo}:`;
-            document.getElementById('tituloLeSirven').innerHTML = `🎁 A ${nombreAmigo} le sirven ${cantLeSirven} tuyas:`;
+            document.getElementById('tituloMeSirven').innerHTML = `✅ Te sirven ${textoMeSirven} de ${nombreAmigo}:`;
+            document.getElementById('tituloLeSirven').innerHTML = `🎁 A ${nombreAmigo} le sirven ${textoLeSirven} tuyas:`;
             
             document.getElementById('resultados').style.display = 'block';
             
@@ -298,7 +327,7 @@
             
             navigator.clipboard.writeText(inputLink.value).then(() => {
                 if (esPrivado) {
-                    alert("¡Link Privado copiado!\n\n⚠️ ADVERTENCIA: NO compartas este link. Si se lo pasás a alguien, podrá modificar tu lista. Guardalo solo en favoritos.");
+                    alert("¡Link Privado copiado!\n\n⚠️ ADVERTENCIA: NO compartas este link. Si se lo pasás a alguien, esa persona podrá modificar tu lista. Guardalo solo en favoritos.");
                 }
                 let btn = document.getElementById(btnId);
                 btn.innerText = "¡Copiado!";
@@ -325,12 +354,12 @@
 
         function generarTextoResultados() {
             let miUsuario = document.getElementById('miUsuario').value.trim() || "MÍ";
-            let cantMe = contarTotal(ultimoMatchMeSirven);
-            let cantLe = contarTotal(ultimoMatchLeSirven);
+            let textoMeSirven = obtenerDesglose(ultimoMatchMeSirven);
+            let textoLeSirven = obtenerDesglose(ultimoMatchLeSirven);
             
             let texto = `⚽ *MATCH DE FIGURITAS* ⚽\n\n`;
-            texto += `✅ *${cantMe} figuritas para ${miUsuario.toUpperCase()} de ${ultimoNombreAmigo}:*\n` + formatearDiccionario(ultimoMatchMeSirven);
-            texto += `\n🎁 *${cantLe} figuritas para ${ultimoNombreAmigo} de ${miUsuario.toUpperCase()}:*\n` + formatearDiccionario(ultimoMatchLeSirven);
+            texto += `✅ *Para ${miUsuario.toUpperCase()} de ${ultimoNombreAmigo}:*\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven)}`;
+            texto += `\n🎁 *Para ${ultimoNombreAmigo} de ${miUsuario.toUpperCase()}:*\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven)}`;
             texto += `\n🔍 _Cruzá tus repetidas acá:_ https://luishacevedo.github.io/match-figuritas/`;
             
             return texto;
