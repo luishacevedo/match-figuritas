@@ -41,6 +41,13 @@
         .team-row { margin: 5px 0; font-size: 14px; }
         .footer { text-align: center; margin-top: 30px; color: #6c757d; font-size: 13px; padding-top: 20px; border-top: 1px solid #dee2e6; }
         .footer a { color: var(--primary); font-weight: bold; text-decoration: none; }
+        
+        /* ESTILOS DEL RANKING */
+        .ranking-item { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .ranking-text { line-height: 1.4; }
+        .ranking-name { font-size: 16px; font-weight: bold; color: #333; }
+        .ranking-stats { font-size: 14px; }
+        
         @media (max-width: 768px) { 
             body { padding: 10px; }
             .grid { grid-template-columns: 1fr; gap: 15px; }
@@ -54,6 +61,7 @@
             .botones-resultados { flex-direction: column; gap: 10px; }
             .resultados { padding: 15px; }
             .team-row { font-size: 13px; }
+            .ranking-item { flex-direction: column; align-items: flex-start; gap: 10px; }
         }
     </style>
 </head>
@@ -97,7 +105,10 @@
 
         <div class="box">
             <h3>🤝 Intercambio</h3>
-            <div id="botonesAmigos" style="margin-bottom: 15px;"></div>
+            <div id="botonesAmigos" style="margin-bottom: 10px;"></div>
+            
+            <button id="btnEscanearAmigos" class="btn-yellow" style="margin-bottom: 15px; padding: 8px; font-size: 13px; display: none;">⚡ Escanear a todos mis amigos</button>
+            
             <label>☁️ Nombre a buscar o guardar:</label>
             <div class="flex-row">
                 <input type="text" id="amigoUsuario" placeholder="Ej: FedeQatar">
@@ -115,14 +126,24 @@
     </div>
 
     <div id="resultados" class="resultados">
-        <h3 id="tituloMeSirven">✅ Me sirven:</h3>
-        <div id="meSirven" style="margin-bottom: 20px;"></div>
-        <h3 id="tituloLeSirven">🎁 Le sirven:</h3>
-        <div id="leSirven"></div>
-        <div class="botones-resultados">
-            <button id="btnCopiarPortapapeles" class="btn-primary">📋 Copiar Texto</button>
-            <button id="btnCopiarWhatsApp" class="btn-wsp">📲 Enviar por WhatsApp</button>
+        
+        <div id="rankingResultados" style="display: none; margin-bottom: 10px;">
+            <h3 style="border-bottom: 2px solid var(--yellow); border-color: var(--yellow);">🏆 Ranking de Intercambios</h3>
+            <p style="font-size: 13px; color: #6c757d; margin-top: -5px; margin-bottom: 15px;">Las mejores opciones dentro de tus amigos frecuentes:</p>
+            <div id="listaRanking"></div>
         </div>
+
+        <div id="detalleIndividual" style="display: none;">
+            <h3 id="tituloMeSirven">✅ Me sirven:</h3>
+            <div id="meSirven" style="margin-bottom: 20px;"></div>
+            <h3 id="tituloLeSirven">🎁 Le sirven:</h3>
+            <div id="leSirven"></div>
+            <div class="botones-resultados">
+                <button id="btnCopiarPortapapeles" class="btn-primary">📋 Copiar Texto</button>
+                <button id="btnCopiarWhatsApp" class="btn-wsp">📲 Enviar por WhatsApp</button>
+            </div>
+        </div>
+        
     </div>
 
     <div class="footer"><p>Contacto: <a href="https://t.me/luishacevedo" target="_blank">Telegram @luishacevedo</a></p></div>
@@ -150,19 +171,12 @@
         document.getElementById('btnCopiarPortapapeles').addEventListener('click', copiarTextoPortapapeles);
         document.getElementById('btnCopiarWhatsApp').addEventListener('click', abrirWhatsAppConTexto);
         document.getElementById('btnGuardarAmigoNuevo').addEventListener('click', guardarAmigoNuevo);
+        document.getElementById('btnEscanearAmigos').addEventListener('click', escanearAmigos); // NUEVO EVENTO
 
-        // MOTOR DE LIMPIEZA BLINDADO
         function limpiarNombreEquipo(textoRaw) {
-            // Se queda sólo con las letras y en mayúscula
             let limpio = textoRaw.replace(/[^A-Za-z]/g, '').toUpperCase();
-            
-            // Busca las siglas oficiales de los países para no fallar nunca
             let siglas = ["FWC", "MEX", "RSA", "KOR", "CZE", "CAN", "BIH", "QAT", "SUI", "BRA", "MAR", "HAI", "SCO", "USA", "PAR", "AUS", "TUR", "GER", "CUW", "CIV", "ECU", "NED", "JPN", "SWE", "TUN", "BEL", "EGY", "IRN", "NZL", "ESP", "CPV", "KSA", "URU", "FRA", "SEN", "IRQ", "NOR", "ARG", "ALG", "AUT", "JOR", "POR", "COD", "UZB", "COL", "ENG", "CRO", "GHA", "PAN", "CC"];
-            
-            for (let sigla of siglas) {
-                if (limpio.includes(sigla)) return sigla;
-            }
-            // Si por alguna razón no es oficial, devuelve los 3 primeros caracteres
+            for (let sigla of siglas) { if (limpio.includes(sigla)) return sigla; }
             return limpio.substring(0, 3);
         }
 
@@ -176,33 +190,19 @@
                 if (!lineaLimpia) return; 
 
                 let lineaMin = lineaLimpia.toLowerCase();
-                
-                // Detección de secciones a prueba de balas (español, inglés y variantes)
-                if (lineaMin.includes('me faltan') || lineaMin.includes('faltantes') || lineaMin.includes('i need')) { 
-                    seccionActual = 'faltan'; 
-                    return; 
-                } 
-                if (lineaMin.includes('repetidas') || lineaMin.includes('swaps') || lineaMin.includes('repetidos')) { 
-                    seccionActual = 'repetidas'; 
-                    return; 
-                }
+                if (lineaMin.includes('me faltan') || lineaMin.includes('faltantes') || lineaMin.includes('i need')) { seccionActual = 'faltan'; return; } 
+                if (lineaMin.includes('repetidas') || lineaMin.includes('swaps') || lineaMin.includes('repetidos')) { seccionActual = 'repetidas'; return; }
 
                 if (!seccionActual) return; 
 
-                // Si la línea tiene los dos puntos (ej: "🏆 FWC: 4, 6, 18, 20")
                 if (lineaLimpia.includes(':')) {
                     let partes = lineaLimpia.split(':');
-                    let equipoRaw = partes[0];
-                    let equipoLimpio = limpiarNombreEquipo(equipoRaw);
-                    
-                    // Limpia multiplicadores (x2), (X2), (×2), con o sin espacios
+                    let equipoLimpio = limpiarNombreEquipo(partes[0]);
                     let numerosRaw = partes[1].split(',').map(n => n.replace(/\(?[xX×]\s*\d+\)?/g, '').trim());
                     
                     if (equipoLimpio) {
                         if (!datos[seccionActual][equipoLimpio]) datos[seccionActual][equipoLimpio] = [];
-                        
                         numerosRaw.forEach(n => {
-                            // Detectar si usan formato "MEX18" mezclado
                             let subMatch = n.match(/^([A-Za-z]+)(\d+)$/);
                             if (subMatch) { 
                                 let subEq = subMatch[1].toUpperCase();
@@ -213,9 +213,7 @@
                             }
                         });
                     }
-                } 
-                // Formato sin dos puntos (ej: Figuri App -> "NOR2, NOR3")
-                else {
+                } else {
                     let patrones = lineaLimpia.match(/[A-Za-z]+\d+/g);
                     if (patrones) {
                         patrones.forEach(item => {
@@ -231,15 +229,11 @@
                 }
             });
             
-            // Eliminar duplicados y ordenar
             for(let seccion in datos) {
                 for(let equipo in datos[seccion]) {
-                    let numerosUnicos = [...new Set(datos[seccion][equipo])];
-                    numerosUnicos.sort((a,b) => parseInt(a) - parseInt(b));
-                    datos[seccion][equipo] = numerosUnicos;
+                    datos[seccion][equipo] = [...new Set(datos[seccion][equipo])].sort((a,b) => parseInt(a) - parseInt(b));
                 }
             }
-            
             return datos;
         }
 
@@ -263,9 +257,9 @@
                 } else {
                     numeros.forEach(num => {
                         let val = parseInt(num);
-                        if (val === 1) { c.escudos++; } 
-                        else if (val === 13) { c.equipos++; } 
-                        else { c.jugadores++; }
+                        if (val === 1) c.escudos++; 
+                        else if (val === 13) c.equipos++; 
+                        else c.jugadores++;
                     });
                 }
             }
@@ -315,7 +309,11 @@
             
             document.getElementById('tituloMeSirven').innerHTML = `✅ Me sirven ${textoMeSirven} de ${nombreAmigo}:`;
             document.getElementById('tituloLeSirven').innerHTML = `🎁 A ${nombreAmigo} le sirven ${textoLeSirven} tuyas:`;
+            
+            // Mostrar Detalle y ocultar Ranking si estuviera abierto
             document.getElementById('resultados').style.display = 'block';
+            document.getElementById('detalleIndividual').style.display = 'block';
+            document.getElementById('rankingResultados').style.display = 'none';
             
             if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
         }
@@ -324,9 +322,19 @@
             let container = document.getElementById('botonesAmigos');
             container.innerHTML = '';
             let amigosTexto = document.getElementById('misAmigos').value;
-            if (!amigosTexto) return;
+            let btnEscanear = document.getElementById('btnEscanearAmigos');
+            
+            if (!amigosTexto) {
+                btnEscanear.style.display = 'none';
+                return;
+            }
             
             let amigos = amigosTexto.split(',').map(a => a.trim()).filter(a => a !== "");
+            
+            // Mostrar u ocultar el botón de escanear dependiendo si hay amigos
+            if(amigos.length > 0) { btnEscanear.style.display = 'block'; } 
+            else { btnEscanear.style.display = 'none'; }
+
             amigos.forEach(amigo => {
                 let wrapper = document.createElement('div');
                 wrapper.className = 'amigo-wrapper';
@@ -381,6 +389,107 @@
             } catch (error) { status.style.color = "red"; status.innerText = "Error al guardar."; }
         }
 
+        // LÓGICA DEL OPTIMIZADOR DE INTERCAMBIOS (ETAPA 1)
+        async function escanearAmigos() {
+            let textoMio = document.getElementById('miLista').value.trim();
+            let misAmigosTexto = document.getElementById('misAmigos').value.trim();
+            let status = document.getElementById('statusAmigo');
+
+            if (!textoMio) { alert("Primero pegá o cargá tu lista de figuritas a la izquierda para poder comparar."); return; }
+            
+            let amigos = misAmigosTexto.split(',').map(a => a.trim()).filter(a => a !== "");
+            if (amigos.length === 0) return;
+
+            status.style.color = "#005c98"; status.innerText = "⚡ Escaneando la nube...";
+            let misDatos = parsearTexto(textoMio);
+
+            // Descargar todas las listas en paralelo para mayor velocidad
+            let promesasDescarga = amigos.map(async (amigo) => {
+                try {
+                    const snapshot = await get(child(ref(db), `usuarios/${amigo}`));
+                    if (snapshot.exists()) {
+                        let amigoTexto = snapshot.val().textoOriginal;
+                        let amigoDatos = parsearTexto(amigoTexto);
+                        let matchMeSirven = encontrarInterseccion(misDatos.faltan, amigoDatos.repetidas);
+                        let matchLeSirven = encontrarInterseccion(amigoDatos.faltan, misDatos.repetidas);
+                        
+                        let countMe = contarTotal(matchMeSirven);
+                        let countLe = contarTotal(matchLeSirven);
+                        
+                        if (countMe > 0 || countLe > 0) {
+                            return { nombre: amigo, me: countMe, le: countLe, textoRaw: amigoTexto };
+                        }
+                    }
+                } catch (e) { console.error("Error escaneando a " + amigo); }
+                return null;
+            });
+
+            let resultadosBrutos = await Promise.all(promesasDescarga);
+            let resultadosRanking = resultadosBrutos.filter(r => r !== null);
+
+            // Criterio de orden: Primero los que más me dan, en caso de empate, los que más les doy
+            resultadosRanking.sort((a, b) => {
+                if (b.me !== a.me) return b.me - a.me;
+                return b.le - a.le;
+            });
+
+            renderizarRanking(resultadosRanking);
+            status.innerText = "";
+        }
+
+        function renderizarRanking(ranking) {
+            document.getElementById('resultados').style.display = 'block';
+            document.getElementById('detalleIndividual').style.display = 'none';
+            
+            let divRanking = document.getElementById('rankingResultados');
+            let listaContainer = document.getElementById('listaRanking');
+            divRanking.style.display = 'block';
+            listaContainer.innerHTML = '';
+
+            if (ranking.length === 0) {
+                listaContainer.innerHTML = '<p style="color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 5px; font-size: 14px;">No hay ningún intercambio posible con tus amigos en este momento. 😢</p>';
+                return;
+            }
+
+            let medallas = ['🥇', '🥈', '🥉'];
+
+            ranking.forEach((res, index) => {
+                let medalla = index < 3 ? medallas[index] : '🔹';
+                
+                let div = document.createElement('div');
+                div.className = 'ranking-item';
+
+                let infoText = document.createElement('div');
+                infoText.className = 'ranking-text';
+                infoText.innerHTML = `
+                    <div class="ranking-name">${medalla} ${res.nombre}</div>
+                    <div class="ranking-stats">
+                        <span style="color: var(--success);">Te sirve para <b>${res.me}</b></span> | 
+                        <span style="color: var(--primary);">Le sirven <b>${res.le}</b></span>
+                    </div>
+                `;
+                
+                let btnVer = document.createElement('button');
+                btnVer.className = 'btn-primary';
+                btnVer.style.width = 'auto';
+                btnVer.style.padding = '8px 12px';
+                btnVer.style.fontSize = '12px';
+                btnVer.innerText = '🔍 Ver Match';
+                btnVer.onclick = () => {
+                    document.getElementById('amigoUsuario').value = res.nombre;
+                    document.getElementById('amigoLista').value = res.textoRaw;
+                    ejecutarComparacion(document.getElementById('miLista').value, res.textoRaw, res.nombre);
+                };
+
+                div.appendChild(infoText);
+                div.appendChild(btnVer);
+                listaContainer.appendChild(div);
+            });
+            
+            if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // FUNCIONES COMPARTIR Y URL
         function actualizarLinkDirecto(usuario) {
             let urlBase = window.location.origin + window.location.pathname;
             document.getElementById('linkCompartir').value = urlBase + '?buscar=' + encodeURIComponent(usuario);
