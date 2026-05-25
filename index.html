@@ -42,10 +42,10 @@
         .footer { text-align: center; margin-top: 30px; color: #6c757d; font-size: 13px; padding-top: 20px; border-top: 1px solid #dee2e6; }
         .footer a { color: var(--primary); font-weight: bold; text-decoration: none; }
         
-        /* ESTILOS DEL RANKING */
+        /* ESTILOS DEL RANKING Y MERCADO GLOBAL */
         .ranking-item { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .ranking-text { line-height: 1.4; }
-        .ranking-name { font-size: 16px; font-weight: bold; color: #333; }
+        .ranking-name { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 4px;}
         .ranking-stats { font-size: 14px; }
         
         @media (max-width: 768px) { 
@@ -107,7 +107,10 @@
             <h3>🤝 Intercambio</h3>
             <div id="botonesAmigos" style="margin-bottom: 10px;"></div>
             
-            <button id="btnEscanearAmigos" class="btn-yellow" style="margin-bottom: 15px; padding: 8px; font-size: 13px; display: none;">⚡ Escanear a todos mis amigos</button>
+            <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 15px;" id="cajaOptimizadores">
+                <button id="btnEscanearAmigos" class="btn-yellow" style="padding: 8px; font-size: 13px; display: none;">⚡ Mis Mejores Cambios</button>
+                <button id="btnMercadoGlobal" class="btn-primary" style="padding: 8px; font-size: 13px; display: none;">🌐 Analizar cruces entre amigos</button>
+            </div>
             
             <label>☁️ Nombre a buscar o guardar:</label>
             <div class="flex-row">
@@ -128,9 +131,15 @@
     <div id="resultados" class="resultados">
         
         <div id="rankingResultados" style="display: none; margin-bottom: 10px;">
-            <h3 style="border-bottom: 2px solid var(--yellow); border-color: var(--yellow);">🏆 Ranking de Intercambios</h3>
-            <p style="font-size: 13px; color: #6c757d; margin-top: -5px; margin-bottom: 15px;">Las mejores opciones dentro de tus amigos frecuentes:</p>
+            <h3 style="border-bottom: 2px solid var(--yellow); border-color: var(--yellow);">🏆 Mis Mejores Opciones</h3>
+            <p style="font-size: 13px; color: #6c757d; margin-top: -5px; margin-bottom: 15px;">Ordenado por la cantidad de figuritas que pueden cambiar mano a mano equitativamente:</p>
             <div id="listaRanking"></div>
+        </div>
+
+        <div id="mercadoGlobalResultados" style="display: none; margin-bottom: 10px;">
+            <h3 style="border-bottom: 2px solid var(--primary); border-color: var(--primary);">🌐 Triangulación de Grupo</h3>
+            <p style="font-size: 13px; color: #6c757d; margin-top: -5px; margin-bottom: 15px;">Los mejores cruces de figuritas posibles entre tus propios amigos:</p>
+            <div id="listaMercadoGlobal"></div>
         </div>
 
         <div id="detalleIndividual" style="display: none;">
@@ -171,7 +180,10 @@
         document.getElementById('btnCopiarPortapapeles').addEventListener('click', copiarTextoPortapapeles);
         document.getElementById('btnCopiarWhatsApp').addEventListener('click', abrirWhatsAppConTexto);
         document.getElementById('btnGuardarAmigoNuevo').addEventListener('click', guardarAmigoNuevo);
-        document.getElementById('btnEscanearAmigos').addEventListener('click', escanearAmigos); // NUEVO EVENTO
+        
+        // EVENTOS DE LOS OPTIMIZADORES
+        document.getElementById('btnEscanearAmigos').addEventListener('click', escanearMisCambios);
+        document.getElementById('btnMercadoGlobal').addEventListener('click', analizarMercadoGlobal);
 
         function limpiarNombreEquipo(textoRaw) {
             let limpio = textoRaw.replace(/[^A-Za-z]/g, '').toUpperCase();
@@ -310,10 +322,10 @@
             document.getElementById('tituloMeSirven').innerHTML = `✅ Me sirven ${textoMeSirven} de ${nombreAmigo}:`;
             document.getElementById('tituloLeSirven').innerHTML = `🎁 A ${nombreAmigo} le sirven ${textoLeSirven} tuyas:`;
             
-            // Mostrar Detalle y ocultar Ranking si estuviera abierto
             document.getElementById('resultados').style.display = 'block';
             document.getElementById('detalleIndividual').style.display = 'block';
             document.getElementById('rankingResultados').style.display = 'none';
+            document.getElementById('mercadoGlobalResultados').style.display = 'none';
             
             if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
         }
@@ -323,17 +335,23 @@
             container.innerHTML = '';
             let amigosTexto = document.getElementById('misAmigos').value;
             let btnEscanear = document.getElementById('btnEscanearAmigos');
+            let btnMercado = document.getElementById('btnMercadoGlobal');
             
             if (!amigosTexto) {
                 btnEscanear.style.display = 'none';
+                btnMercado.style.display = 'none';
                 return;
             }
             
             let amigos = amigosTexto.split(',').map(a => a.trim()).filter(a => a !== "");
             
-            // Mostrar u ocultar el botón de escanear dependiendo si hay amigos
-            if(amigos.length > 0) { btnEscanear.style.display = 'block'; } 
-            else { btnEscanear.style.display = 'none'; }
+            if(amigos.length > 0) { 
+                btnEscanear.style.display = 'block'; 
+                if(amigos.length > 1) btnMercado.style.display = 'block'; // Requiere al menos 2 amigos para triangular
+            } else { 
+                btnEscanear.style.display = 'none'; 
+                btnMercado.style.display = 'none';
+            }
 
             amigos.forEach(amigo => {
                 let wrapper = document.createElement('div');
@@ -389,21 +407,21 @@
             } catch (error) { status.style.color = "red"; status.innerText = "Error al guardar."; }
         }
 
-        // LÓGICA DEL OPTIMIZADOR DE INTERCAMBIOS (ETAPA 1)
-        async function escanearAmigos() {
+        // ==========================================
+        // OPTIMIZADOR ETAPA 1: MIS MEJORES CAMBIOS (Mano a Mano)
+        // ==========================================
+        async function escanearMisCambios() {
             let textoMio = document.getElementById('miLista').value.trim();
             let misAmigosTexto = document.getElementById('misAmigos').value.trim();
             let status = document.getElementById('statusAmigo');
 
             if (!textoMio) { alert("Primero pegá o cargá tu lista de figuritas a la izquierda para poder comparar."); return; }
-            
             let amigos = misAmigosTexto.split(',').map(a => a.trim()).filter(a => a !== "");
             if (amigos.length === 0) return;
 
-            status.style.color = "#005c98"; status.innerText = "⚡ Escaneando la nube...";
+            status.style.color = "#005c98"; status.innerText = "⚡ Escaneando opciones mano a mano...";
             let misDatos = parsearTexto(textoMio);
 
-            // Descargar todas las listas en paralelo para mayor velocidad
             let promesasDescarga = amigos.map(async (amigo) => {
                 try {
                     const snapshot = await get(child(ref(db), `usuarios/${amigo}`));
@@ -415,9 +433,10 @@
                         
                         let countMe = contarTotal(matchMeSirven);
                         let countLe = contarTotal(matchLeSirven);
+                        let posibles = Math.min(countMe, countLe); // LOGICA MANO A MANO
                         
                         if (countMe > 0 || countLe > 0) {
-                            return { nombre: amigo, me: countMe, le: countLe, textoRaw: amigoTexto };
+                            return { nombre: amigo, me: countMe, le: countLe, posibles: posibles, textoRaw: amigoTexto };
                         }
                     }
                 } catch (e) { console.error("Error escaneando a " + amigo); }
@@ -427,23 +446,23 @@
             let resultadosBrutos = await Promise.all(promesasDescarga);
             let resultadosRanking = resultadosBrutos.filter(r => r !== null);
 
-            // Criterio de orden: Primero los que más me dan, en caso de empate, los que más les doy
+            // Ordenamiento: 1° Potencial Mano a Mano. 2° El que me da más figuritas (desempate).
             resultadosRanking.sort((a, b) => {
-                if (b.me !== a.me) return b.me - a.me;
-                return b.le - a.le;
+                if (b.posibles !== a.posibles) return b.posibles - a.posibles;
+                return b.me - a.me;
             });
 
-            renderizarRanking(resultadosRanking);
+            renderizarRankingMisCambios(resultadosRanking);
             status.innerText = "";
         }
 
-        function renderizarRanking(ranking) {
+        function renderizarRankingMisCambios(ranking) {
             document.getElementById('resultados').style.display = 'block';
+            document.getElementById('rankingResultados').style.display = 'block';
             document.getElementById('detalleIndividual').style.display = 'none';
+            document.getElementById('mercadoGlobalResultados').style.display = 'none';
             
-            let divRanking = document.getElementById('rankingResultados');
             let listaContainer = document.getElementById('listaRanking');
-            divRanking.style.display = 'block';
             listaContainer.innerHTML = '';
 
             if (ranking.length === 0) {
@@ -455,17 +474,19 @@
 
             ranking.forEach((res, index) => {
                 let medalla = index < 3 ? medallas[index] : '🔹';
+                let opacidad = res.posibles === 0 ? 'opacity: 0.7;' : '';
                 
                 let div = document.createElement('div');
                 div.className = 'ranking-item';
+                div.style = opacidad;
 
                 let infoText = document.createElement('div');
                 infoText.className = 'ranking-text';
                 infoText.innerHTML = `
-                    <div class="ranking-name">${medalla} ${res.nombre}</div>
+                    <div class="ranking-name">${medalla} ${res.nombre} - 🔄 ${res.posibles} mano a mano</div>
                     <div class="ranking-stats">
-                        <span style="color: var(--success);">Te sirve para <b>${res.me}</b></span> | 
-                        <span style="color: var(--primary);">Le sirven <b>${res.le}</b></span>
+                        <span style="color: var(--success);">Te puede dar <b>${res.me}</b></span> | 
+                        <span style="color: var(--primary);">Le podés dar <b>${res.le}</b></span>
                     </div>
                 `;
                 
@@ -483,6 +504,94 @@
 
                 div.appendChild(infoText);
                 div.appendChild(btnVer);
+                listaContainer.appendChild(div);
+            });
+            
+            if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ==========================================
+        // OPTIMIZADOR ETAPA 2: BROKER GLOBAL (Cruces entre terceros)
+        // ==========================================
+        async function analizarMercadoGlobal() {
+            let misAmigosTexto = document.getElementById('misAmigos').value.trim();
+            let status = document.getElementById('statusAmigo');
+            let amigos = misAmigosTexto.split(',').map(a => a.trim()).filter(a => a !== "");
+            
+            if (amigos.length < 2) { alert("Necesitás al menos 2 amigos guardados para triangular intercambios."); return; }
+
+            status.style.color = "#005c98"; status.innerText = "🌐 Analizando matriz global...";
+
+            // 1. Descargar todas las listas de los amigos
+            let amigosData = [];
+            let promesas = amigos.map(async (amigo) => {
+                try {
+                    const snapshot = await get(child(ref(db), `usuarios/${amigo}`));
+                    if (snapshot.exists()) {
+                        amigosData.push({ nombre: amigo, datos: parsearTexto(snapshot.val().textoOriginal) });
+                    }
+                } catch (e) { console.error("Error", e); }
+            });
+            await Promise.all(promesas);
+
+            // 2. Cruce Todos vs Todos
+            let cruces = [];
+            for (let i = 0; i < amigosData.length; i++) {
+                for (let j = i + 1; j < amigosData.length; j++) {
+                    let A = amigosData[i];
+                    let B = amigosData[j];
+                    
+                    let aDaB = contarTotal(encontrarInterseccion(B.datos.faltan, A.datos.repetidas));
+                    let bDaA = contarTotal(encontrarInterseccion(A.datos.faltan, B.datos.repetidas));
+                    let posibles = Math.min(aDaB, bDaA);
+                    
+                    if (posibles > 0) {
+                        cruces.push({ A: A.nombre, B: B.nombre, posibles: posibles, aDaB: aDaB, bDaA: bDaA });
+                    }
+                }
+            }
+
+            // 3. Ordenar por potencial de cambio equitativo
+            cruces.sort((a, b) => b.posibles - a.posibles);
+
+            renderizarMercadoGlobal(cruces);
+            status.innerText = "";
+        }
+
+        function renderizarMercadoGlobal(cruces) {
+            document.getElementById('resultados').style.display = 'block';
+            document.getElementById('mercadoGlobalResultados').style.display = 'block';
+            document.getElementById('rankingResultados').style.display = 'none';
+            document.getElementById('detalleIndividual').style.display = 'none';
+            
+            let listaContainer = document.getElementById('listaMercadoGlobal');
+            listaContainer.innerHTML = '';
+
+            if (cruces.length === 0) {
+                listaContainer.innerHTML = '<p style="color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 5px; font-size: 14px;">Tus amigos no tienen figuritas para intercambiar entre ellos. 😢</p>';
+                return;
+            }
+
+            // Mostrar el Top 10 de mejores negocios entre amigos
+            let topCruces = cruces.slice(0, 10);
+
+            topCruces.forEach((res) => {
+                let div = document.createElement('div');
+                div.className = 'ranking-item';
+                div.style.borderLeftColor = 'var(--success)';
+
+                let infoText = document.createElement('div');
+                infoText.className = 'ranking-text';
+                infoText.style.width = '100%';
+                infoText.innerHTML = `
+                    <div class="ranking-name">🤝 ${res.A} & ${res.B}</div>
+                    <div class="ranking-stats" style="margin-top: 5px;">
+                        Tienen <b>${res.posibles}</b> cambios mano a mano posibles. <br>
+                        <span style="font-size: 12px; color: #6c757d;">(${res.A} le da ${res.aDaB} a ${res.B} | ${res.B} le da ${res.bDaA} a ${res.A})</span>
+                    </div>
+                `;
+
+                div.appendChild(infoText);
                 listaContainer.appendChild(div);
             });
             
