@@ -23,14 +23,19 @@
         .btn-wsp { background-color: var(--wsp); box-shadow: 0 4px 6px rgba(37,211,102,0.3); }
         .btn-wsp-small { background-color: var(--wsp); color: white; }
         
-        /* ESTILOS BOTONES AMIGOS CON CHECKBOX */
-        .amigo-wrapper { display: inline-flex; align-items: stretch; background-color: #17a2b8; border-radius: 6px; overflow: hidden; margin-right: 6px; margin-bottom: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
-        .amigo-checkbox { margin: 0 0 0 8px; align-self: center; cursor: pointer; transform: scale(1.1); accent-color: var(--yellow);}
-        .btn-amigo-match { background: transparent; border: none; color: white; padding: 6px 10px; font-size: 13px; cursor: pointer; font-weight: bold; width: auto; margin: 0; border-radius: 0; }
+        /* ESTILOS BOTONES AMIGOS BLINDADOS Y ORDENADOS */
+        .grid-amigos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+        .amigo-wrapper { display: flex; align-items: center; background-color: #17a2b8; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%; height: 40px; }
+        .amigo-checkbox { margin: 0 0 0 10px; cursor: pointer; transform: scale(1.2); accent-color: var(--yellow); flex-shrink: 0; }
+        .btn-amigo-match { background: transparent; border: none; color: white; padding: 0 10px; font-size: 13px; cursor: pointer; font-weight: bold; flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; height: 100%; display: flex; align-items: center; }
         .btn-amigo-match:hover { background: rgba(0,0,0,0.1); }
-        .btn-amigo-delete { background: rgba(0,0,0,0.15); border: none; color: white; padding: 6px 8px; font-size: 12px; cursor: pointer; width: auto; margin: 0; border-radius: 0; display: flex; align-items: center; }
+        .btn-amigo-delete { background: rgba(0,0,0,0.15); border: none; color: white; padding: 0 12px; font-size: 14px; cursor: pointer; flex-shrink: 0; height: 100%; display: flex; align-items: center; justify-content: center; }
         .btn-amigo-delete:hover { background: var(--danger); }
         
+        /* CONTROLES DE SELECCIÓN DISCRETOS */
+        .btn-link-action { font-size: 12px; color: var(--primary); background: #e9ecef; padding: 5px 12px; border-radius: 12px; text-decoration: none; font-weight: bold; transition: 0.2s; display: inline-flex; align-items: center; gap: 4px;}
+        .btn-link-action:hover { background: #dde2e6; color: #004573; }
+
         .flex-row { display: flex; gap: 8px; margin-bottom: 15px; align-items: stretch; }
         .flex-row input { margin-bottom: 0; flex: 1; }
         .flex-row button { width: auto; white-space: nowrap; margin: 0; padding: 0 15px; }
@@ -45,7 +50,12 @@
         .step-box { background: #e9f7ef; border-left: 4px solid var(--success); padding: 15px; margin-bottom: 15px; border-radius: 8px; }
         .footer { text-align: center; margin-top: 30px; color: #6c757d; font-size: 13px; padding-top: 20px; border-top: 1px solid #dee2e6; }
         .footer a { color: var(--primary); font-weight: bold; text-decoration: none; }
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; gap: 15px; } .botones-resultados { flex-direction: column; gap: 10px; } }
+        
+        @media (max-width: 768px) { 
+            .grid { grid-template-columns: 1fr; gap: 15px; } 
+            .botones-resultados { flex-direction: column; gap: 10px; } 
+            .grid-amigos { grid-template-columns: 1fr; } /* 1 columna en celular */
+        }
     </style>
 </head>
 <body>
@@ -75,7 +85,13 @@
 
         <div class="box">
             <h3>🤝 Intercambio y Estrategia</h3>
-            <div id="botonesAmigos" style="margin-bottom: 10px;"></div>
+            
+            <div id="controlesSeleccion" style="display: none; justify-content: flex-end; gap: 10px; margin-bottom: 10px;">
+                <a href="#" id="btnSeleccionarTodos" class="btn-link-action">☑️ Marcar todos</a>
+                <a href="#" id="btnDeseleccionarTodos" class="btn-link-action">🔲 Desmarcar todos</a>
+            </div>
+
+            <div id="botonesAmigos" class="grid-amigos"></div>
             
             <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 15px;">
                 <button id="btnEscanearAmigos" class="btn-yellow" style="padding: 8px; font-size: 13px; display: none;">⚡ Ranking de los Seleccionados</button>
@@ -131,6 +147,13 @@
         document.getElementById('btnMercadoGlobal').addEventListener('click', analizarMercadoGlobal);
         document.getElementById('btnRutaCompletar').addEventListener('click', calcularRutaCompletar);
 
+        document.getElementById('btnSeleccionarTodos').addEventListener('click', (e) => {
+            e.preventDefault(); document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = true);
+        });
+        document.getElementById('btnDeseleccionarTodos').addEventListener('click', (e) => {
+            e.preventDefault(); document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = false);
+        });
+
         // Core Parsing
         function limpiarNombreEquipo(textoRaw) {
             let limpio = textoRaw.replace(/[^A-Za-z]/g, '').toUpperCase();
@@ -155,12 +178,10 @@
                     datos[seccion][eq].push(...nums);
                 }
             });
-            // Ordenar pero NO eliminar duplicados para la nueva lógica "consumible"
             for(let s in datos) for(let e in datos[s]) datos[s][e].sort((a,b)=>a-b);
             return datos;
         }
 
-        // Lógica de Match "Consumible"
         function encontrarInterseccion(buscadas, ofrecidas) {
             let matches = {};
             let copiaOfrecidas = JSON.parse(JSON.stringify(ofrecidas));
@@ -238,9 +259,6 @@
             if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // =====================================
-        // RENDERIZAR AMIGOS CON CHECKBOXES
-        // =====================================
         function renderizarBotonesAmigos() {
             let container = document.getElementById('botonesAmigos');
             container.innerHTML = '';
@@ -249,9 +267,10 @@
             let btnEscanear = document.getElementById('btnEscanearAmigos');
             let btnMercado = document.getElementById('btnMercadoGlobal');
             let btnRuta = document.getElementById('btnRutaCompletar');
+            let controlesSelec = document.getElementById('controlesSeleccion');
             
             if (!amigosTexto) {
-                btnEscanear.style.display = 'none'; btnMercado.style.display = 'none'; btnRuta.style.display = 'none';
+                btnEscanear.style.display = 'none'; btnMercado.style.display = 'none'; btnRuta.style.display = 'none'; controlesSelec.style.display = 'none';
                 return;
             }
             
@@ -259,28 +278,29 @@
             
             if(amigos.length > 0) { 
                 btnEscanear.style.display = 'block'; btnRuta.style.display = 'block';
-                if(amigos.length > 1) btnMercado.style.display = 'block';
+                if(amigos.length > 1) { btnMercado.style.display = 'block'; controlesSelec.style.display = 'flex'; } 
+                else { controlesSelec.style.display = 'none'; }
             }
 
             amigos.forEach(amigo => {
                 let wrapper = document.createElement('div');
                 wrapper.className = 'amigo-wrapper';
                 
-                // Agregamos el Checkbox para selección
                 let chk = document.createElement('input');
                 chk.type = 'checkbox';
                 chk.className = 'amigo-checkbox';
                 chk.value = amigo;
-                chk.checked = true; // Por defecto seleccionado
+                chk.checked = true;
                 
                 let btnMatch = document.createElement('button');
                 btnMatch.className = 'btn-amigo-match';
-                btnMatch.innerText = `🆚 ${amigo}`;
+                btnMatch.title = amigo;
+                btnMatch.innerHTML = "🆚 " + amigo;
                 btnMatch.onclick = () => { document.getElementById('amigoUsuario').value = amigo; cargarYComparar(); };
                 
                 let btnDelete = document.createElement('button');
                 btnDelete.className = 'btn-amigo-delete';
-                btnDelete.innerText = '✖';
+                btnDelete.innerHTML = "✖";
                 btnDelete.onclick = () => eliminarAmigoFrecuente(amigo);
                 
                 wrapper.appendChild(chk);
@@ -290,24 +310,15 @@
             });
         }
 
-        // =====================================
-        // OBTENER AMIGOS SELECCIONADOS
-        // =====================================
         function obtenerAmigosSeleccionados() {
             let seleccionados = Array.from(document.querySelectorAll('.amigo-checkbox:checked')).map(cb => cb.value);
-            if (seleccionados.length === 0) {
-                alert("Por favor, dejá al menos un amigo tildado en la lista azul de arriba para poder analizar.");
-            }
+            if (seleccionados.length === 0) alert("Por favor, dejá al menos un amigo tildado en la lista azul de arriba para poder analizar.");
             return seleccionados;
         }
 
-        // =====================================
-        // OPTIMIZADOR ETAPA 1: RANKING
-        // =====================================
         async function escanearMisCambios() {
             let textoMio = document.getElementById('miLista').value.trim();
             if (!textoMio) { alert("Pegá tu lista primero."); return; }
-            
             let amigos = obtenerAmigosSeleccionados();
             if (amigos.length === 0) return;
 
@@ -368,9 +379,6 @@
             status.innerText = "";
         }
 
-        // ==========================================
-        // OPTIMIZADOR ETAPA 2: BROKER GLOBAL
-        // ==========================================
         async function analizarMercadoGlobal() {
             let amigos = obtenerAmigosSeleccionados();
             if (amigos.length < 2) { alert("Necesitás al menos 2 amigos tildados para triangular."); return; }
@@ -438,13 +446,9 @@
             status.innerText = "";
         }
 
-        // ==========================================
-        // OPTIMIZADOR ETAPA 3: RUTA PARA COMPLETAR
-        // ==========================================
         async function calcularRutaCompletar() {
             let textoMio = document.getElementById('miLista').value.trim();
             if (!textoMio) { alert("Primero pegá tu lista."); return; }
-            
             let amigos = obtenerAmigosSeleccionados();
             if (amigos.length === 0) return;
 
@@ -453,7 +457,6 @@
             
             let misDatos = parsearTexto(textoMio);
             let faltanOriginal = contarTotal(misDatos.faltan);
-            
             let misFaltan = aplanarDiccionario(misDatos.faltan);
             let misRepetidas = aplanarDiccionario(misDatos.repetidas);
 
