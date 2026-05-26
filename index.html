@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Match de Figuritas Mundial 2026</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
-    
     <style>
         :root { --primary: #005c98; --secondary: #6c757d; --success: #28a745; --danger: #dc3545; --yellow: #ffc107; --wsp: #25D366; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; padding: 20px; max-width: 1000px; margin: auto; }
@@ -23,85 +22,54 @@
         .btn-yellow { background-color: var(--yellow); color: #333; }
         .btn-wsp { background-color: var(--wsp); box-shadow: 0 4px 6px rgba(37,211,102,0.3); }
         .btn-wsp-small { background-color: var(--wsp); color: white; }
-        .btn-amigo { background-color: #17a2b8; width: auto; font-size: 12px; padding: 6px 10px; margin-right: 5px; margin-bottom: 5px; display: inline-block; }
+        
+        /* ESTILOS BOTONES AMIGOS CON CHECKBOX */
         .amigo-wrapper { display: inline-flex; align-items: stretch; background-color: #17a2b8; border-radius: 6px; overflow: hidden; margin-right: 6px; margin-bottom: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+        .amigo-checkbox { margin: 0 0 0 8px; align-self: center; cursor: pointer; transform: scale(1.1); accent-color: var(--yellow);}
         .btn-amigo-match { background: transparent; border: none; color: white; padding: 6px 10px; font-size: 13px; cursor: pointer; font-weight: bold; width: auto; margin: 0; border-radius: 0; }
         .btn-amigo-match:hover { background: rgba(0,0,0,0.1); }
         .btn-amigo-delete { background: rgba(0,0,0,0.15); border: none; color: white; padding: 6px 8px; font-size: 12px; cursor: pointer; width: auto; margin: 0; border-radius: 0; display: flex; align-items: center; }
         .btn-amigo-delete:hover { background: var(--danger); }
+        
         .flex-row { display: flex; gap: 8px; margin-bottom: 15px; align-items: stretch; }
         .flex-row input { margin-bottom: 0; flex: 1; }
         .flex-row button { width: auto; white-space: nowrap; margin: 0; padding: 0 15px; }
         .botones-resultados { display: flex; gap: 15px; margin-top: 25px; }
-        .botones-resultados button { padding: 12px; font-size: 15px; }
         .resultados { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-top: 20px; display: none; border: 1px solid #e9ecef;}
         h2 { text-align: center; color: #1a1a1a; margin-bottom: 5px; font-size: 24px; }
         h3 { color: #1a1a1a; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-top: 0; font-size: 18px; }
-        .status { text-align: center; font-weight: bold; margin-top: 5px; font-size: 12px; }
         .team-row { margin: 5px 0; font-size: 14px; }
+        .ranking-item { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; }
+        .ranking-header { display: flex; justify-content: space-between; align-items: center; }
+        .ranking-content { display: none; padding-top: 10px; font-size: 13px; border-top: 1px solid #ddd; margin-top: 10px;}
+        .step-box { background: #e9f7ef; border-left: 4px solid var(--success); padding: 15px; margin-bottom: 15px; border-radius: 8px; }
         .footer { text-align: center; margin-top: 30px; color: #6c757d; font-size: 13px; padding-top: 20px; border-top: 1px solid #dee2e6; }
         .footer a { color: var(--primary); font-weight: bold; text-decoration: none; }
-        
-        /* ESTILOS DEL RANKING, MERCADO Y RUTA */
-        .ranking-item { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .ranking-text { line-height: 1.4; }
-        .ranking-name { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 4px;}
-        .ranking-stats { font-size: 14px; }
-        .step-box { background: #e9f7ef; border-left: 4px solid var(--success); padding: 15px; margin-bottom: 15px; border-radius: 8px; }
-        .step-title { font-weight: bold; font-size: 16px; color: var(--success); margin-bottom: 5px; }
-        
-        @media (max-width: 768px) { 
-            body { padding: 10px; }
-            .grid { grid-template-columns: 1fr; gap: 15px; }
-            .box { padding: 15px; }
-            h2 { font-size: 20px; }
-            h3 { font-size: 16px; margin-bottom: 10px; }
-            label { font-size: 13px; margin-bottom: 3px; }
-            input, button { font-size: 13px; padding: 10px; }
-            textarea { font-size: 12px; height: 110px; }
-            .flex-row button { padding: 0 10px; }
-            .botones-resultados { flex-direction: column; gap: 10px; }
-            .resultados { padding: 15px; }
-            .team-row { font-size: 13px; }
-            .ranking-item { flex-direction: column; align-items: flex-start; gap: 10px; }
-        }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; gap: 15px; } .botones-resultados { flex-direction: column; gap: 10px; } }
     </style>
 </head>
 <body>
 
     <div style="text-align: center; margin-bottom: 25px;">
         <h2><a href="#" onclick="window.location.href=window.location.pathname; return false;" style="text-decoration: none; color: #1a1a1a;">⚽ Match Mundial 2026 ⚽</a></h2>
-        <p style="font-size: 13px; color: #6c757d; margin-top: 0;">Complemento inspirado en <a href="https://www.figuritas.app/es/descargar" target="_blank">Figuritas App</a> (App externa)</p>
+        <p style="font-size: 13px; color: #6c757d; margin-top: 0;">Complemento inspirado en <a href="https://www.figuritas.app/es/descargar" target="_blank">Figuritas App</a></p>
     </div>
 
     <div class="grid">
         <div class="box">
             <h3>👤 Mi Perfil</h3>
-            <label>Tu Usuario:</label>
-            <div class="flex-row">
-                <input type="text" id="miUsuario" placeholder="Ej: Luis2026">
-                <button id="btnCargarPerfil" class="btn-yellow">⬇️ Cargar</button>
-            </div>
-            <label>Amigos Frecuentes (ej: Guada, Pilar):</label>
-            <input type="text" id="misAmigos" placeholder="Separados por coma...">
-            <label>Tus Figuritas:</label>
-            <textarea id="miLista" placeholder="Pegá tu lista de la App acá..."></textarea>
-            <button id="btnGuardarNube" class="btn-success">☁️ Guardar en la Nube</button>
+            <label>Usuario:</label>
+            <div class="flex-row"><input type="text" id="miUsuario" placeholder="Ej: Luis2026"><button id="btnCargarPerfil" class="btn-yellow">⬇️ Cargar</button></div>
+            <label>Amigos Frecuentes:</label><input type="text" id="misAmigos" placeholder="Guada, Pilar...">
+            <label>Tus Figuritas:</label><textarea id="miLista" placeholder="Pegá tu lista acá..."></textarea>
+            <button id="btnGuardarNube" class="btn-success">☁️ Guardar</button>
             <div id="statusMiNube" class="status"></div>
-
             <div style="margin-top: 20px; border-top: 1px solid #dee2e6; padding-top: 15px;">
-                <label style="color: var(--primary);">📢 Link Público (Para compartir):</label>
-                <div class="flex-row">
-                    <input type="text" id="linkCompartir" readonly style="background: #e9ecef; font-size: 11px;">
-                    <button id="btnCompartirPublico" class="btn-wsp-small" style="padding: 0 10px;">📲 WhatsApp</button>
-                </div>
-
-                <label style="color: var(--danger);">🔒 Link Privado (Tus favoritos):</label>
-                <div class="flex-row" style="margin-bottom: 10px;">
-                    <input type="text" id="linkPrivado" readonly style="background: #f8d7da; border-color: #f5c6cb; font-size: 11px;">
-                    <button id="btnCopiarPrivado" class="btn-secondary" style="padding: 0 10px;">📋 Copiar</button>
-                </div>
-                <button id="btnInstalar" class="btn-yellow">📱 Instalar App en Android</button>
+                <label style="color: var(--primary);">📢 Link Público:</label>
+                <div class="flex-row"><input type="text" id="linkCompartir" readonly style="background: #e9ecef; font-size: 11px;"><button id="btnCompartirPublico" class="btn-wsp-small" style="padding: 0 10px;">📲 WA</button></div>
+                <label style="color: var(--danger);">🔒 Link Privado:</label>
+                <div class="flex-row"><input type="text" id="linkPrivado" readonly style="background: #f8d7da; border-color: #f5c6cb; font-size: 11px;"><button id="btnCopiarPrivado" class="btn-secondary" style="padding: 0 10px;">📋</button></div>
+                <button id="btnInstalar" class="btn-yellow">📱 Instalar Android</button>
             </div>
         </div>
 
@@ -109,60 +77,30 @@
             <h3>🤝 Intercambio y Estrategia</h3>
             <div id="botonesAmigos" style="margin-bottom: 10px;"></div>
             
-            <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 15px;" id="cajaOptimizadores">
-                <button id="btnEscanearAmigos" class="btn-yellow" style="padding: 8px; font-size: 13px; display: none;">⚡ Ranking de mis cambios</button>
-                <button id="btnRutaCompletar" class="btn-success" style="padding: 8px; font-size: 13px; display: none;">🚀 Ruta para Completar el Álbum</button>
-                <button id="btnMercadoGlobal" class="btn-primary" style="padding: 8px; font-size: 13px; display: none;">🌐 Analizar cruces entre amigos</button>
+            <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 15px;">
+                <button id="btnEscanearAmigos" class="btn-yellow" style="padding: 8px; font-size: 13px; display: none;">⚡ Ranking de los Seleccionados</button>
+                <button id="btnRutaCompletar" class="btn-success" style="padding: 8px; font-size: 13px; display: none;">🚀 Ruta al 100% (Seleccionados)</button>
+                <button id="btnMercadoGlobal" class="btn-primary" style="padding: 8px; font-size: 13px; display: none;">🌐 Cruces entre Seleccionados</button>
             </div>
             
             <label>☁️ Nombre a buscar o guardar:</label>
-            <div class="flex-row">
-                <input type="text" id="amigoUsuario" placeholder="Ej: FedeQatar">
-                <button id="btnBuscarAmigo" class="btn-primary">🔍 Buscar</button>
-            </div>
-            <label>✍️ Pegar su lista manualmente:</label>
-            <textarea id="amigoLista" placeholder="Pegá la lista de tu amigo acá..."></textarea>
-            <button id="btnGuardarAmigoNuevo" class="btn-success" style="padding: 8px; font-size: 13px; margin-bottom: 10px; margin-top: 0;">💾 Guardar lista como Amigo Frecuente</button>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px;">
-                <button id="btnCompararLocal" class="btn-primary">⚖️ Comparar</button>
-                <button id="btnLimpiar" class="btn-danger">🧹 Limpiar</button>
-            </div>
+            <div class="flex-row"><input type="text" id="amigoUsuario" placeholder="Ej: FedeQatar"><button id="btnBuscarAmigo" class="btn-primary">🔍</button></div>
+            <label>✍️ Pegar su lista:</label><textarea id="amigoLista" placeholder="Pegá la lista de tu amigo acá..."></textarea>
+            <button id="btnGuardarAmigoNuevo" class="btn-success" style="padding: 8px; font-size: 13px; margin-bottom: 10px;">💾 Guardar Amigo</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;"><button id="btnCompararLocal" class="btn-primary">⚖️ Comparar</button><button id="btnLimpiar" class="btn-danger">🧹 Limpiar</button></div>
             <div id="statusAmigo" class="status"></div>
         </div>
     </div>
 
     <div id="resultados" class="resultados">
-        
-        <div id="rankingResultados" style="display: none; margin-bottom: 10px;">
-            <h3 style="border-bottom: 2px solid var(--yellow); border-color: var(--yellow);">🏆 Ranking de Opciones</h3>
-            <p style="font-size: 13px; color: #6c757d; margin-top: -5px; margin-bottom: 15px;">Ordenado por la cantidad de figuritas que pueden cambiar mano a mano equitativamente:</p>
-            <div id="listaRanking"></div>
-        </div>
-
-        <div id="rutaCompletarResultados" style="display: none; margin-bottom: 10px;">
-            <h3 style="border-bottom: 2px solid var(--success); border-color: var(--success);">🚀 Plan de Acción Estratégico</h3>
-            <p style="font-size: 13px; color: #6c757d; margin-top: -5px; margin-bottom: 15px;">La mejor combinación de cambios para conseguir la mayor cantidad de figuritas faltantes, priorizando exprimir al máximo a cada contacto.</p>
-            <div id="resumenRuta" style="margin-bottom: 20px;"></div>
-            <div id="listaRuta"></div>
-        </div>
-
-        <div id="mercadoGlobalResultados" style="display: none; margin-bottom: 10px;">
-            <h3 style="border-bottom: 2px solid var(--primary); border-color: var(--primary);">🌐 Triangulación de Grupo</h3>
-            <p style="font-size: 13px; color: #6c757d; margin-top: -5px; margin-bottom: 15px;">Los mejores cruces de figuritas posibles entre tus propios amigos:</p>
-            <div id="listaMercadoGlobal"></div>
-        </div>
-
+        <div id="rankingResultados" style="display: none;"><h3>🏆 Ranking de Opciones</h3><div id="listaRanking"></div></div>
+        <div id="rutaCompletarResultados" style="display: none;"><h3>🚀 Plan de Acción Estratégico</h3><div id="resumenRuta"></div><div id="listaRuta"></div></div>
+        <div id="mercadoGlobalResultados" style="display: none;"><h3>🌐 Triangulación de Grupo</h3><div id="listaMercadoGlobal"></div></div>
         <div id="detalleIndividual" style="display: none;">
-            <h3 id="tituloMeSirven">✅ Me sirven:</h3>
-            <div id="meSirven" style="margin-bottom: 20px;"></div>
-            <h3 id="tituloLeSirven">🎁 Le sirven:</h3>
-            <div id="leSirven"></div>
-            <div class="botones-resultados">
-                <button id="btnCopiarPortapapeles" class="btn-primary">📋 Copiar Texto</button>
-                <button id="btnCopiarWhatsApp" class="btn-wsp">📲 Enviar por WhatsApp</button>
-            </div>
+            <h3 id="tituloMeSirven">✅ Me sirven:</h3><div id="meSirven" style="margin-bottom: 20px;"></div>
+            <h3 id="tituloLeSirven">🎁 Le sirven:</h3><div id="leSirven"></div>
+            <div class="botones-resultados"><button id="btnCopiarPortapapeles" class="btn-primary">📋 Copiar Texto</button><button id="btnCopiarWhatsApp" class="btn-wsp">📲 Enviar por WhatsApp</button></div>
         </div>
-        
     </div>
 
     <div class="footer"><p>Contacto: <a href="https://t.me/luishacevedo" target="_blank">Telegram @luishacevedo</a></p></div>
@@ -170,15 +108,14 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
         const firebaseConfig = { apiKey: "AIzaSyAPGcn1zq1NPTrfcAZ1a1xLIjZ6IwDwMoY", authDomain: "match-figuritas-app.firebaseapp.com", databaseURL: "https://match-figuritas-app-default-rtdb.firebaseio.com", projectId: "match-figuritas-app", storageBucket: "match-figuritas-app.firebasestorage.app", messagingSenderId: "13972953348", appId: "1:13972953348:web:2d60c62f4bd2e5e0ac5851" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let ultimoMatchMeSirven = {};
-        let ultimoMatchLeSirven = {};
-        let ultimoNombreAmigo = "";
+        let ultimoMatchMeSirven = {}, ultimoMatchLeSirven = {}, ultimoNombreAmigo = "";
+        window.amigosDataGlobal = [];
 
+        // UI Listeners
         document.getElementById('btnCargarPerfil').addEventListener('click', cargarMiPerfil);
         document.getElementById('btnGuardarNube').addEventListener('click', guardarMisDatos);
         document.getElementById('btnBuscarAmigo').addEventListener('click', cargarYComparar);
@@ -190,12 +127,11 @@
         document.getElementById('btnCopiarPortapapeles').addEventListener('click', copiarTextoPortapapeles);
         document.getElementById('btnCopiarWhatsApp').addEventListener('click', abrirWhatsAppConTexto);
         document.getElementById('btnGuardarAmigoNuevo').addEventListener('click', guardarAmigoNuevo);
-        
-        // EVENTOS DE LOS OPTIMIZADORES
         document.getElementById('btnEscanearAmigos').addEventListener('click', escanearMisCambios);
         document.getElementById('btnMercadoGlobal').addEventListener('click', analizarMercadoGlobal);
-        document.getElementById('btnRutaCompletar').addEventListener('click', calcularRutaCompletar); // ETAPA 3
+        document.getElementById('btnRutaCompletar').addEventListener('click', calcularRutaCompletar);
 
+        // Core Parsing
         function limpiarNombreEquipo(textoRaw) {
             let limpio = textoRaw.replace(/[^A-Za-z]/g, '').toUpperCase();
             let siglas = ["FWC", "MEX", "RSA", "KOR", "CZE", "CAN", "BIH", "QAT", "SUI", "BRA", "MAR", "HAI", "SCO", "USA", "PAR", "AUS", "TUR", "GER", "CUW", "CIV", "ECU", "NED", "JPN", "SWE", "TUN", "BEL", "EGY", "IRN", "NZL", "ESP", "CPV", "KSA", "URU", "FRA", "SEN", "IRQ", "NOR", "ARG", "ALG", "AUT", "JOR", "POR", "COD", "UZB", "COL", "ENG", "CRO", "GHA", "PAN", "CC"];
@@ -205,67 +141,59 @@
 
         function parsearTexto(texto) {
             let datos = { faltan: {}, repetidas: {} };
-            let seccionActual = null;
-            let lineas = texto.split('\n');
-
-            lineas.forEach(linea => {
-                let lineaLimpia = linea.trim();
-                if (!lineaLimpia) return; 
-
-                let lineaMin = lineaLimpia.toLowerCase();
-                if (lineaMin.includes('me faltan') || lineaMin.includes('faltantes') || lineaMin.includes('i need')) { seccionActual = 'faltan'; return; } 
-                if (lineaMin.includes('repetidas') || lineaMin.includes('swaps') || lineaMin.includes('repetidos')) { seccionActual = 'repetidas'; return; }
-
-                if (!seccionActual) return; 
-
-                if (lineaLimpia.includes(':')) {
-                    let partes = lineaLimpia.split(':');
-                    let equipoLimpio = limpiarNombreEquipo(partes[0]);
-                    let numerosRaw = partes[1].split(',').map(n => n.replace(/\(?[xX×]\s*\d+\)?/g, '').trim());
-                    
-                    if (equipoLimpio) {
-                        if (!datos[seccionActual][equipoLimpio]) datos[seccionActual][equipoLimpio] = [];
-                        numerosRaw.forEach(n => {
-                            let subMatch = n.match(/^([A-Za-z]+)(\d+)$/);
-                            if (subMatch) { 
-                                let subEq = subMatch[1].toUpperCase();
-                                if (!datos[seccionActual][subEq]) datos[seccionActual][subEq] = [];
-                                datos[seccionActual][subEq].push(subMatch[2]);
-                            } else if (n !== "") {
-                                datos[seccionActual][equipoLimpio].push(n);
-                            }
-                        });
-                    }
-                } else {
-                    let patrones = lineaLimpia.match(/[A-Za-z]+\d+/g);
-                    if (patrones) {
-                        patrones.forEach(item => {
-                            let match = item.match(/^([A-Za-z]+)(\d+)$/);
-                            if (match) {
-                                let equipo = match[1].toUpperCase();
-                                let num = match[2];
-                                if (!datos[seccionActual][equipo]) datos[seccionActual][equipo] = [];
-                                datos[seccionActual][equipo].push(num);
-                            }
-                        });
-                    }
+            let seccion = null;
+            texto.split('\n').forEach(linea => {
+                let l = linea.trim();
+                if(!l) return;
+                let lm = l.toLowerCase();
+                if(lm.includes('faltan') || lm.includes('need')) seccion = 'faltan';
+                else if(lm.includes('repetidas') || lm.includes('swaps')) seccion = 'repetidas';
+                else if(seccion && l.includes(':')) {
+                    let eq = limpiarNombreEquipo(l.split(':')[0]);
+                    let nums = l.split(':')[1].replace(/\(x\d+\)/g, '').split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+                    if(!datos[seccion][eq]) datos[seccion][eq] = [];
+                    datos[seccion][eq].push(...nums);
                 }
             });
-            
-            for(let seccion in datos) {
-                for(let equipo in datos[seccion]) {
-                    datos[seccion][equipo] = [...new Set(datos[seccion][equipo])].sort((a,b) => parseInt(a) - parseInt(b));
-                }
-            }
+            // Ordenar pero NO eliminar duplicados para la nueva lógica "consumible"
+            for(let s in datos) for(let e in datos[s]) datos[s][e].sort((a,b)=>a-b);
             return datos;
         }
 
-        // FUNCIONES DE APOYO PARA LA ETAPA 3 (Aplanar diccionarios para hacer cuentas fáciles)
+        // Lógica de Match "Consumible"
+        function encontrarInterseccion(buscadas, ofrecidas) {
+            let matches = {};
+            let copiaOfrecidas = JSON.parse(JSON.stringify(ofrecidas));
+            for (let eq in buscadas) {
+                if (copiaOfrecidas[eq]) {
+                    buscadas[eq].forEach(num => {
+                        let index = copiaOfrecidas[eq].indexOf(num);
+                        if (index !== -1) {
+                            if (!matches[eq]) matches[eq] = [];
+                            matches[eq].push(num);
+                            copiaOfrecidas[eq].splice(index, 1);
+                        }
+                    });
+                }
+            }
+            return matches;
+        }
+
+        function obtenerDesglose(d) {
+            let c = { esp: 0, esc: 0, eq: 0, jug: 0 };
+            for(let e in d) {
+                if(e.includes('FWC') || e.includes('CC')) c.esp += d[e].length;
+                else d[e].forEach(n => { if(n==1) c.esc++; else if(n==13) c.eq++; else c.jug++; });
+            }
+            let tot = c.esp + c.esc + c.eq + c.jug;
+            return tot > 0 ? `${tot} fig. (${c.esp}🌟, ${c.esc}🛡️, ${c.eq}👥, ${c.jug}🏃)` : "0 fig.";
+        }
+
+        function contarTotal(d) { let t = 0; for(let e in d) t += d[e].length; return t; }
+
         function aplanarDiccionario(dict) {
             let arr = [];
-            for (let eq in dict) {
-                dict[eq].forEach(num => arr.push(`${eq} ${num}`));
-            }
+            for (let eq in dict) { dict[eq].forEach(num => arr.push(`${eq} ${num}`)); }
             return arr;
         }
 
@@ -273,99 +201,46 @@
             let dict = {};
             arr.forEach(item => {
                 let partes = item.split(' ');
-                let eq = partes[0];
-                let num = partes[1];
+                let eq = partes[0], num = partes[1];
                 if (!dict[eq]) dict[eq] = [];
                 dict[eq].push(num);
             });
-            for (let eq in dict) {
-                dict[eq] = [...new Set(dict[eq])].sort((a,b) => parseInt(a) - parseInt(b));
-            }
+            for (let eq in dict) { dict[eq].sort((a,b) => parseInt(a) - parseInt(b)); }
             return dict;
         }
 
-        function encontrarInterseccion(buscadas, ofrecidas) {
-            let matches = {};
-            for (let equipo in buscadas) {
-                if (ofrecidas[equipo]) {
-                    let comunes = buscadas[equipo].filter(num => ofrecidas[equipo].includes(num));
-                    if (comunes.length > 0) matches[equipo] = comunes;
-                }
-            }
-            return matches;
-        }
-
-        function obtenerDesglose(datos) {
-            let c = { especiales: 0, escudos: 0, equipos: 0, jugadores: 0 };
-            for (let equipo in datos) {
-                let numeros = datos[equipo];
-                if (equipo.includes('FWC') || equipo.includes('CC')) {
-                    c.especiales += numeros.length;
-                } else {
-                    numeros.forEach(num => {
-                        let val = parseInt(num);
-                        if (val === 1) c.escudos++; 
-                        else if (val === 13) c.equipos++; 
-                        else c.jugadores++;
-                    });
-                }
-            }
-            let total = c.especiales + c.escudos + c.equipos + c.jugadores;
-            if (total === 0) return "0 figuritas";
-            let detalles = [];
-            if (c.especiales > 0) detalles.push(`${c.especiales} 🌟 Especiales`);
-            if (c.escudos > 0) detalles.push(`${c.escudos} 🛡️ Escudos`);
-            if (c.equipos > 0) detalles.push(`${c.equipos} 👥 Equipos`);
-            if (c.jugadores > 0) detalles.push(`${c.jugadores} 🏃 Jugadores`);
-            return `${total} figuritas (${detalles.join(', ')})`;
-        }
-
-        function contarTotal(datos) {
-            let total = 0;
-            for (let eq in datos) total += datos[eq].length;
-            return total;
-        }
-
-        function renderizarResultados(divId, datos) {
-            let div = document.getElementById(divId);
-            div.innerHTML = '';
+        function renderizarResultados(divId, d) {
+            let div = document.getElementById(divId); div.innerHTML = '';
             let hayMatches = false;
-            for (let equipo in datos) {
+            for(let e in d) {
                 hayMatches = true;
-                let fila = document.createElement('div');
-                fila.className = 'team-row';
-                fila.innerHTML = `<b>${equipo}:</b> ${datos[equipo].join(', ')}`;
-                div.appendChild(fila);
+                div.innerHTML += `<div class="team-row"><b>${e}:</b> ${d[e].join(', ')}</div>`;
             }
-            if (!hayMatches) div.innerHTML = '<p style="color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 5px; font-size: 13px;">No hay coincidencias en esta lista. 😢</p>';
+            if(!hayMatches) div.innerHTML = '<p style="color:#856404; background:#fff3cd; padding:10px; border-radius:5px; font-size:13px;">No hay coincidencias.</p>';
         }
 
-        function ejecutarComparacion(textoMio, textoAmigo, nombreAmigo = "TU AMIGO") {
-            let misDatos = parsearTexto(textoMio);
-            let amigoDatos = parsearTexto(textoAmigo);
+        function ejecutarComparacion(mio, otro, nombre) {
+            let mD = parsearTexto(mio), oD = parsearTexto(otro);
+            ultimoMatchMeSirven = encontrarInterseccion(mD.faltan, oD.repetidas);
+            ultimoMatchLeSirven = encontrarInterseccion(oD.faltan, mD.repetidas);
+            ultimoNombreAmigo = nombre;
             
-            ultimoMatchMeSirven = encontrarInterseccion(misDatos.faltan, amigoDatos.repetidas);
-            ultimoMatchLeSirven = encontrarInterseccion(amigoDatos.faltan, misDatos.repetidas);
-            ultimoNombreAmigo = nombreAmigo;
-
-            let textoMeSirven = obtenerDesglose(ultimoMatchMeSirven);
-            let textoLeSirven = obtenerDesglose(ultimoMatchLeSirven);
-
             renderizarResultados('meSirven', ultimoMatchMeSirven);
             renderizarResultados('leSirven', ultimoMatchLeSirven);
-            
-            document.getElementById('tituloMeSirven').innerHTML = `✅ Me sirven ${textoMeSirven} de ${nombreAmigo}:`;
-            document.getElementById('tituloLeSirven').innerHTML = `🎁 A ${nombreAmigo} le sirven ${textoLeSirven} tuyas:`;
+            document.getElementById('tituloMeSirven').innerText = `✅ Me sirven ${obtenerDesglose(ultimoMatchMeSirven)} de ${nombre}:`;
+            document.getElementById('tituloLeSirven').innerText = `🎁 A ${nombre} le sirven ${obtenerDesglose(ultimoMatchLeSirven)} tuyas:`;
             
             document.getElementById('resultados').style.display = 'block';
             document.getElementById('detalleIndividual').style.display = 'block';
             document.getElementById('rankingResultados').style.display = 'none';
             document.getElementById('mercadoGlobalResultados').style.display = 'none';
             document.getElementById('rutaCompletarResultados').style.display = 'none';
-            
             if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
         }
 
+        // =====================================
+        // RENDERIZAR AMIGOS CON CHECKBOXES
+        // =====================================
         function renderizarBotonesAmigos() {
             let container = document.getElementById('botonesAmigos');
             container.innerHTML = '';
@@ -376,88 +251,67 @@
             let btnRuta = document.getElementById('btnRutaCompletar');
             
             if (!amigosTexto) {
-                btnEscanear.style.display = 'none';
-                btnMercado.style.display = 'none';
-                btnRuta.style.display = 'none';
+                btnEscanear.style.display = 'none'; btnMercado.style.display = 'none'; btnRuta.style.display = 'none';
                 return;
             }
             
             let amigos = amigosTexto.split(',').map(a => a.trim()).filter(a => a !== "");
             
             if(amigos.length > 0) { 
-                btnEscanear.style.display = 'block'; 
-                btnRuta.style.display = 'block';
+                btnEscanear.style.display = 'block'; btnRuta.style.display = 'block';
                 if(amigos.length > 1) btnMercado.style.display = 'block';
-            } else { 
-                btnEscanear.style.display = 'none'; 
-                btnMercado.style.display = 'none';
-                btnRuta.style.display = 'none';
             }
 
             amigos.forEach(amigo => {
                 let wrapper = document.createElement('div');
                 wrapper.className = 'amigo-wrapper';
+                
+                // Agregamos el Checkbox para selección
+                let chk = document.createElement('input');
+                chk.type = 'checkbox';
+                chk.className = 'amigo-checkbox';
+                chk.value = amigo;
+                chk.checked = true; // Por defecto seleccionado
+                
                 let btnMatch = document.createElement('button');
                 btnMatch.className = 'btn-amigo-match';
                 btnMatch.innerText = `🆚 ${amigo}`;
                 btnMatch.onclick = () => { document.getElementById('amigoUsuario').value = amigo; cargarYComparar(); };
+                
                 let btnDelete = document.createElement('button');
                 btnDelete.className = 'btn-amigo-delete';
                 btnDelete.innerText = '✖';
                 btnDelete.onclick = () => eliminarAmigoFrecuente(amigo);
+                
+                wrapper.appendChild(chk);
                 wrapper.appendChild(btnMatch);
                 wrapper.appendChild(btnDelete);
                 container.appendChild(wrapper);
             });
         }
 
-        function eliminarAmigoFrecuente(amigoAEliminar) {
-            if(confirm(`¿Estás seguro de que querés borrar a ${amigoAEliminar}?`)) {
-                let misAmigosInput = document.getElementById('misAmigos');
-                let amigosActuales = misAmigosInput.value.split(',').map(a => a.trim()).filter(a => a !== "" && a !== amigoAEliminar);
-                misAmigosInput.value = amigosActuales.join(', ');
-                let miUsuario = document.getElementById('miUsuario').value.trim();
-                if(miUsuario) {
-                    let miTexto = document.getElementById('miLista').value.trim();
-                    set(ref(db, 'usuarios/' + miUsuario), { textoOriginal: miTexto, amigos: misAmigosInput.value, ultimaActualizacion: new Date().toLocaleString() }).then(() => renderizarBotonesAmigos());
-                } else renderizarBotonesAmigos();
+        // =====================================
+        // OBTENER AMIGOS SELECCIONADOS
+        // =====================================
+        function obtenerAmigosSeleccionados() {
+            let seleccionados = Array.from(document.querySelectorAll('.amigo-checkbox:checked')).map(cb => cb.value);
+            if (seleccionados.length === 0) {
+                alert("Por favor, dejá al menos un amigo tildado en la lista azul de arriba para poder analizar.");
             }
+            return seleccionados;
         }
 
-        async function guardarAmigoNuevo() {
-            let miUsuario = document.getElementById('miUsuario').value.trim();
-            let amigoUsuario = document.getElementById('amigoUsuario').value.trim();
-            let amigoTexto = document.getElementById('amigoLista').value.trim();
-            let status = document.getElementById('statusAmigo');
-            if (!miUsuario) { alert("Cargá tu usuario en la izquierda."); return; }
-            if (!amigoUsuario || !amigoTexto) { alert("Escribí el nombre y pegá la lista."); return; }
-            status.style.color = "#005c98"; status.innerText = "Guardando...";
-            try {
-                await set(ref(db, 'usuarios/' + amigoUsuario), { textoOriginal: amigoTexto, amigos: "", ultimaActualizacion: new Date().toLocaleString() });
-                let misAmigosInput = document.getElementById('misAmigos');
-                let amigosActuales = misAmigosInput.value.split(',').map(a => a.trim()).filter(a => a !== "");
-                if (!amigosActuales.includes(amigoUsuario)) {
-                    amigosActuales.push(amigoUsuario);
-                    misAmigosInput.value = amigosActuales.join(', ');
-                    let miTexto = document.getElementById('miLista').value.trim();
-                    await set(ref(db, 'usuarios/' + miUsuario), { textoOriginal: miTexto, amigos: misAmigosInput.value, ultimaActualizacion: new Date().toLocaleString() });
-                }
-                renderizarBotonesAmigos();
-                status.style.color = "green"; status.innerText = `¡Guardado!`;
-            } catch (error) { status.style.color = "red"; status.innerText = "Error."; }
-        }
-
-        // ==========================================
+        // =====================================
         // OPTIMIZADOR ETAPA 1: RANKING
-        // ==========================================
+        // =====================================
         async function escanearMisCambios() {
             let textoMio = document.getElementById('miLista').value.trim();
-            let misAmigosTexto = document.getElementById('misAmigos').value.trim();
-            let status = document.getElementById('statusAmigo');
             if (!textoMio) { alert("Pegá tu lista primero."); return; }
-            let amigos = misAmigosTexto.split(',').map(a => a.trim()).filter(a => a !== "");
+            
+            let amigos = obtenerAmigosSeleccionados();
             if (amigos.length === 0) return;
 
+            let status = document.getElementById('statusAmigo');
             status.style.color = "#005c98"; status.innerText = "⚡ Escaneando opciones...";
             let misDatos = parsearTexto(textoMio);
 
@@ -490,8 +344,8 @@
             let listaContainer = document.getElementById('listaRanking');
             listaContainer.innerHTML = '';
             if (resultadosRanking.length === 0) {
-                listaContainer.innerHTML = '<p style="color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 5px;">No hay intercambios posibles.</p>';
-                return;
+                listaContainer.innerHTML = '<p style="color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 5px;">No hay intercambios posibles con los seleccionados.</p>';
+                status.innerText = ""; return;
             }
 
             let medallas = ['🥇', '🥈', '🥉'];
@@ -500,9 +354,14 @@
                 let div = document.createElement('div');
                 div.className = 'ranking-item';
                 div.style = res.posibles === 0 ? 'opacity: 0.7;' : '';
-                div.innerHTML = `<div class="ranking-text"><div class="ranking-name">${medalla} ${res.nombre} - 🔄 ${res.posibles} mano a mano</div>
-                    <div class="ranking-stats"><span style="color: var(--success);">Te da <b>${res.me}</b></span> | <span style="color: var(--primary);">Le das <b>${res.le}</b></span></div></div>
-                    <button class="btn-primary" style="width: auto; padding: 8px 12px; font-size: 12px;" onclick="document.getElementById('amigoUsuario').value='${res.nombre}'; document.getElementById('amigoLista').value=\`${res.textoRaw}\`; document.getElementById('btnCompararLocal').click();">🔍 Ver Match</button>`;
+                div.innerHTML = `
+                    <div class="ranking-header">
+                        <div class="ranking-text">
+                            <div class="ranking-name">${medalla} ${res.nombre} - 🔄 ${res.posibles} mano a mano</div>
+                            <div class="ranking-stats"><span style="color: var(--success);">Te da <b>${res.me}</b></span> | <span style="color: var(--primary);">Le das <b>${res.le}</b></span></div>
+                        </div>
+                        <button class="btn-primary" style="width: auto; padding: 8px 12px; font-size: 12px;" onclick="document.getElementById('amigoUsuario').value='${res.nombre}'; document.getElementById('amigoLista').value=\`${res.textoRaw}\`; document.getElementById('btnCompararLocal').click();">🔍 Ver Match</button>
+                    </div>`;
                 listaContainer.appendChild(div);
             });
             if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
@@ -513,25 +372,25 @@
         // OPTIMIZADOR ETAPA 2: BROKER GLOBAL
         // ==========================================
         async function analizarMercadoGlobal() {
-            let misAmigosTexto = document.getElementById('misAmigos').value.trim();
-            let status = document.getElementById('statusAmigo');
-            let amigos = misAmigosTexto.split(',').map(a => a.trim()).filter(a => a !== "");
-            if (amigos.length < 2) { alert("Necesitás al menos 2 amigos guardados."); return; }
+            let amigos = obtenerAmigosSeleccionados();
+            if (amigos.length < 2) { alert("Necesitás al menos 2 amigos tildados para triangular."); return; }
 
+            let status = document.getElementById('statusAmigo');
             status.style.color = "#005c98"; status.innerText = "🌐 Analizando matriz...";
-            let amigosData = [];
+            window.amigosDataGlobal = [];
+
             let promesas = amigos.map(async (amigo) => {
                 try {
                     const snapshot = await get(child(ref(db), `usuarios/${amigo}`));
-                    if (snapshot.exists()) amigosData.push({ nombre: amigo, datos: parsearTexto(snapshot.val().textoOriginal) });
+                    if (snapshot.exists()) window.amigosDataGlobal.push({ nombre: amigo, datos: parsearTexto(snapshot.val().textoOriginal) });
                 } catch (e) { }
             });
             await Promise.all(promesas);
 
             let cruces = [];
-            for (let i = 0; i < amigosData.length; i++) {
-                for (let j = i + 1; j < amigosData.length; j++) {
-                    let A = amigosData[i], B = amigosData[j];
+            for (let i = 0; i < window.amigosDataGlobal.length; i++) {
+                for (let j = i + 1; j < window.amigosDataGlobal.length; j++) {
+                    let A = window.amigosDataGlobal[i], B = window.amigosDataGlobal[j];
                     let aDaB = contarTotal(encontrarInterseccion(B.datos.faltan, A.datos.repetidas));
                     let bDaA = contarTotal(encontrarInterseccion(A.datos.faltan, B.datos.repetidas));
                     let posibles = Math.min(aDaB, bDaA);
@@ -549,17 +408,30 @@
             let listaContainer = document.getElementById('listaMercadoGlobal');
             listaContainer.innerHTML = '';
             if (cruces.length === 0) {
-                listaContainer.innerHTML = '<p style="color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 5px;">Tus amigos no tienen intercambios entre ellos.</p>';
-                return;
+                listaContainer.innerHTML = '<p style="color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 5px;">Los amigos seleccionados no tienen intercambios entre ellos.</p>';
+                status.innerText = ""; return;
             }
 
-            cruces.slice(0, 10).forEach((res) => {
+            cruces.slice(0, 15).forEach((res) => {
                 let div = document.createElement('div');
                 div.className = 'ranking-item';
-                div.style.borderLeftColor = 'var(--primary)';
-                div.innerHTML = `<div class="ranking-text" style="width: 100%;"><div class="ranking-name">🤝 ${res.A} & ${res.B}</div>
-                    <div class="ranking-stats" style="margin-top: 5px;">Tienen <b>${res.posibles}</b> cambios mano a mano posibles. <br>
-                    <span style="font-size: 12px; color: #6c757d;">(${res.A} le da ${res.aDaB} a ${res.B} | ${res.B} le da ${res.bDaA} a ${res.A})</span></div></div>`;
+                let amigoA = window.amigosDataGlobal.find(a => a.nombre === res.A).datos;
+                let amigoB = window.amigosDataGlobal.find(a => a.nombre === res.B).datos;
+                let A_da_B = encontrarInterseccion(amigoB.faltan, amigoA.repetidas);
+                let B_da_A = encontrarInterseccion(amigoA.faltan, amigoB.repetidas);
+
+                div.innerHTML = `
+                    <div class="ranking-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block'">
+                        <div class="ranking-text">
+                            <div class="ranking-name">🤝 ${res.A} & ${res.B}</div>
+                            <div class="ranking-stats">Posibles cambios: <b>${res.posibles}</b> (Tocá para detalle)</div>
+                        </div>
+                    </div>
+                    <div class="ranking-content">
+                        <p><b>${res.A} le da a ${res.B}:</b><br>${formatearDiccionario(A_da_B, false)}</p>
+                        <p><b>${res.B} le da a ${res.A}:</b><br>${formatearDiccionario(B_da_A, false)}</p>
+                    </div>
+                `;
                 listaContainer.appendChild(div);
             });
             if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
@@ -567,27 +439,24 @@
         }
 
         // ==========================================
-        // OPTIMIZADOR ETAPA 3: RUTA PARA COMPLETAR AL 100%
+        // OPTIMIZADOR ETAPA 3: RUTA PARA COMPLETAR
         // ==========================================
         async function calcularRutaCompletar() {
             let textoMio = document.getElementById('miLista').value.trim();
-            let misAmigosTexto = document.getElementById('misAmigos').value.trim();
-            let status = document.getElementById('statusAmigo');
-
             if (!textoMio) { alert("Primero pegá tu lista."); return; }
-            let amigos = misAmigosTexto.split(',').map(a => a.trim()).filter(a => a !== "");
+            
+            let amigos = obtenerAmigosSeleccionados();
             if (amigos.length === 0) return;
 
+            let status = document.getElementById('statusAmigo');
             status.style.color = "#005c98"; status.innerText = "🚀 Calculando la ruta óptima...";
             
             let misDatos = parsearTexto(textoMio);
             let faltanOriginal = contarTotal(misDatos.faltan);
             
-            // Trabajamos con arrays planos (Ej: ["MEX 1", "MEX 2", "ARG 10"]) para simplificar la resta de figuritas
             let misFaltan = aplanarDiccionario(misDatos.faltan);
             let misRepetidas = aplanarDiccionario(misDatos.repetidas);
 
-            // Descargar amigos
             let amigosData = [];
             let promesas = amigos.map(async (amigo) => {
                 try {
@@ -604,7 +473,6 @@
             let conseguidasTotal = 0;
             let iteracionSeguridad = 0;
 
-            // ALGORITMO GREEDY (Avaro): Buscar iterativamente el amigo que me dé el cambio máximo posible
             while (misFaltan.length > 0 && iteracionSeguridad < 50) {
                 iteracionSeguridad++;
                 let mejorAmigo = null;
@@ -613,51 +481,27 @@
                 let mejorLeDoy = [];
 
                 for (let amigo of amigosData) {
-                    // Qué me puede dar este amigo AHORA MISMO (que yo todavía necesite)
                     let mePuedeDar = amigo.repetidas.filter(f => misFaltan.includes(f));
-                    // Qué le puedo dar yo AHORA MISMO (que a él le falte y yo todavía tenga)
                     let lePuedoDar = amigo.faltan.filter(f => misRepetidas.includes(f));
-
                     let posibles = Math.min(mePuedeDar.length, lePuedoDar.length);
 
                     if (posibles > mejorCantidad) {
-                        mejorCantidad = posibles;
-                        mejorAmigo = amigo;
-                        mejorMeDa = mePuedeDar.slice(0, posibles);
-                        mejorLeDoy = lePuedoDar.slice(0, posibles);
+                        mejorCantidad = posibles; mejorAmigo = amigo;
+                        mejorMeDa = mePuedeDar.slice(0, posibles); mejorLeDoy = lePuedoDar.slice(0, posibles);
                     }
                 }
 
-                if (mejorCantidad === 0) break; // Ya no hay más cambios equitativos posibles con nadie
+                if (mejorCantidad === 0) break; 
 
-                // Registrar el paso
-                planDeAccion.push({
-                    nombre: mejorAmigo.nombre,
-                    cantidad: mejorCantidad,
-                    recibo: desaplanarArray(mejorMeDa),
-                    doy: desaplanarArray(mejorLeDoy)
-                });
+                planDeAccion.push({ nombre: mejorAmigo.nombre, cantidad: mejorCantidad, recibo: desaplanarArray(mejorMeDa), doy: desaplanarArray(mejorLeDoy) });
                 conseguidasTotal += mejorCantidad;
 
-                // "Consumir" las figuritas para la siguiente vuelta del algoritmo
                 misFaltan = misFaltan.filter(f => !mejorMeDa.includes(f));
-                mejorLeDoy.forEach(f => {
-                    let idx = misRepetidas.indexOf(f);
-                    if (idx > -1) misRepetidas.splice(idx, 1);
-                });
-                
-                // Actualizar las listas del amigo para no sacarle dos veces la misma
-                mejorMeDa.forEach(f => {
-                    let idx = mejorAmigo.repetidas.indexOf(f);
-                    if (idx > -1) mejorAmigo.repetidas.splice(idx, 1);
-                });
-                mejorLeDoy.forEach(f => {
-                    let idx = mejorAmigo.faltan.indexOf(f);
-                    if (idx > -1) mejorAmigo.faltan.splice(idx, 1);
-                });
+                mejorLeDoy.forEach(f => { let idx = misRepetidas.indexOf(f); if (idx > -1) misRepetidas.splice(idx, 1); });
+                mejorMeDa.forEach(f => { let idx = mejorAmigo.repetidas.indexOf(f); if (idx > -1) mejorAmigo.repetidas.splice(idx, 1); });
+                mejorLeDoy.forEach(f => { let idx = mejorAmigo.faltan.indexOf(f); if (idx > -1) mejorAmigo.faltan.splice(idx, 1); });
             }
 
-            // Renderizar la Vista 3
             document.getElementById('resultados').style.display = 'block';
             document.getElementById('rutaCompletarResultados').style.display = 'block';
             document.getElementById('rankingResultados').style.display = 'none';
@@ -669,14 +513,14 @@
             listaContainer.innerHTML = '';
 
             if (planDeAccion.length === 0) {
-                resumenDiv.innerHTML = '<p style="color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 5px;">No hay combinaciones equitativas para conseguir nuevas figuritas. 😢</p>';
+                resumenDiv.innerHTML = '<p style="color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 5px;">No hay combinaciones equitativas con los seleccionados. 😢</p>';
             } else {
                 resumenDiv.innerHTML = `
                     <div style="background: #e9ecef; padding: 15px; border-radius: 8px;">
                         <b style="color: var(--primary);">Resumen del Plan:</b><br>
                         🔹 Te faltaban: <b>${faltanOriginal}</b><br>
                         ✅ Conseguirías siguiendo estos pasos: <b>${conseguidasTotal}</b><br>
-                        ⚠️ Te seguirán faltando: <b style="color: var(--danger);">${misFaltan.length}</b> (Ningún amigo las tiene, o te quedaste sin repetidas para cambiarles).
+                        ⚠️ Te seguirán faltando: <b style="color: var(--danger);">${misFaltan.length}</b>
                     </div>
                 `;
 
@@ -699,16 +543,12 @@
             status.innerText = "";
         }
 
-        // Formateador especial para inyectar HTML en la vista de Ruta
         function formatearDiccionarioHTML(datos) {
             let texto = "";
-            for (let equipo in datos) {
-                texto += `&nbsp;&nbsp;• <b>${equipo}:</b> ${datos[equipo].join(', ')}<br>`;
-            }
+            for (let equipo in datos) { texto += `&nbsp;&nbsp;• <b>${equipo}:</b> ${datos[equipo].join(', ')}<br>`; }
             return texto;
         }
 
-        // ... (el resto de las funciones de Links y Copy se mantienen iguales)
         function actualizarLinkDirecto(usuario) {
             let urlBase = window.location.origin + window.location.pathname;
             document.getElementById('linkCompartir').value = urlBase + '?buscar=' + encodeURIComponent(usuario);
@@ -811,6 +651,40 @@
                     status.style.color = "green"; status.innerText = `¡Lista cargada!`;
                 } else { status.style.color = "red"; status.innerText = `Usuario no encontrado.`; }
             } catch (error) { status.style.color = "red"; status.innerText = "Error de conexión."; }
+        }
+        function eliminarAmigoFrecuente(amigoAEliminar) {
+            if(confirm(`¿Estás seguro de que querés borrar a ${amigoAEliminar}?`)) {
+                let misAmigosInput = document.getElementById('misAmigos');
+                let amigosActuales = misAmigosInput.value.split(',').map(a => a.trim()).filter(a => a !== "" && a !== amigoAEliminar);
+                misAmigosInput.value = amigosActuales.join(', ');
+                let miUsuario = document.getElementById('miUsuario').value.trim();
+                if(miUsuario) {
+                    let miTexto = document.getElementById('miLista').value.trim();
+                    set(ref(db, 'usuarios/' + miUsuario), { textoOriginal: miTexto, amigos: misAmigosInput.value, ultimaActualizacion: new Date().toLocaleString() }).then(() => renderizarBotonesAmigos());
+                } else renderizarBotonesAmigos();
+            }
+        }
+        async function guardarAmigoNuevo() {
+            let miUsuario = document.getElementById('miUsuario').value.trim();
+            let amigoUsuario = document.getElementById('amigoUsuario').value.trim();
+            let amigoTexto = document.getElementById('amigoLista').value.trim();
+            let status = document.getElementById('statusAmigo');
+            if (!miUsuario) { alert("Cargá tu usuario en la izquierda."); return; }
+            if (!amigoUsuario || !amigoTexto) { alert("Escribí el nombre y pegá la lista."); return; }
+            status.style.color = "#005c98"; status.innerText = "Guardando...";
+            try {
+                await set(ref(db, 'usuarios/' + amigoUsuario), { textoOriginal: amigoTexto, amigos: "", ultimaActualizacion: new Date().toLocaleString() });
+                let misAmigosInput = document.getElementById('misAmigos');
+                let amigosActuales = misAmigosInput.value.split(',').map(a => a.trim()).filter(a => a !== "");
+                if (!amigosActuales.includes(amigoUsuario)) {
+                    amigosActuales.push(amigoUsuario);
+                    misAmigosInput.value = amigosActuales.join(', ');
+                    let miTexto = document.getElementById('miLista').value.trim();
+                    await set(ref(db, 'usuarios/' + miUsuario), { textoOriginal: miTexto, amigos: misAmigosInput.value, ultimaActualizacion: new Date().toLocaleString() });
+                }
+                renderizarBotonesAmigos();
+                status.style.color = "green"; status.innerText = `¡Guardado!`;
+            } catch (error) { status.style.color = "red"; status.innerText = "Error."; }
         }
         function compararListasLocales() {
             let textoMio = document.getElementById('miLista').value.trim();
