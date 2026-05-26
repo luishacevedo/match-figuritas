@@ -23,19 +23,15 @@
         .btn-wsp { background-color: var(--wsp); box-shadow: 0 4px 6px rgba(37,211,102,0.3); }
         .btn-wsp-small { background-color: var(--wsp); color: white; }
         
-        /* ESTILOS BOTONES AMIGOS BLINDADOS Y ORDENADOS */
-        .grid-amigos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
-        .amigo-wrapper { display: flex; align-items: center; background-color: #17a2b8; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%; height: 40px; }
-        .amigo-checkbox { margin: 0 0 0 10px; cursor: pointer; transform: scale(1.2); accent-color: var(--yellow); flex-shrink: 0; }
-        .btn-amigo-match { background: transparent; border: none; color: white; padding: 0 10px; font-size: 13px; cursor: pointer; font-weight: bold; flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; height: 100%; display: flex; align-items: center; }
+        /* ESTILOS BOTONES AMIGOS: FIJOS Y BLINDADOS */
+        #botonesAmigos { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        .amigo-wrapper { display: flex; align-items: center; background-color: #17a2b8; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%; height: 38px; box-sizing: border-box;}
+        .amigo-checkbox { margin: 0 0 0 10px; cursor: pointer; transform: scale(1.2); accent-color: var(--yellow); flex-shrink: 0;}
+        .btn-amigo-match { background: transparent; border: none; color: white; padding: 0 10px; font-size: 13px; cursor: pointer; font-weight: bold; flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; height: 100%; margin: 0;}
         .btn-amigo-match:hover { background: rgba(0,0,0,0.1); }
-        .btn-amigo-delete { background: rgba(0,0,0,0.15); border: none; color: white; padding: 0 12px; font-size: 14px; cursor: pointer; flex-shrink: 0; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .btn-amigo-delete { background: rgba(0,0,0,0.15); border: none; color: white; padding: 0 12px; font-size: 12px; cursor: pointer; flex-shrink: 0; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0;}
         .btn-amigo-delete:hover { background: var(--danger); }
         
-        /* CONTROLES DE SELECCIÓN DISCRETOS */
-        .btn-link-action { font-size: 12px; color: var(--primary); background: #e9ecef; padding: 5px 12px; border-radius: 12px; text-decoration: none; font-weight: bold; transition: 0.2s; display: inline-flex; align-items: center; gap: 4px;}
-        .btn-link-action:hover { background: #dde2e6; color: #004573; }
-
         .flex-row { display: flex; gap: 8px; margin-bottom: 15px; align-items: stretch; }
         .flex-row input { margin-bottom: 0; flex: 1; }
         .flex-row button { width: auto; white-space: nowrap; margin: 0; padding: 0 15px; }
@@ -50,12 +46,7 @@
         .step-box { background: #e9f7ef; border-left: 4px solid var(--success); padding: 15px; margin-bottom: 15px; border-radius: 8px; }
         .footer { text-align: center; margin-top: 30px; color: #6c757d; font-size: 13px; padding-top: 20px; border-top: 1px solid #dee2e6; }
         .footer a { color: var(--primary); font-weight: bold; text-decoration: none; }
-        
-        @media (max-width: 768px) { 
-            .grid { grid-template-columns: 1fr; gap: 15px; } 
-            .botones-resultados { flex-direction: column; gap: 10px; } 
-            .grid-amigos { grid-template-columns: 1fr; } /* 1 columna en celular */
-        }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; gap: 15px; } .botones-resultados { flex-direction: column; gap: 10px; } }
     </style>
 </head>
 <body>
@@ -86,12 +77,12 @@
         <div class="box">
             <h3>🤝 Intercambio y Estrategia</h3>
             
-            <div id="controlesSeleccion" style="display: none; justify-content: flex-end; gap: 10px; margin-bottom: 10px;">
-                <a href="#" id="btnSeleccionarTodos" class="btn-link-action">☑️ Marcar todos</a>
-                <a href="#" id="btnDeseleccionarTodos" class="btn-link-action">🔲 Desmarcar todos</a>
+            <div id="controlesSeleccion" style="display: none; justify-content: flex-end; gap: 15px; margin-bottom: 8px;">
+                <a href="#" id="btnSeleccionarTodos" style="font-size: 12px; color: var(--secondary); text-decoration: none; font-weight: bold;">☑️ Marcar todos</a>
+                <a href="#" id="btnDeseleccionarTodos" style="font-size: 12px; color: var(--secondary); text-decoration: none; font-weight: bold;">🔲 Desmarcar todos</a>
             </div>
 
-            <div id="botonesAmigos" class="grid-amigos"></div>
+            <div id="botonesAmigos"></div>
             
             <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 15px;">
                 <button id="btnEscanearAmigos" class="btn-yellow" style="padding: 8px; font-size: 13px; display: none;">⚡ Ranking de los Seleccionados</button>
@@ -146,7 +137,7 @@
         document.getElementById('btnEscanearAmigos').addEventListener('click', escanearMisCambios);
         document.getElementById('btnMercadoGlobal').addEventListener('click', analizarMercadoGlobal);
         document.getElementById('btnRutaCompletar').addEventListener('click', calcularRutaCompletar);
-
+        
         document.getElementById('btnSeleccionarTodos').addEventListener('click', (e) => {
             e.preventDefault(); document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = true);
         });
@@ -178,10 +169,36 @@
                     datos[seccion][eq].push(...nums);
                 }
             });
-            for(let s in datos) for(let e in datos[s]) datos[s][e].sort((a,b)=>a-b);
+            
+            for(let s in datos) {
+                for(let e in datos[s]) {
+                    if (s === 'faltan') {
+                        // Limpiamos duplicados solo en Faltan (no necesitas 2 veces la misma)
+                        datos[s][e] = [...new Set(datos[s][e])].sort((a,b)=>a-b);
+                    } else {
+                        // En Repetidas MANTENEMOS los duplicados (ej: 5, 5, 5 son 3 copias físicas)
+                        datos[s][e].sort((a,b)=>a-b);
+                    }
+                }
+            }
             return datos;
         }
 
+        // Nueva lógica de intersección de multiconjuntos (Arrays planos) para Ruta al 100%
+        function multisetIntersection(arr1, arr2) {
+            let result = [];
+            let copy2 = [...arr2];
+            for (let item of arr1) {
+                let idx = copy2.indexOf(item);
+                if (idx !== -1) {
+                    result.push(item);
+                    copy2.splice(idx, 1);
+                }
+            }
+            return result;
+        }
+
+        // Lógica de Match "Consumible" tradicional (Diccionarios)
         function encontrarInterseccion(buscadas, ofrecidas) {
             let matches = {};
             let copiaOfrecidas = JSON.parse(JSON.stringify(ofrecidas));
@@ -484,8 +501,8 @@
                 let mejorLeDoy = [];
 
                 for (let amigo of amigosData) {
-                    let mePuedeDar = amigo.repetidas.filter(f => misFaltan.includes(f));
-                    let lePuedoDar = amigo.faltan.filter(f => misRepetidas.includes(f));
+                    let mePuedeDar = multisetIntersection(misFaltan, amigo.repetidas);
+                    let lePuedoDar = multisetIntersection(amigo.faltan, misRepetidas);
                     let posibles = Math.min(mePuedeDar.length, lePuedoDar.length);
 
                     if (posibles > mejorCantidad) {
@@ -499,7 +516,7 @@
                 planDeAccion.push({ nombre: mejorAmigo.nombre, cantidad: mejorCantidad, recibo: desaplanarArray(mejorMeDa), doy: desaplanarArray(mejorLeDoy) });
                 conseguidasTotal += mejorCantidad;
 
-                misFaltan = misFaltan.filter(f => !mejorMeDa.includes(f));
+                misFaltan = multisetIntersection(misFaltan, misFaltan.filter(f => !mejorMeDa.includes(f)));
                 mejorLeDoy.forEach(f => { let idx = misRepetidas.indexOf(f); if (idx > -1) misRepetidas.splice(idx, 1); });
                 mejorMeDa.forEach(f => { let idx = mejorAmigo.repetidas.indexOf(f); if (idx > -1) mejorAmigo.repetidas.splice(idx, 1); });
                 mejorLeDoy.forEach(f => { let idx = mejorAmigo.faltan.indexOf(f); if (idx > -1) mejorAmigo.faltan.splice(idx, 1); });
