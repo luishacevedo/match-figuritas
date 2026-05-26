@@ -23,12 +23,12 @@
         .btn-wsp { background-color: var(--wsp); box-shadow: 0 4px 6px rgba(37,211,102,0.3); }
         .btn-wsp-small { background-color: var(--wsp); color: white; }
         
-        /* ESTILOS BOTONES AMIGOS BLINDADOS */
-        .amigo-wrapper { display: flex; align-items: center; background-color: #17a2b8; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%;}
-        .amigo-checkbox { margin: 0 0 0 10px; cursor: pointer; transform: scale(1.2); accent-color: var(--yellow); flex-shrink: 0;}
-        .btn-amigo-match { background: transparent; border: none; color: white; padding: 8px 10px; font-size: 13px; cursor: pointer; font-weight: bold; flex: 1 1 auto; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0; min-width: 0;}
+        /* ESTILOS BOTONES AMIGOS (GRILLA MEJORADA) */
+        .amigo-wrapper { display: flex; align-items: stretch; background-color: #17a2b8; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%;}
+        .amigo-checkbox { margin: 0 0 0 8px; align-self: center; cursor: pointer; transform: scale(1.1); accent-color: var(--yellow); flex-shrink: 0;}
+        .btn-amigo-match { background: transparent; border: none; color: white; padding: 6px 10px; font-size: 13px; cursor: pointer; font-weight: bold; flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0; border-radius: 0; }
         .btn-amigo-match:hover { background: rgba(0,0,0,0.1); }
-        .btn-amigo-delete { background: rgba(0,0,0,0.15); border: none; color: white; padding: 8px 10px; font-size: 12px; cursor: pointer; width: auto; margin: 0; display: flex; align-items: center; flex-shrink: 0;}
+        .btn-amigo-delete { background: rgba(0,0,0,0.15); border: none; color: white; padding: 6px 8px; font-size: 12px; cursor: pointer; width: auto; margin: 0; border-radius: 0; display: flex; align-items: center; flex-shrink: 0;}
         .btn-amigo-delete:hover { background: var(--danger); }
         
         .flex-row { display: flex; gap: 8px; margin-bottom: 15px; align-items: stretch; }
@@ -136,12 +136,15 @@
         document.getElementById('btnEscanearAmigos').addEventListener('click', escanearMisCambios);
         document.getElementById('btnMercadoGlobal').addEventListener('click', analizarMercadoGlobal);
         document.getElementById('btnRutaCompletar').addEventListener('click', calcularRutaCompletar);
-
+        
+        // Listeners Marcar/Desmarcar
         document.getElementById('btnSeleccionarTodos').addEventListener('click', (e) => {
-            e.preventDefault(); document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = true);
+            e.preventDefault();
+            document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = true);
         });
         document.getElementById('btnDeseleccionarTodos').addEventListener('click', (e) => {
-            e.preventDefault(); document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = false);
+            e.preventDefault();
+            document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = false);
         });
 
         // Core Parsing
@@ -268,8 +271,12 @@
             
             if(amigos.length > 0) { 
                 btnEscanear.style.display = 'block'; btnRuta.style.display = 'block';
-                if(amigos.length > 1) { btnMercado.style.display = 'block'; controlesSelec.style.display = 'flex'; } 
-                else { controlesSelec.style.display = 'none'; }
+                if(amigos.length > 1) {
+                    btnMercado.style.display = 'block';
+                    controlesSelec.style.display = 'flex';
+                } else {
+                    controlesSelec.style.display = 'none';
+                }
             }
 
             amigos.forEach(amigo => {
@@ -284,13 +291,13 @@
                 
                 let btnMatch = document.createElement('button');
                 btnMatch.className = 'btn-amigo-match';
-                btnMatch.title = amigo;
-                btnMatch.innerHTML = "🆚 " + amigo;
+                btnMatch.title = amigo; // Muestra el nombre completo si pasas el mouse
+                btnMatch.innerText = `🆚 ${amigo}`;
                 btnMatch.onclick = () => { document.getElementById('amigoUsuario').value = amigo; cargarYComparar(); };
                 
                 let btnDelete = document.createElement('button');
                 btnDelete.className = 'btn-amigo-delete';
-                btnDelete.innerHTML = "✖";
+                btnDelete.innerText = '✖';
                 btnDelete.onclick = () => eliminarAmigoFrecuente(amigo);
                 
                 wrapper.appendChild(chk);
@@ -302,13 +309,17 @@
 
         function obtenerAmigosSeleccionados() {
             let seleccionados = Array.from(document.querySelectorAll('.amigo-checkbox:checked')).map(cb => cb.value);
-            if (seleccionados.length === 0) alert("Por favor, dejá al menos un amigo tildado en la lista azul de arriba para poder analizar.");
+            if (seleccionados.length === 0) {
+                alert("Por favor, dejá al menos un amigo tildado en la lista azul de arriba para poder analizar.");
+            }
             return seleccionados;
         }
 
+        // OPTIMIZADOR ETAPA 1: RANKING
         async function escanearMisCambios() {
             let textoMio = document.getElementById('miLista').value.trim();
             if (!textoMio) { alert("Pegá tu lista primero."); return; }
+            
             let amigos = obtenerAmigosSeleccionados();
             if (amigos.length === 0) return;
 
@@ -369,6 +380,7 @@
             status.innerText = "";
         }
 
+        // OPTIMIZADOR ETAPA 2: BROKER GLOBAL
         async function analizarMercadoGlobal() {
             let amigos = obtenerAmigosSeleccionados();
             if (amigos.length < 2) { alert("Necesitás al menos 2 amigos tildados para triangular."); return; }
@@ -436,9 +448,11 @@
             status.innerText = "";
         }
 
+        // OPTIMIZADOR ETAPA 3: RUTA PARA COMPLETAR
         async function calcularRutaCompletar() {
             let textoMio = document.getElementById('miLista').value.trim();
             if (!textoMio) { alert("Primero pegá tu lista."); return; }
+            
             let amigos = obtenerAmigosSeleccionados();
             if (amigos.length === 0) return;
 
@@ -447,6 +461,7 @@
             
             let misDatos = parsearTexto(textoMio);
             let faltanOriginal = contarTotal(misDatos.faltan);
+            
             let misFaltan = aplanarDiccionario(misDatos.faltan);
             let misRepetidas = aplanarDiccionario(misDatos.repetidas);
 
