@@ -23,19 +23,19 @@
         .btn-wsp { background-color: var(--wsp); box-shadow: 0 4px 6px rgba(37,211,102,0.3); }
         .btn-wsp-small { background-color: var(--wsp); color: white; }
         
-        /* ESTILOS BOTONES AMIGOS: DISEÑO BLINDADO */
-        #botonesAmigos { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px; }
-        .amigo-wrapper { display: flex; align-items: stretch; background-color: #17a2b8; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .chk-container { padding: 0 12px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.05); border-right: 1px solid rgba(255,255,255,0.2); }
-        .amigo-checkbox { margin: 0; transform: scale(1.3); cursor: pointer; accent-color: var(--yellow); }
-        .btn-amigo-match { flex: 1; text-align: left; background: transparent; color: white; border: none; padding: 10px 12px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 0; margin: 0; }
+        /* ESTILOS BOTONES AMIGOS: 100% BLINDADOS CONTRA COLAPSOS VISUALES */
+        #botonesAmigos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        .amigo-wrapper { display: flex; align-items: stretch; background-color: #17a2b8; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%; }
+        .chk-container { padding: 0 12px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.1); border-right: 1px solid rgba(255,255,255,0.2); }
+        .amigo-checkbox { cursor: pointer; transform: scale(1.3); accent-color: var(--yellow); margin: 0; }
+        .btn-amigo-match { flex: 1; min-width: 0; background: transparent; border: none; color: white; padding: 10px; font-size: 13px; font-weight: bold; cursor: pointer; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0; }
         .btn-amigo-match:hover { background: rgba(0,0,0,0.1); }
-        .btn-amigo-delete { background: rgba(0,0,0,0.15); color: white; border: none; padding: 0 15px; cursor: pointer; font-size: 14px; border-left: 1px solid rgba(255,255,255,0.2); border-radius: 0; margin: 0; display: flex; align-items: center; }
+        .btn-amigo-delete { padding: 0 15px; background: rgba(0,0,0,0.15); color: white; border: none; font-size: 14px; cursor: pointer; display: flex; align-items: center; border-left: 1px solid rgba(255,255,255,0.2); margin: 0; }
         .btn-amigo-delete:hover { background: var(--danger); }
         
         /* CONTROLES MINI Y LAYOUT */
         .controles-seleccion { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 12px; }
-        .btn-mini { background: #e9ecef; border: 1px solid #ced4da; padding: 5px 10px; border-radius: 20px; font-size: 11px; cursor: pointer; font-weight: bold; color: #495057; text-decoration: none; display: inline-flex; align-items: center; }
+        .btn-mini { background: #e9ecef; border: 1px solid #ced4da; padding: 5px 10px; border-radius: 20px; font-size: 11px; cursor: pointer; font-weight: bold; color: #495057; text-decoration: none; display: inline-flex; align-items: center; width: auto; }
         .btn-mini:hover { background: #dde0e3; color: #212529; }
         .flex-row { display: flex; gap: 8px; margin-bottom: 15px; align-items: stretch; }
         .flex-row input { margin-bottom: 0; flex: 1; }
@@ -60,9 +60,16 @@
         .cart-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
         .cart-item { font-size: 13px; border-bottom: 1px solid #ffeeba; padding: 8px 0; }
         
+        /* PESTAÑAS VISTA TEXTO VS SIMULADOR */
+        .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; background: #e9ecef; padding: 5px; border-radius: 8px; }
+        .tab-btn { margin: 0; border-radius: 6px; flex: 1; padding: 8px; font-size: 14px; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .tab-btn.inactive { background: transparent; color: #495057; border: none; }
+        .tab-btn.inactive:hover { background: rgba(0,0,0,0.05); }
+        
         .footer { text-align: center; margin-top: 30px; color: #6c757d; font-size: 13px; padding-top: 20px; border-top: 1px solid #dee2e6; }
         .footer a { color: var(--primary); font-weight: bold; text-decoration: none; }
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; gap: 15px; } .botones-resultados { flex-direction: column; gap: 10px; } .contador-simulador { flex-direction: column; gap: 10px; align-items: stretch; text-align: center;} }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; gap: 15px; } .botones-resultados { flex-direction: column; gap: 10px; } #botonesAmigos { grid-template-columns: 1fr; } .contador-simulador { flex-direction: column; gap: 10px; align-items: stretch; text-align: center;} }
     </style>
 </head>
 <body>
@@ -117,7 +124,7 @@
 
     <div id="areaCarrito" class="resultados" style="border-color: var(--yellow);">
         <h3 style="border-color: var(--yellow);">🛒 Mi Simulador de Cambios</h3>
-        <div id="carritoVacio" style="font-size: 13px; color: #6c757d;">Todavía no guardaste ningún cambio en el simulador. Seleccioná figuritas en una comparación y tocale a Guardar.</div>
+        <div id="carritoVacio" style="font-size: 13px; color: #6c757d;">Todavía no guardaste ningún cambio. Seleccioná el Modo Simulador en un amigo y guardá el intercambio.</div>
         <div id="carritoLleno" style="display: none;">
             <div id="listaCarritoItems"></div>
             <button id="btnProyectarLista" class="btn-yellow" style="margin-top: 15px;">✨ Generar mi Nueva Lista Proyectada</button>
@@ -140,17 +147,39 @@
         <div id="mercadoGlobalResultados" style="display: none;"><h3>🌐 Triangulación de Grupo</h3><div id="listaMercadoGlobal"></div></div>
         
         <div id="detalleIndividual" style="display: none;">
-            <p style="font-size: 12px; color: #6c757d; margin-top: -5px; margin-bottom: 15px;">💡 <b>Modo Simulador:</b> Tocá las figuritas que quieras para armar un cambio a medida.</p>
-            
-            <h3 id="tituloMeSirven">✅ Me sirven:</h3><div id="meSirven" style="margin-bottom: 20px;"></div>
-            <h3 id="tituloLeSirven">🎁 Le sirven:</h3><div id="leSirven"></div>
-            
-            <div class="contador-simulador">
-                <div>📥 Seleccionadas a recibir: <b id="countRecibir">0</b> &nbsp;|&nbsp; 📤 Seleccionadas a dar: <b id="countDar">0</b></div>
-                <button id="btnGuardarEnCarrito" class="btn-yellow" style="width: auto; padding: 8px 15px; margin: 0;">🛒 Guardar en Simulador</button>
+            <div class="tabs-container">
+                <button id="tabVistaTexto" class="tab-btn active">📝 Vista Texto</button>
+                <button id="tabVistaSimulador" class="tab-btn inactive">🎮 Modo Simulador</button>
             </div>
 
-            <div class="botones-resultados" style="margin-top: 15px;"><button id="btnCopiarWhatsApp" class="btn-wsp">📲 Enviar Match Total por WhatsApp</button></div>
+            <div id="vistaTexto">
+                <h3 id="tituloMeSirvenTexto">✅ Me sirven:</h3>
+                <div id="meSirvenTexto" style="margin-bottom: 20px;"></div>
+                <h3 id="tituloLeSirvenTexto">🎁 Le sirven:</h3>
+                <div id="leSirvenTexto"></div>
+                <div class="botones-resultados" style="margin-top: 15px;">
+                    <button id="btnCopiarPortapapeles" class="btn-primary">📋 Copiar Texto</button>
+                    <button id="btnCopiarWhatsApp" class="btn-wsp">📲 Enviar Match por WhatsApp</button>
+                </div>
+            </div>
+
+            <div id="vistaSimulador" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                    <p style="font-size: 12px; color: #6c757d; margin: 0;">💡 Tocá las figuritas para armar un cambio a medida.</p>
+                    <div style="display: flex; gap: 8px;">
+                        <button id="btnSimTodos" class="btn-mini" style="background:#28a745; color:white; border:none;">☑️ Sel. Todas</button>
+                        <button id="btnSimNinguno" class="btn-mini" style="background:#dc3545; color:white; border:none;">🔲 Ninguna</button>
+                    </div>
+                </div>
+                
+                <h3 id="tituloMeSirvenSim">✅ Me sirven:</h3><div id="meSirvenSim" style="margin-bottom: 20px;"></div>
+                <h3 id="tituloLeSirvenSim">🎁 Le sirven:</h3><div id="leSirvenSim"></div>
+                
+                <div class="contador-simulador">
+                    <div>📥 Seleccionadas a recibir: <b id="countRecibir">0</b> &nbsp;|&nbsp; 📤 Seleccionadas a dar: <b id="countDar">0</b></div>
+                    <button id="btnGuardarEnCarrito" class="btn-yellow" style="width: auto; padding: 8px 15px; margin: 0;">🛒 Guardar en Simulador</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -166,10 +195,9 @@
         let ultimoMatchMeSirven = {}, ultimoMatchLeSirven = {}, ultimoNombreAmigo = "";
         window.amigosDataGlobal = [];
         window.carritoSimulador = []; 
-        
         let seleccionesActuales = { recibir: [], dar: [] };
 
-        // UI Listeners
+        // UI Listeners principales
         document.getElementById('btnCargarPerfil').addEventListener('click', cargarMiPerfil);
         document.getElementById('btnGuardarNube').addEventListener('click', guardarMisDatos);
         document.getElementById('btnCompararLocal').addEventListener('click', compararListasLocales);
@@ -177,16 +205,44 @@
         document.getElementById('btnCompartirPublico').addEventListener('click', compartirWhatsAppPublico);
         document.getElementById('btnCopiarPrivado').addEventListener('click', () => copiarLink('linkPrivado', 'btnCopiarPrivado', '#6c757d', true));
         document.getElementById('btnInstalar').addEventListener('click', mostrarInstruccionesAndroid);
+        document.getElementById('btnCopiarPortapapeles').addEventListener('click', copiarTextoPortapapeles);
         document.getElementById('btnCopiarWhatsApp').addEventListener('click', abrirWhatsAppConTexto);
         document.getElementById('btnGuardarAmigoNuevo').addEventListener('click', guardarAmigoNuevo);
         document.getElementById('btnEscanearAmigos').addEventListener('click', escanearMisCambios);
         document.getElementById('btnMercadoGlobal').addEventListener('click', analizarMercadoGlobal);
         document.getElementById('btnRutaCompletar').addEventListener('click', calcularRutaCompletar);
+        document.getElementById('btnBuscarAmigo').addEventListener('click', () => {
+            let user = document.getElementById('amigoUsuario').value.trim();
+            if(user) { document.getElementById('statusAmigo').innerText = "Buscando..."; cargarAmigoYComparar(user); }
+        });
         
+        // Controles de Selección Rápida
         document.getElementById('btnSeleccionarTodos').addEventListener('click', (e) => { e.preventDefault(); document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = true); });
         document.getElementById('btnDeseleccionarTodos').addEventListener('click', (e) => { e.preventDefault(); document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = false); });
 
-        // Listeners del Simulador
+        // Pestañas Vista Texto / Simulador
+        document.getElementById('tabVistaTexto').addEventListener('click', () => {
+            document.getElementById('tabVistaTexto').className = 'tab-btn active';
+            document.getElementById('tabVistaSimulador').className = 'tab-btn inactive';
+            document.getElementById('vistaTexto').style.display = 'block';
+            document.getElementById('vistaSimulador').style.display = 'none';
+        });
+        document.getElementById('tabVistaSimulador').addEventListener('click', () => {
+            document.getElementById('tabVistaSimulador').className = 'tab-btn active';
+            document.getElementById('tabVistaTexto').className = 'tab-btn inactive';
+            document.getElementById('vistaSimulador').style.display = 'block';
+            document.getElementById('vistaTexto').style.display = 'none';
+        });
+
+        // Controles Internos del Simulador
+        document.getElementById('btnSimTodos').addEventListener('click', () => {
+            document.querySelectorAll('#vistaSimulador .sticker-btn').forEach(btn => btn.classList.add('selected'));
+            actualizarContadoresSeleccion();
+        });
+        document.getElementById('btnSimNinguno').addEventListener('click', () => {
+            document.querySelectorAll('#vistaSimulador .sticker-btn').forEach(btn => btn.classList.remove('selected'));
+            actualizarContadoresSeleccion();
+        });
         document.getElementById('btnGuardarEnCarrito').addEventListener('click', agregarAlCarrito);
         document.getElementById('btnVaciarCarrito').addEventListener('click', vaciarCarrito);
         document.getElementById('btnProyectarLista').addEventListener('click', generarListaProyectada);
@@ -199,10 +255,6 @@
                 document.getElementById('miLista').value = document.getElementById('listaProyectada').value; vaciarCarrito(); alert("Lista aplicada al perfil. ¡Apretá Guardar en la Nube!");
             }
         });
-        document.getElementById('btnBuscarAmigo').addEventListener('click', () => {
-            let user = document.getElementById('amigoUsuario').value.trim();
-            if(user) { document.getElementById('statusAmigo').innerText = "Buscando..."; cargarAmigoYComparar(user); }
-        });
 
         // Core Parsing
         function limpiarNombreEquipo(textoRaw) {
@@ -214,7 +266,7 @@
 
         function parsearTexto(texto) {
             let datos = { faltan: {}, repetidas: {} };
-            if (!texto || typeof texto !== 'string') return datos; // SALVAVIDAS ANTI-CUELGUE
+            if (!texto || typeof texto !== 'string') return datos; 
             let seccion = null;
             texto.split('\n').forEach(linea => {
                 let l = linea.trim();
@@ -251,24 +303,6 @@
             return matches;
         }
 
-        function aplanarDiccionario(dict) {
-            let arr = [];
-            for (let eq in dict) { dict[eq].forEach(num => arr.push(`${eq} ${num}`)); }
-            return arr;
-        }
-
-        function desaplanarArray(arr) {
-            let dict = {};
-            arr.forEach(item => {
-                let partes = item.split(' ');
-                let eq = partes[0], num = partes[1];
-                if (!dict[eq]) dict[eq] = [];
-                dict[eq].push(num);
-            });
-            for (let eq in dict) { dict[eq].sort((a,b) => parseInt(a) - parseInt(b)); }
-            return dict;
-        }
-
         function obtenerDesglose(d) {
             let c = { esp: 0, esc: 0, eq: 0, jug: 0 };
             for(let e in d) {
@@ -281,9 +315,29 @@
 
         function contarTotal(d) { let t = 0; for(let e in d) t += d[e].length; return t; }
 
+        function aplanarDiccionario(dict) {
+            let arr = []; for (let eq in dict) { dict[eq].forEach(num => arr.push(`${eq} ${num}`)); } return arr;
+        }
+
+        function desaplanarArray(arr) {
+            let dict = {};
+            arr.forEach(item => { let partes = item.split(' '); let eq = partes[0], num = partes[1]; if (!dict[eq]) dict[eq] = []; dict[eq].push(num); });
+            for (let eq in dict) { dict[eq].sort((a,b) => parseInt(a) - parseInt(b)); } return dict;
+        }
+
         // =====================================
-        // RENDERIZADO INTERACTIVO (SIMULADOR)
+        // RENDERIZADO VISTAS (TEXTO Y SIMULADOR)
         // =====================================
+        function renderizarResultadosTexto(divId, d) {
+            let div = document.getElementById(divId); div.innerHTML = '';
+            let hayMatches = false;
+            for(let e in d) {
+                hayMatches = true;
+                div.innerHTML += `<div class="team-row" style="display:block;"><b>${e}:</b> ${d[e].join(', ')}</div>`;
+            }
+            if(!hayMatches) div.innerHTML = '<p style="color:#856404; background:#fff3cd; padding:10px; border-radius:5px; font-size:13px;">No hay coincidencias.</p>';
+        }
+
         function renderizarResultadosInteractivos(divId, d, tipo) {
             let div = document.getElementById(divId); div.innerHTML = '';
             let hayMatches = false; let claseBtn = tipo === 'recibir' ? 'receive' : 'give';
@@ -301,8 +355,8 @@
         }
 
         function actualizarContadoresSeleccion() {
-            seleccionesActuales.recibir = Array.from(document.querySelectorAll('#meSirven .sticker-btn.selected')).map(el => el.dataset.id);
-            seleccionesActuales.dar = Array.from(document.querySelectorAll('#leSirven .sticker-btn.selected')).map(el => el.dataset.id);
+            seleccionesActuales.recibir = Array.from(document.querySelectorAll('#meSirvenSim .sticker-btn.selected')).map(el => el.dataset.id);
+            seleccionesActuales.dar = Array.from(document.querySelectorAll('#leSirvenSim .sticker-btn.selected')).map(el => el.dataset.id);
             document.getElementById('countRecibir').innerText = seleccionesActuales.recibir.length;
             document.getElementById('countDar').innerText = seleccionesActuales.dar.length;
         }
@@ -313,15 +367,32 @@
             ultimoMatchLeSirven = encontrarInterseccion(oD.faltan, mD.repetidas);
             ultimoNombreAmigo = nombre;
             
+            // Render Vista Texto
+            renderizarResultadosTexto('meSirvenTexto', ultimoMatchMeSirven);
+            renderizarResultadosTexto('leSirvenTexto', ultimoMatchLeSirven);
+            document.getElementById('tituloMeSirvenTexto').innerText = `✅ Me sirven ${obtenerDesglose(ultimoMatchMeSirven)} de ${nombre}:`;
+            document.getElementById('tituloLeSirvenTexto').innerText = `🎁 A ${nombre} le sirven ${obtenerDesglose(ultimoMatchLeSirven)} tuyas:`;
+
+            // Render Vista Simulador
             seleccionesActuales = { recibir: [], dar: [] };
-            renderizarResultadosInteractivos('meSirven', ultimoMatchMeSirven, 'recibir');
-            renderizarResultadosInteractivos('leSirven', ultimoMatchLeSirven, 'dar');
+            renderizarResultadosInteractivos('meSirvenSim', ultimoMatchMeSirven, 'recibir');
+            renderizarResultadosInteractivos('leSirvenSim', ultimoMatchLeSirven, 'dar');
             actualizarContadoresSeleccion();
+            document.getElementById('tituloMeSirvenSim').innerText = `✅ Me sirven de ${nombre}:`;
+            document.getElementById('tituloLeSirvenSim').innerText = `🎁 A ${nombre} le sirven tuyas:`;
             
-            document.getElementById('tituloMeSirven').innerText = `✅ Me sirven de ${nombre}:`;
-            document.getElementById('tituloLeSirven').innerText = `🎁 A ${nombre} le sirven tuyas:`;
+            // Mostrar Contenedores
+            document.getElementById('resultados').style.display = 'block';
+            document.getElementById('detalleIndividual').style.display = 'block';
             
-            document.getElementById('resultados').style.display = 'block'; document.getElementById('detalleIndividual').style.display = 'block'; document.getElementById('rankingResultados').style.display = 'none'; document.getElementById('mercadoGlobalResultados').style.display = 'none'; document.getElementById('rutaCompletarResultados').style.display = 'none';
+            // Volver por defecto a la pestaña de texto
+            document.getElementById('tabVistaTexto').click();
+
+            // Ocultar otras herramientas
+            document.getElementById('rankingResultados').style.display = 'none';
+            document.getElementById('mercadoGlobalResultados').style.display = 'none';
+            document.getElementById('rutaCompletarResultados').style.display = 'none';
+            
             if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -422,7 +493,7 @@
             try {
                 let textoMio = document.getElementById('miLista').value.trim(); if (!textoMio) { alert("Pegá tu lista primero."); return; }
                 let amigos = obtenerAmigosSeleccionados(); if (amigos.length === 0) return;
-                let status = document.getElementById('statusAmigo'); status.style.color = "#005c98"; status.innerText = "⚡ Escaneando opciones...";
+                let status = document.getElementById('statusAmigo'); status.style.color = "#005c98"; status.innerText = "⚡ Escaneando...";
                 let misDatos = parsearTexto(textoMio);
 
                 let promesasDescarga = amigos.map(async (amigo) => {
@@ -430,12 +501,11 @@
                         const snap = await get(child(ref(db), `usuarios/${amigo}`));
                         if (snap.exists()) {
                             let aTexto = snap.val().textoOriginal, aDatos = parsearTexto(aTexto);
-                            let mMe = encontrarInterseccion(misDatos.faltan, aDatos.repetidas);
-                            let mLe = encontrarInterseccion(aDatos.faltan, misDatos.repetidas);
+                            let mMe = encontrarInterseccion(misDatos.faltan, aDatos.repetidas), mLe = encontrarInterseccion(aDatos.faltan, misDatos.repetidas);
                             let cMe = contarTotal(mMe), cLe = contarTotal(mLe), pos = Math.min(cMe, cLe);
                             if (cMe > 0 || cLe > 0) return { nombre: amigo, me: cMe, le: cLe, pos: pos, txt: aTexto };
                         }
-                    } catch (e) { console.error("Error al leer amigo: " + amigo, e); } return null;
+                    } catch (e) { } return null;
                 });
 
                 let res = (await Promise.all(promesasDescarga)).filter(r => r !== null);
@@ -497,9 +567,7 @@
                 let status = document.getElementById('statusAmigo'); status.style.color = "#005c98"; status.innerText = "🚀 Calculando...";
                 
                 let misDatos = parsearTexto(textoMio);
-                let faltanOriginal = contarTotal(misDatos.faltan);
-                let misFaltan = aplanarDiccionario(misDatos.faltan);
-                let misRepetidas = aplanarDiccionario(misDatos.repetidas);
+                let faltanOriginal = contarTotal(misDatos.faltan), misFaltan = aplanarDiccionario(misDatos.faltan), misRepetidas = aplanarDiccionario(misDatos.repetidas);
 
                 let amigosData = [];
                 await Promise.all(amigos.map(async (amigo) => {
@@ -529,6 +597,7 @@
 
                 document.getElementById('resultados').style.display = 'block'; document.getElementById('rutaCompletarResultados').style.display = 'block'; document.getElementById('rankingResultados').style.display = 'none'; document.getElementById('mercadoGlobalResultados').style.display = 'none'; document.getElementById('detalleIndividual').style.display = 'none';
                 let resumenDiv = document.getElementById('resumenRuta'), listaContainer = document.getElementById('listaRuta'); listaContainer.innerHTML = '';
+
                 if (planDeAccion.length === 0) { resumenDiv.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">No hay combinaciones equitativas con los seleccionados. 😢</p>'; } 
                 else {
                     resumenDiv.innerHTML = `<div style="background:#e9ecef;padding:15px;border-radius:8px;">🔹 Te faltaban: <b>${faltanOriginal}</b><br>✅ Conseguirías siguiendo estos pasos: <b>${conseguidasTotal}</b><br>⚠️ Te seguirán faltando: <b style="color:var(--danger);">${misFaltan.length}</b></div>`;
