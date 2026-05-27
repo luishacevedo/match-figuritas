@@ -117,7 +117,7 @@
 
     <div id="areaCarrito" class="resultados" style="border-color: var(--yellow);">
         <h3 style="border-color: var(--yellow);">🛒 Mi Simulador de Cambios</h3>
-        <div id="carritoVacio" style="font-size: 13px; color: #6c757d;">Todavía no guardaste ningún cambio en el simulador. Hacé una comparación individual y armá tu cambio.</div>
+        <div id="carritoVacio" style="font-size: 13px; color: #6c757d;">Todavía no guardaste ningún cambio en el simulador. Seleccioná figuritas en una comparación y tocale a Guardar.</div>
         <div id="carritoLleno" style="display: none;">
             <div id="listaCarritoItems"></div>
             <button id="btnProyectarLista" class="btn-yellow" style="margin-top: 15px;">✨ Generar mi Nueva Lista Proyectada</button>
@@ -165,7 +165,7 @@
 
         let ultimoMatchMeSirven = {}, ultimoMatchLeSirven = {}, ultimoNombreAmigo = "";
         window.amigosDataGlobal = [];
-        window.carritoSimulador = []; // Array de {amigo, recibo: [..], doy: [..]}
+        window.carritoSimulador = []; 
         
         let seleccionesActuales = { recibir: [], dar: [] };
 
@@ -206,7 +206,7 @@
             }
         });
 
-        // Core Parsing
+        // Core Parsing BLINDADO
         function limpiarNombreEquipo(textoRaw) {
             let limpio = textoRaw.replace(/[^A-Za-z]/g, '').toUpperCase();
             let siglas = ["FWC", "MEX", "RSA", "KOR", "CZE", "CAN", "BIH", "QAT", "SUI", "BRA", "MAR", "HAI", "SCO", "USA", "PAR", "AUS", "TUR", "GER", "CUW", "CIV", "ECU", "NED", "JPN", "SWE", "TUN", "BEL", "EGY", "IRN", "NZL", "ESP", "CPV", "KSA", "URU", "FRA", "SEN", "IRQ", "NOR", "ARG", "ALG", "AUT", "JOR", "POR", "COD", "UZB", "COL", "ENG", "CRO", "GHA", "PAN", "CC"];
@@ -216,6 +216,7 @@
 
         function parsearTexto(texto) {
             let datos = { faltan: {}, repetidas: {} };
+            if (!texto || typeof texto !== 'string') return datos; // SALVAVIDAS ANTI-CUELGUE
             let seccion = null;
             texto.split('\n').forEach(linea => {
                 let l = linea.trim();
@@ -350,7 +351,6 @@
             
             actualizarVistaCarrito();
             
-            // Deseleccionar todo
             document.querySelectorAll('.sticker-btn.selected').forEach(el => el.classList.remove('selected'));
             actualizarContadoresSeleccion();
             
@@ -396,16 +396,8 @@
             let repes = aplanarDiccionario(misDatos.repetidas);
             
             window.carritoSimulador.forEach(trade => {
-                // Restar las que recibo de mis faltantes
-                trade.recibo.forEach(r => {
-                    let idx = faltan.indexOf(r);
-                    if(idx > -1) faltan.splice(idx, 1);
-                });
-                // Restar las que doy de mis repetidas
-                trade.doy.forEach(d => {
-                    let idx = repes.indexOf(d);
-                    if(idx > -1) repes.splice(idx, 1);
-                });
+                trade.recibo.forEach(r => { let idx = faltan.indexOf(r); if(idx > -1) faltan.splice(idx, 1); });
+                trade.doy.forEach(d => { let idx = repes.indexOf(d); if(idx > -1) repes.splice(idx, 1); });
             });
             
             let faltanNuevas = desaplanarArray(faltan);
@@ -465,112 +457,127 @@
         }
 
         async function escanearMisCambios() {
-            let textoMio = document.getElementById('miLista').value.trim();
-            if (!textoMio) return;
-            let amigos = obtenerAmigosSeleccionados(); if (amigos.length === 0) return;
-            let status = document.getElementById('statusAmigo'); status.style.color = "#005c98"; status.innerText = "⚡ Escaneando opciones...";
-            let misDatos = parsearTexto(textoMio);
+            try {
+                let textoMio = document.getElementById('miLista').value.trim();
+                if (!textoMio) return;
+                let amigos = obtenerAmigosSeleccionados(); if (amigos.length === 0) return;
+                let status = document.getElementById('statusAmigo'); status.style.color = "#005c98"; status.innerText = "⚡ Escaneando opciones...";
+                let misDatos = parsearTexto(textoMio);
 
-            let promesasDescarga = amigos.map(async (amigo) => {
-                try {
-                    const snap = await get(child(ref(db), `usuarios/${amigo}`));
-                    if (snap.exists()) {
-                        let aTexto = snap.val().textoOriginal, aDatos = parsearTexto(aTexto);
-                        let mMe = encontrarInterseccion(misDatos.faltan, aDatos.repetidas);
-                        let mLe = encontrarInterseccion(aDatos.faltan, misDatos.repetidas);
-                        let cMe = contarTotal(mMe), cLe = contarTotal(mLe);
-                        if (cMe > 0 || cLe > 0) return { nombre: amigo, me: cMe, le: cLe, pos: Math.min(cMe, cLe), txt: aTexto };
-                    }
-                } catch (e) { } return null;
-            });
+                let promesasDescarga = amigos.map(async (amigo) => {
+                    try {
+                        const snap = await get(child(ref(db), `usuarios/${amigo}`));
+                        if (snap.exists()) {
+                            let aTexto = snap.val().textoOriginal, aDatos = parsearTexto(aTexto);
+                            let mMe = encontrarInterseccion(misDatos.faltan, aDatos.repetidas);
+                            let mLe = encontrarInterseccion(aDatos.faltan, misDatos.repetidas);
+                            let cMe = contarTotal(mMe), cLe = contarTotal(mLe);
+                            if (cMe > 0 || cLe > 0) return { nombre: amigo, me: cMe, le: cLe, pos: Math.min(cMe, cLe), txt: aTexto };
+                        }
+                    } catch (e) { } return null;
+                });
 
-            let res = (await Promise.all(promesasDescarga)).filter(r => r !== null);
-            res.sort((a, b) => b.pos !== a.pos ? b.pos - a.pos : b.me - a.me);
+                let res = (await Promise.all(promesasDescarga)).filter(r => r !== null);
+                res.sort((a, b) => b.pos !== a.pos ? b.pos - a.pos : b.me - a.me);
 
-            document.getElementById('resultados').style.display = 'block'; document.getElementById('rankingResultados').style.display = 'block'; document.getElementById('detalleIndividual').style.display = 'none'; document.getElementById('mercadoGlobalResultados').style.display = 'none'; document.getElementById('rutaCompletarResultados').style.display = 'none';
-            let list = document.getElementById('listaRanking'); list.innerHTML = '';
-            if (res.length === 0) { list.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">No hay intercambios posibles.</p>'; status.innerText = ""; return; }
+                document.getElementById('resultados').style.display = 'block'; document.getElementById('rankingResultados').style.display = 'block'; document.getElementById('detalleIndividual').style.display = 'none'; document.getElementById('mercadoGlobalResultados').style.display = 'none'; document.getElementById('rutaCompletarResultados').style.display = 'none';
+                let list = document.getElementById('listaRanking'); list.innerHTML = '';
+                if (res.length === 0) { list.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">No hay intercambios posibles.</p>'; status.innerText = ""; return; }
 
-            res.forEach((r, i) => {
-                let div = document.createElement('div'); div.className = 'ranking-item'; div.style = r.pos === 0 ? 'opacity:0.7;' : '';
-                div.innerHTML = `<div class="ranking-header"><div class="ranking-text"><div class="ranking-name">${i<3?['🥇','🥈','🥉'][i]:'🔹'} ${r.nombre} - 🔄 ${r.pos} mano a mano</div>
-                    <div class="ranking-stats"><span style="color:var(--success);">Te da <b>${r.me}</b></span> | <span style="color:var(--primary);">Le das <b>${r.le}</b></span></div></div>
-                    <button class="btn-primary" style="width:auto;padding:8px 12px;font-size:12px;" onclick="document.getElementById('amigoUsuario').value='${r.nombre}'; document.getElementById('amigoLista').value=\`${r.txt}\`; document.getElementById('btnCompararLocal').click();">🔍 Ver Match</button></div>`;
-                list.appendChild(div);
-            });
-            if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' }); status.innerText = "";
+                res.forEach((r, i) => {
+                    let div = document.createElement('div'); div.className = 'ranking-item'; div.style = r.pos === 0 ? 'opacity:0.7;' : '';
+                    div.innerHTML = `<div class="ranking-header"><div class="ranking-text"><div class="ranking-name">${i<3?['🥇','🥈','🥉'][i]:'🔹'} ${r.nombre} - 🔄 ${r.pos} mano a mano</div>
+                        <div class="ranking-stats"><span style="color:var(--success);">Te da <b>${r.me}</b></span> | <span style="color:var(--primary);">Le das <b>${r.le}</b></span></div></div>
+                        <button class="btn-primary" style="width:auto;padding:8px 12px;font-size:12px;" onclick="document.getElementById('amigoUsuario').value='${r.nombre}'; document.getElementById('amigoLista').value=\`${r.txt}\`; document.getElementById('btnCompararLocal').click();">🔍 Ver Match</button></div>`;
+                    list.appendChild(div);
+                });
+                if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' }); status.innerText = "";
+            } catch(e) {
+                console.error(e); alert("Hubo un error al escanear. Asegurate de que tu lista no esté vacía.");
+                document.getElementById('statusAmigo').innerText = "";
+            }
         }
 
         async function analizarMercadoGlobal() {
-            let amigos = obtenerAmigosSeleccionados(); if (amigos.length < 2) return;
-            let status = document.getElementById('statusAmigo'); status.style.color = "#005c98"; status.innerText = "🌐 Analizando...";
-            window.amigosDataGlobal = [];
-            await Promise.all(amigos.map(async (amigo) => {
-                try { const snap = await get(child(ref(db), `usuarios/${amigo}`)); if (snap.exists()) window.amigosDataGlobal.push({ nombre: amigo, datos: parsearTexto(snap.val().textoOriginal) }); } catch (e) { }
-            }));
+            try {
+                let amigos = obtenerAmigosSeleccionados(); if (amigos.length < 2) return;
+                let status = document.getElementById('statusAmigo'); status.style.color = "#005c98"; status.innerText = "🌐 Analizando...";
+                window.amigosDataGlobal = [];
+                await Promise.all(amigos.map(async (amigo) => {
+                    try { const snap = await get(child(ref(db), `usuarios/${amigo}`)); if (snap.exists()) window.amigosDataGlobal.push({ nombre: amigo, datos: parsearTexto(snap.val().textoOriginal) }); } catch (e) { }
+                }));
 
-            let cruces = [];
-            for (let i = 0; i < window.amigosDataGlobal.length; i++) {
-                for (let j = i + 1; j < window.amigosDataGlobal.length; j++) {
-                    let A = window.amigosDataGlobal[i], B = window.amigosDataGlobal[j];
-                    let aDaB = contarTotal(encontrarInterseccion(B.datos.faltan, A.datos.repetidas)), bDaA = contarTotal(encontrarInterseccion(A.datos.faltan, B.datos.repetidas));
-                    if (Math.min(aDaB, bDaA) > 0) cruces.push({ A: A.nombre, B: B.nombre, pos: Math.min(aDaB, bDaA), aDaB: aDaB, bDaA: bDaA });
+                let cruces = [];
+                for (let i = 0; i < window.amigosDataGlobal.length; i++) {
+                    for (let j = i + 1; j < window.amigosDataGlobal.length; j++) {
+                        let A = window.amigosDataGlobal[i], B = window.amigosDataGlobal[j];
+                        let aDaB = contarTotal(encontrarInterseccion(B.datos.faltan, A.datos.repetidas)), bDaA = contarTotal(encontrarInterseccion(A.datos.faltan, B.datos.repetidas));
+                        if (Math.min(aDaB, bDaA) > 0) cruces.push({ A: A.nombre, B: B.nombre, pos: Math.min(aDaB, bDaA), aDaB: aDaB, bDaA: bDaA });
+                    }
                 }
+                cruces.sort((a, b) => b.pos - a.pos);
+
+                document.getElementById('resultados').style.display = 'block'; document.getElementById('mercadoGlobalResultados').style.display = 'block'; document.getElementById('rankingResultados').style.display = 'none'; document.getElementById('detalleIndividual').style.display = 'none'; document.getElementById('rutaCompletarResultados').style.display = 'none';
+                let list = document.getElementById('listaMercadoGlobal'); list.innerHTML = '';
+                if (cruces.length === 0) { list.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">No hay intercambios entre ellos.</p>'; status.innerText = ""; return; }
+
+                cruces.slice(0, 15).forEach(res => {
+                    let div = document.createElement('div'); div.className = 'ranking-item';
+                    let aA = window.amigosDataGlobal.find(a=>a.nombre===res.A).datos, aB = window.amigosDataGlobal.find(a=>a.nombre===res.B).datos;
+                    div.innerHTML = `<div class="ranking-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'"><div class="ranking-text"><div class="ranking-name">🤝 ${res.A} & ${res.B}</div><div class="ranking-stats">Posibles: <b>${res.pos}</b> (Tocá para detalle)</div></div></div>
+                        <div class="ranking-content"><p><b>${res.A} da:</b><br>${formatearDiccionario(encontrarInterseccion(aB.faltan, aA.repetidas), false)}</p><p><b>${res.B} da:</b><br>${formatearDiccionario(encontrarInterseccion(aA.faltan, aB.repetidas), false)}</p></div>`;
+                    list.appendChild(div);
+                });
+                if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' }); status.innerText = "";
+            } catch(e) {
+                console.error(e); alert("Hubo un error al cruzar datos. Alguna lista podría estar corrupta.");
+                document.getElementById('statusAmigo').innerText = "";
             }
-            cruces.sort((a, b) => b.pos - a.pos);
-
-            document.getElementById('resultados').style.display = 'block'; document.getElementById('mercadoGlobalResultados').style.display = 'block'; document.getElementById('rankingResultados').style.display = 'none'; document.getElementById('detalleIndividual').style.display = 'none'; document.getElementById('rutaCompletarResultados').style.display = 'none';
-            let list = document.getElementById('listaMercadoGlobal'); list.innerHTML = '';
-            if (cruces.length === 0) { list.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">No hay intercambios entre ellos.</p>'; status.innerText = ""; return; }
-
-            cruces.slice(0, 15).forEach(res => {
-                let div = document.createElement('div'); div.className = 'ranking-item';
-                let aA = window.amigosDataGlobal.find(a=>a.nombre===res.A).datos, aB = window.amigosDataGlobal.find(a=>a.nombre===res.B).datos;
-                div.innerHTML = `<div class="ranking-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'"><div class="ranking-text"><div class="ranking-name">🤝 ${res.A} & ${res.B}</div><div class="ranking-stats">Posibles: <b>${res.pos}</b> (Tocá para detalle)</div></div></div>
-                    <div class="ranking-content"><p><b>${res.A} da:</b><br>${formatearDiccionario(encontrarInterseccion(aB.faltan, aA.repetidas), false)}</p><p><b>${res.B} da:</b><br>${formatearDiccionario(encontrarInterseccion(aA.faltan, aB.repetidas), false)}</p></div>`;
-                list.appendChild(div);
-            });
-            if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' }); status.innerText = "";
         }
 
         async function calcularRutaCompletar() {
-            let textoMio = document.getElementById('miLista').value.trim(); if (!textoMio) return;
-            let amigos = obtenerAmigosSeleccionados(); if (amigos.length === 0) return;
-            let status = document.getElementById('statusAmigo'); status.style.color = "#005c98"; status.innerText = "🚀 Calculando...";
-            
-            let misDatos = parsearTexto(textoMio);
-            let fOrig = contarTotal(misDatos.faltan), mF = aplanarDiccionario(misDatos.faltan), mR = aplanarDiccionario(misDatos.repetidas);
-            let aData = [];
-            await Promise.all(amigos.map(async (amigo) => {
-                try { const snap = await get(child(ref(db), `usuarios/${amigo}`)); if (snap.exists()) { let d = parsearTexto(snap.val().textoOriginal); aData.push({ nombre: amigo, f: aplanarDiccionario(d.faltan), r: aplanarDiccionario(d.repetidas) }); } } catch (e) {}
-            }));
+            try {
+                let textoMio = document.getElementById('miLista').value.trim(); if (!textoMio) return;
+                let amigos = obtenerAmigosSeleccionados(); if (amigos.length === 0) return;
+                let status = document.getElementById('statusAmigo'); status.style.color = "#005c98"; status.innerText = "🚀 Calculando...";
+                
+                let misDatos = parsearTexto(textoMio);
+                let fOrig = contarTotal(misDatos.faltan), mF = aplanarDiccionario(misDatos.faltan), mR = aplanarDiccionario(misDatos.repetidas);
+                let aData = [];
+                await Promise.all(amigos.map(async (amigo) => {
+                    try { const snap = await get(child(ref(db), `usuarios/${amigo}`)); if (snap.exists()) { let d = parsearTexto(snap.val().textoOriginal); aData.push({ nombre: amigo, f: aplanarDiccionario(d.faltan), r: aplanarDiccionario(d.repetidas) }); } } catch (e) {}
+                }));
 
-            let plan = [], cons = 0, iter = 0;
-            while (mF.length > 0 && iter < 50) {
-                iter++; let bA = null, bC = 0, bRec = [], bDoy = [];
-                for (let a of aData) {
-                    let meDa = a.r.filter(x => mF.includes(x)), leDoy = a.f.filter(x => mR.includes(x)), pos = Math.min(meDa.length, leDoy.length);
-                    if (pos > bC) { bC = pos; bA = a; bRec = meDa.slice(0, pos); bDoy = leDoy.slice(0, pos); }
+                let plan = [], cons = 0, iter = 0;
+                while (mF.length > 0 && iter < 50) {
+                    iter++; let bA = null, bC = 0, bRec = [], bDoy = [];
+                    for (let a of aData) {
+                        let meDa = a.r.filter(x => mF.includes(x)), leDoy = a.f.filter(x => mR.includes(x)), pos = Math.min(meDa.length, leDoy.length);
+                        if (pos > bC) { bC = pos; bA = a; bRec = meDa.slice(0, pos); bDoy = leDoy.slice(0, pos); }
+                    }
+                    if (bC === 0) break; 
+                    plan.push({ n: bA.nombre, c: bC, r: desaplanarArray(bRec), d: desaplanarArray(bDoy) }); cons += bC;
+                    mF = mF.filter(x => !bRec.includes(x));
+                    bDoy.forEach(x => { let i = mR.indexOf(x); if (i>-1) mR.splice(i, 1); let j = bA.f.indexOf(x); if (j>-1) bA.f.splice(j, 1); });
+                    bRec.forEach(x => { let j = bA.r.indexOf(x); if (j>-1) bA.r.splice(j, 1); });
                 }
-                if (bC === 0) break; 
-                plan.push({ n: bA.nombre, c: bC, r: desaplanarArray(bRec), d: desaplanarArray(bDoy) }); cons += bC;
-                mF = mF.filter(x => !bRec.includes(x));
-                bDoy.forEach(x => { let i = mR.indexOf(x); if (i>-1) mR.splice(i, 1); let j = bA.f.indexOf(x); if (j>-1) bA.f.splice(j, 1); });
-                bRec.forEach(x => { let j = bA.r.indexOf(x); if (j>-1) bA.r.splice(j, 1); });
-            }
 
-            document.getElementById('resultados').style.display = 'block'; document.getElementById('rutaCompletarResultados').style.display = 'block'; document.getElementById('rankingResultados').style.display = 'none'; document.getElementById('mercadoGlobalResultados').style.display = 'none'; document.getElementById('detalleIndividual').style.display = 'none';
-            let resDiv = document.getElementById('resumenRuta'), list = document.getElementById('listaRuta'); list.innerHTML = '';
-            if (plan.length === 0) { resDiv.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">No hay combinaciones equitativas.</p>'; } 
-            else {
-                resDiv.innerHTML = `<div style="background:#e9ecef;padding:15px;border-radius:8px;">🔹 Faltaban: <b>${fOrig}</b><br>✅ Conseguirías: <b>${cons}</b><br>⚠️ Seguirán faltando: <b style="color:var(--danger);">${mF.length}</b></div>`;
-                plan.forEach((p, i) => {
-                    let div = document.createElement('div'); div.className = 'step-box';
-                    div.innerHTML = `<div class="step-title">Paso ${i+1}: Cambiá ${p.c} con ${p.n}</div><div style="font-size:13px;margin-top:8px;"><b style="color:var(--success);">Vos recibís:</b><br>${Object.keys(p.r).map(e=>`&nbsp;&nbsp;• <b>${e}:</b> ${p.r[e].join(', ')}<br>`).join('')}<b style="color:var(--danger);margin-top:5px;display:inline-block;">Vos le das:</b><br>${Object.keys(p.d).map(e=>`&nbsp;&nbsp;• <b>${e}:</b> ${p.d[e].join(', ')}<br>`).join('')}</div>`;
-                    list.appendChild(div);
-                });
+                document.getElementById('resultados').style.display = 'block'; document.getElementById('rutaCompletarResultados').style.display = 'block'; document.getElementById('rankingResultados').style.display = 'none'; document.getElementById('mercadoGlobalResultados').style.display = 'none'; document.getElementById('detalleIndividual').style.display = 'none';
+                let resDiv = document.getElementById('resumenRuta'), list = document.getElementById('listaRuta'); list.innerHTML = '';
+                if (plan.length === 0) { resDiv.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">No hay combinaciones equitativas.</p>'; } 
+                else {
+                    resDiv.innerHTML = `<div style="background:#e9ecef;padding:15px;border-radius:8px;">🔹 Faltaban: <b>${fOrig}</b><br>✅ Conseguirías: <b>${cons}</b><br>⚠️ Seguirán faltando: <b style="color:var(--danger);">${mF.length}</b></div>`;
+                    plan.forEach((p, i) => {
+                        let div = document.createElement('div'); div.className = 'step-box';
+                        div.innerHTML = `<div class="step-title">Paso ${i+1}: Cambiá ${p.c} con ${p.n}</div><div style="font-size:13px;margin-top:8px;"><b style="color:var(--success);">Vos recibís:</b><br>${Object.keys(p.r).map(e=>`&nbsp;&nbsp;• <b>${e}:</b> ${p.r[e].join(', ')}<br>`).join('')}<b style="color:var(--danger);margin-top:5px;display:inline-block;">Vos le das:</b><br>${Object.keys(p.d).map(e=>`&nbsp;&nbsp;• <b>${e}:</b> ${p.d[e].join(', ')}<br>`).join('')}</div>`;
+                        list.appendChild(div);
+                    });
+                }
+                if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' }); status.innerText = "";
+            } catch(e) {
+                console.error(e); alert("Ocurrió un error al calcular. Revisá que tus listas no estén vacías.");
+                document.getElementById('statusAmigo').innerText = "";
             }
-            if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' }); status.innerText = "";
         }
 
         // Utilidades Links y Firebase
