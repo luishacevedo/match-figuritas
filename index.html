@@ -23,19 +23,19 @@
         .btn-wsp { background-color: var(--wsp); box-shadow: 0 4px 6px rgba(37,211,102,0.3); }
         .btn-wsp-small { background-color: var(--wsp); color: white; }
         
-        /* ESTILOS BOTONES AMIGOS: 100% BLINDADOS CONTRA COLAPSOS VISUALES */
-        #botonesAmigos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-bottom: 15px; }
-        .amigo-wrapper { display: flex; align-items: stretch; background-color: #17a2b8; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%; }
-        .chk-container { padding: 0 12px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.1); border-right: 1px solid rgba(255,255,255,0.2); }
-        .amigo-checkbox { cursor: pointer; transform: scale(1.3); accent-color: var(--yellow); margin: 0; }
-        .btn-amigo-match { flex: 1; min-width: 0; background: transparent; border: none; color: white; padding: 10px; font-size: 13px; font-weight: bold; cursor: pointer; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0; }
-        .btn-amigo-match:hover { background: rgba(0,0,0,0.1); }
-        .btn-amigo-delete { padding: 0 15px; background: rgba(0,0,0,0.15); color: white; border: none; font-size: 14px; cursor: pointer; display: flex; align-items: center; border-left: 1px solid rgba(255,255,255,0.2); margin: 0; }
-        .btn-amigo-delete:hover { background: var(--danger); }
+        /* ESTILOS BOTONES AMIGOS: 100% BLINDADOS E INDEPENDIENTES */
+        .lista-amigos-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        .amigo-row { display: flex; align-items: stretch; gap: 8px; width: 100%; }
+        .chk-wrapper { background: #fff; border: 1px solid #ced4da; border-radius: 6px; padding: 0 12px; display: flex; align-items: center; justify-content: center; }
+        .amigo-checkbox { transform: scale(1.3); cursor: pointer; margin: 0; accent-color: var(--yellow); }
+        .btn-amigo-match { flex: 1; background: var(--primary); color: white; border: none; border-radius: 6px; padding: 10px 12px; font-weight: bold; font-size: 13px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; transition: 0.2s; min-width: 0;}
+        .btn-amigo-match:hover { background: #004b7c; }
+        .btn-amigo-delete { background: var(--danger); color: white; border: none; border-radius: 6px; padding: 0 15px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-amigo-delete:hover { background: #c82333; }
         
         /* CONTROLES MINI Y LAYOUT */
         .controles-seleccion { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 12px; }
-        .btn-mini { background: #e9ecef; border: 1px solid #ced4da; padding: 5px 10px; border-radius: 20px; font-size: 11px; cursor: pointer; font-weight: bold; color: #495057; text-decoration: none; display: inline-flex; align-items: center; width: auto; }
+        .btn-mini { background: #e9ecef; border: 1px solid #ced4da; padding: 5px 10px; border-radius: 20px; font-size: 11px; cursor: pointer; font-weight: bold; color: #495057; text-decoration: none; display: inline-flex; align-items: center; width: auto; margin: 0; }
         .btn-mini:hover { background: #dde0e3; color: #212529; }
         .flex-row { display: flex; gap: 8px; margin-bottom: 15px; align-items: stretch; }
         .flex-row input { margin-bottom: 0; flex: 1; }
@@ -50,7 +50,7 @@
         .sticker-btn { background: #e9ecef; border: 1px solid #ced4da; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; user-select: none; }
         .sticker-btn.receive.selected { background: var(--success); color: white; border-color: var(--success); }
         .sticker-btn.give.selected { background: var(--danger); color: white; border-color: var(--danger); }
-        .contador-simulador { background: #343a40; color: white; padding: 10px 15px; border-radius: 8px; margin-top: 15px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .contador-simulador { background: #343a40; color: white; padding: 10px 15px; border-radius: 8px; margin-top: 15px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         
         .ranking-item { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; }
         .ranking-header { display: flex; justify-content: space-between; align-items: center; }
@@ -69,14 +69,14 @@
         
         .footer { text-align: center; margin-top: 30px; color: #6c757d; font-size: 13px; padding-top: 20px; border-top: 1px solid #dee2e6; }
         .footer a { color: var(--primary); font-weight: bold; text-decoration: none; }
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; gap: 15px; } .botones-resultados { flex-direction: column; gap: 10px; } #botonesAmigos { grid-template-columns: 1fr; } .contador-simulador { flex-direction: column; gap: 10px; align-items: stretch; text-align: center;} }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; gap: 15px; } .botones-resultados { flex-direction: column; gap: 10px; } .contador-simulador { flex-direction: column; align-items: stretch; text-align: center;} }
     </style>
 </head>
 <body>
 
     <div style="text-align: center; margin-bottom: 25px;">
         <h2><a href="#" onclick="window.location.href=window.location.pathname; return false;" style="text-decoration: none; color: #1a1a1a;">⚽ Match Mundial 2026 ⚽</a></h2>
-        <p style="font-size: 13px; color: #6c757d; margin-top: 0;">Complemento inspirado en <a href="https://www.figuritas.app/es/descargar" target="_blank">Figuritas App</a></p>
+        <p style="font-size: 13px; color: #6c757d; margin-top: 0;">Complemento inspirado en Figuritas App</p>
     </div>
 
     <div class="grid">
@@ -105,11 +105,11 @@
                 <button id="btnDeseleccionarTodos" class="btn-mini">🔲 Ninguno</button>
             </div>
 
-            <div id="botonesAmigos"></div>
+            <div id="botonesAmigos" class="lista-amigos-container"></div>
             
             <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 15px;">
                 <button id="btnEscanearAmigos" class="btn-yellow" style="padding: 8px; font-size: 13px; display: none;">⚡ Ranking de los Seleccionados</button>
-                <button id="btnRutaCompletar" class="btn-success" style="padding: 8px; font-size: 13px; display: none;">🚀 Ruta al 100% (Automática)</button>
+                <button id="btnRutaCompletar" class="btn-success" style="padding: 8px; font-size: 13px; display: none;">🚀 Ruta al 100% (Asistente Paso a Paso)</button>
                 <button id="btnMercadoGlobal" class="btn-primary" style="padding: 8px; font-size: 13px; display: none;">🌐 Cruces entre Seleccionados</button>
             </div>
             
@@ -123,8 +123,8 @@
     </div>
 
     <div id="areaCarrito" class="resultados" style="border-color: var(--yellow);">
-        <h3 style="border-color: var(--yellow);">🛒 Mi Simulador de Cambios</h3>
-        <div id="carritoVacio" style="font-size: 13px; color: #6c757d;">Todavía no guardaste ningún cambio. Seleccioná el Modo Simulador en un amigo y guardá el intercambio.</div>
+        <h3 style="border-color: var(--yellow);">🛒 Simulador de Cambios</h3>
+        <div id="carritoVacio" style="font-size: 13px; color: #6c757d;">Todavía no guardaste ningún cambio. Seleccioná el Modo Simulador o usá la "Ruta" para armar tus intercambios.</div>
         <div id="carritoLleno" style="display: none;">
             <div id="listaCarritoItems"></div>
             <button id="btnProyectarLista" class="btn-yellow" style="margin-top: 15px;">✨ Generar mi Nueva Lista Proyectada</button>
@@ -143,8 +143,13 @@
 
     <div id="resultados" class="resultados">
         <div id="rankingResultados" style="display: none;"><h3>🏆 Ranking de Opciones</h3><div id="listaRanking"></div></div>
-        <div id="rutaCompletarResultados" style="display: none;"><h3>🚀 Plan de Acción Automático</h3><div id="resumenRuta"></div><div id="listaRuta"></div></div>
         <div id="mercadoGlobalResultados" style="display: none;"><h3>🌐 Triangulación de Grupo</h3><div id="listaMercadoGlobal"></div></div>
+        
+        <div id="rutaCompletarResultados" style="display: none;">
+            <h3 style="border-bottom: 2px solid var(--success); border-color: var(--success);">🚀 Ruta al 100% - Asistente Interactivo</h3>
+            <p style="font-size: 13px; color: #6c757d; margin-top: -5px; margin-bottom: 15px;">Elegí a mano las figuritas que vas a cambiar con cada amigo. El sistema actualizará el siguiente paso en tiempo real.</p>
+            <div id="wizardRutaContainer"></div>
+        </div>
         
         <div id="detalleIndividual" style="display: none;">
             <div class="tabs-container">
@@ -153,10 +158,8 @@
             </div>
 
             <div id="vistaTexto">
-                <h3 id="tituloMeSirvenTexto">✅ Me sirven:</h3>
-                <div id="meSirvenTexto" style="margin-bottom: 20px;"></div>
-                <h3 id="tituloLeSirvenTexto">🎁 Le sirven:</h3>
-                <div id="leSirvenTexto"></div>
+                <h3 id="tituloMeSirvenTexto">✅ Me sirven:</h3><div id="meSirvenTexto" style="margin-bottom: 20px;"></div>
+                <h3 id="tituloLeSirvenTexto">🎁 Le sirven:</h3><div id="leSirvenTexto"></div>
                 <div class="botones-resultados" style="margin-top: 15px;">
                     <button id="btnCopiarPortapapeles" class="btn-primary">📋 Copiar Texto</button>
                     <button id="btnCopiarWhatsApp" class="btn-wsp">📲 Enviar Match por WhatsApp</button>
@@ -196,6 +199,7 @@
         window.amigosDataGlobal = [];
         window.carritoSimulador = []; 
         let seleccionesActuales = { recibir: [], dar: [] };
+        let rutaData = { faltan: [], repes: [], amigos: [], pasoActual: 1 }; // Estado para Asistente Ruta
 
         // UI Listeners principales
         document.getElementById('btnCargarPerfil').addEventListener('click', cargarMiPerfil);
@@ -210,39 +214,29 @@
         document.getElementById('btnGuardarAmigoNuevo').addEventListener('click', guardarAmigoNuevo);
         document.getElementById('btnEscanearAmigos').addEventListener('click', escanearMisCambios);
         document.getElementById('btnMercadoGlobal').addEventListener('click', analizarMercadoGlobal);
-        document.getElementById('btnRutaCompletar').addEventListener('click', calcularRutaCompletar);
+        document.getElementById('btnRutaCompletar').addEventListener('click', iniciarRutaInteractiva);
         document.getElementById('btnBuscarAmigo').addEventListener('click', () => {
             let user = document.getElementById('amigoUsuario').value.trim();
             if(user) { document.getElementById('statusAmigo').innerText = "Buscando..."; cargarAmigoYComparar(user); }
         });
         
-        // Controles de Selección Rápida
+        // Controles de Selección
         document.getElementById('btnSeleccionarTodos').addEventListener('click', (e) => { e.preventDefault(); document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = true); });
         document.getElementById('btnDeseleccionarTodos').addEventListener('click', (e) => { e.preventDefault(); document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = false); });
 
         // Pestañas Vista Texto / Simulador
         document.getElementById('tabVistaTexto').addEventListener('click', () => {
-            document.getElementById('tabVistaTexto').className = 'tab-btn active';
-            document.getElementById('tabVistaSimulador').className = 'tab-btn inactive';
-            document.getElementById('vistaTexto').style.display = 'block';
-            document.getElementById('vistaSimulador').style.display = 'none';
+            document.getElementById('tabVistaTexto').className = 'tab-btn active'; document.getElementById('tabVistaSimulador').className = 'tab-btn inactive';
+            document.getElementById('vistaTexto').style.display = 'block'; document.getElementById('vistaSimulador').style.display = 'none';
         });
         document.getElementById('tabVistaSimulador').addEventListener('click', () => {
-            document.getElementById('tabVistaSimulador').className = 'tab-btn active';
-            document.getElementById('tabVistaTexto').className = 'tab-btn inactive';
-            document.getElementById('vistaSimulador').style.display = 'block';
-            document.getElementById('vistaTexto').style.display = 'none';
+            document.getElementById('tabVistaSimulador').className = 'tab-btn active'; document.getElementById('tabVistaTexto').className = 'tab-btn inactive';
+            document.getElementById('vistaSimulador').style.display = 'block'; document.getElementById('vistaTexto').style.display = 'none';
         });
 
-        // Controles Internos del Simulador
-        document.getElementById('btnSimTodos').addEventListener('click', () => {
-            document.querySelectorAll('#vistaSimulador .sticker-btn').forEach(btn => btn.classList.add('selected'));
-            actualizarContadoresSeleccion();
-        });
-        document.getElementById('btnSimNinguno').addEventListener('click', () => {
-            document.querySelectorAll('#vistaSimulador .sticker-btn').forEach(btn => btn.classList.remove('selected'));
-            actualizarContadoresSeleccion();
-        });
+        // Controles Simulador Individual
+        document.getElementById('btnSimTodos').addEventListener('click', () => { document.querySelectorAll('#vistaSimulador .sticker-btn').forEach(btn => btn.classList.add('selected')); actualizarContadoresSeleccion(); });
+        document.getElementById('btnSimNinguno').addEventListener('click', () => { document.querySelectorAll('#vistaSimulador .sticker-btn').forEach(btn => btn.classList.remove('selected')); actualizarContadoresSeleccion(); });
         document.getElementById('btnGuardarEnCarrito').addEventListener('click', agregarAlCarrito);
         document.getElementById('btnVaciarCarrito').addEventListener('click', vaciarCarrito);
         document.getElementById('btnProyectarLista').addEventListener('click', generarListaProyectada);
@@ -331,10 +325,7 @@
         function renderizarResultadosTexto(divId, d) {
             let div = document.getElementById(divId); div.innerHTML = '';
             let hayMatches = false;
-            for(let e in d) {
-                hayMatches = true;
-                div.innerHTML += `<div class="team-row" style="display:block;"><b>${e}:</b> ${d[e].join(', ')}</div>`;
-            }
+            for(let e in d) { hayMatches = true; div.innerHTML += `<div class="team-row" style="display:block;"><b>${e}:</b> ${d[e].join(', ')}</div>`; }
             if(!hayMatches) div.innerHTML = '<p style="color:#856404; background:#fff3cd; padding:10px; border-radius:5px; font-size:13px;">No hay coincidencias.</p>';
         }
 
@@ -346,7 +337,10 @@
                 let fila = document.createElement('div'); fila.className = 'team-row'; fila.innerHTML = `<b style="width: 45px;">${e}:</b>`;
                 d[e].forEach(num => {
                     let btn = document.createElement('span'); btn.className = `sticker-btn ${claseBtn}`; btn.innerText = num; btn.dataset.id = `${e} ${num}`;
-                    btn.onclick = function() { this.classList.toggle('selected'); actualizarContadoresSeleccion(); };
+                    btn.onclick = function() { 
+                        this.classList.toggle('selected'); 
+                        if(this.closest('#rutaCompletarResultados')) actualizarContadoresRuta(); else actualizarContadoresSeleccion(); 
+                    };
                     fila.appendChild(btn);
                 });
                 div.appendChild(fila);
@@ -381,18 +375,10 @@
             document.getElementById('tituloMeSirvenSim').innerText = `✅ Me sirven de ${nombre}:`;
             document.getElementById('tituloLeSirvenSim').innerText = `🎁 A ${nombre} le sirven tuyas:`;
             
-            // Mostrar Contenedores
-            document.getElementById('resultados').style.display = 'block';
-            document.getElementById('detalleIndividual').style.display = 'block';
+            document.getElementById('resultados').style.display = 'block'; document.getElementById('detalleIndividual').style.display = 'block';
+            document.getElementById('tabVistaTexto').click(); // Por default texto
             
-            // Volver por defecto a la pestaña de texto
-            document.getElementById('tabVistaTexto').click();
-
-            // Ocultar otras herramientas
-            document.getElementById('rankingResultados').style.display = 'none';
-            document.getElementById('mercadoGlobalResultados').style.display = 'none';
-            document.getElementById('rutaCompletarResultados').style.display = 'none';
-            
+            document.getElementById('rankingResultados').style.display = 'none'; document.getElementById('mercadoGlobalResultados').style.display = 'none'; document.getElementById('rutaCompletarResultados').style.display = 'none';
             if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -436,7 +422,7 @@
         }
 
         // =====================================
-        // CREACION DOM BLINDADA
+        // CREACION DOM BLINDADA DE AMIGOS
         // =====================================
         window.cargarAmigoYComparar = async function(amigo) {
             document.getElementById('amigoUsuario').value = amigo;
@@ -471,10 +457,10 @@
             let html = '';
             amigos.forEach(amigo => {
                 html += `
-                <div class="amigo-wrapper">
-                    <div class="chk-container"><input type="checkbox" class="amigo-checkbox" value="${amigo}" checked></div>
+                <div class="amigo-row">
+                    <div class="chk-wrapper"><input type="checkbox" class="amigo-checkbox" value="${amigo}" checked></div>
                     <button class="btn-amigo-match" title="${amigo}" onclick="cargarAmigoYComparar('${amigo}')">🆚 ${amigo}</button>
-                    <button class="btn-amigo-delete" onclick="borrarAmigo('${amigo}')">✖</button>
+                    <button class="btn-amigo-delete" title="Borrar a ${amigo}" onclick="borrarAmigo('${amigo}')">✖</button>
                 </div>`;
             });
             container.innerHTML = html;
@@ -505,7 +491,7 @@
                             let cMe = contarTotal(mMe), cLe = contarTotal(mLe), pos = Math.min(cMe, cLe);
                             if (cMe > 0 || cLe > 0) return { nombre: amigo, me: cMe, le: cLe, pos: pos, txt: aTexto };
                         }
-                    } catch (e) { } return null;
+                    } catch (e) {} return null;
                 });
 
                 let res = (await Promise.all(promesasDescarga)).filter(r => r !== null);
@@ -523,7 +509,7 @@
                     list.appendChild(div);
                 });
                 if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' }); status.innerText = "";
-            } catch(e) { console.error(e); alert("Error en el ranking. Asegurate de que tu lista no esté vacía."); document.getElementById('statusAmigo').innerText = ""; }
+            } catch(e) { console.error(e); alert("Error en el ranking."); document.getElementById('statusAmigo').innerText = ""; }
         }
 
         async function analizarMercadoGlobal() {
@@ -531,9 +517,7 @@
                 let amigos = obtenerAmigosSeleccionados(); if (amigos.length < 2) { alert("Necesitás al menos 2 amigos tildados para triangular."); return; }
                 let status = document.getElementById('statusAmigo'); status.style.color = "#005c98"; status.innerText = "🌐 Analizando matriz...";
                 window.amigosDataGlobal = [];
-                await Promise.all(amigos.map(async (amigo) => {
-                    try { const snap = await get(child(ref(db), `usuarios/${amigo}`)); if (snap.exists()) window.amigosDataGlobal.push({ nombre: amigo, datos: parsearTexto(snap.val().textoOriginal) }); } catch (e) { }
-                }));
+                await Promise.all(amigos.map(async (amigo) => { try { const snap = await get(child(ref(db), `usuarios/${amigo}`)); if (snap.exists()) window.amigosDataGlobal.push({ nombre: amigo, datos: parsearTexto(snap.val().textoOriginal) }); } catch (e) {} }));
 
                 let cruces = [];
                 for (let i = 0; i < window.amigosDataGlobal.length; i++) {
@@ -557,58 +541,117 @@
                     list.appendChild(div);
                 });
                 if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' }); status.innerText = "";
-            } catch(e) { console.error(e); alert("Error al cruzar datos. Alguna lista podría estar corrupta."); document.getElementById('statusAmigo').innerText = ""; }
+            } catch(e) { console.error(e); alert("Error al cruzar datos."); document.getElementById('statusAmigo').innerText = ""; }
         }
 
-        async function calcularRutaCompletar() {
+        // ==========================================
+        // OPTIMIZADOR ETAPA 3: RUTA INTERACTIVA (WIZARD)
+        // ==========================================
+        window.seleccionarTodoRuta = function() { document.querySelectorAll('#wizardRutaContainer .sticker-btn').forEach(b => b.classList.add('selected')); actualizarContadoresRuta(); };
+        window.deseleccionarTodoRuta = function() { document.querySelectorAll('#wizardRutaContainer .sticker-btn').forEach(b => b.classList.remove('selected')); actualizarContadoresRuta(); };
+
+        function actualizarContadoresRuta() {
+            seleccionesActuales.recibir = Array.from(document.querySelectorAll('#rutaMeSirven .sticker-btn.selected')).map(el => el.dataset.id);
+            seleccionesActuales.dar = Array.from(document.querySelectorAll('#rutaLeSirven .sticker-btn.selected')).map(el => el.dataset.id);
+            document.getElementById('rutaCountRecibir').innerText = seleccionesActuales.recibir.length;
+            document.getElementById('rutaCountDar').innerText = seleccionesActuales.dar.length;
+        }
+
+        window.confirmarPasoRuta = function(amigoNombre) {
+            if(seleccionesActuales.recibir.length !== 0 || seleccionesActuales.dar.length !== 0) {
+                if(seleccionesActuales.recibir.length !== seleccionesActuales.dar.length) { if(!confirm(`Estás recibiendo ${seleccionesActuales.recibir.length} y dando ${seleccionesActuales.dar.length}. ¿Continuar igual?`)) return; }
+                
+                rutaData.faltan = rutaData.faltan.filter(f => !seleccionesActuales.recibir.includes(f));
+                seleccionesActuales.dar.forEach(d => { let idx = rutaData.repes.indexOf(d); if(idx > -1) rutaData.repes.splice(idx, 1); });
+                
+                window.carritoSimulador.push({ nombre: amigoNombre, recibo: seleccionesActuales.recibir, doy: seleccionesActuales.dar });
+                actualizarVistaCarrito();
+            }
+            rutaData.amigos = rutaData.amigos.filter(a => a.nombre !== amigoNombre);
+            rutaData.pasoActual++;
+            siguientePasoRuta();
+        };
+
+        async function iniciarRutaInteractiva() {
             try {
                 let textoMio = document.getElementById('miLista').value.trim(); if (!textoMio) { alert("Primero pegá tu lista."); return; }
                 let amigos = obtenerAmigosSeleccionados(); if (amigos.length === 0) return;
-                let status = document.getElementById('statusAmigo'); status.style.color = "#005c98"; status.innerText = "🚀 Calculando...";
+                
+                document.getElementById('statusAmigo').style.color = "#005c98"; document.getElementById('statusAmigo').innerText = "Iniciando Asistente...";
                 
                 let misDatos = parsearTexto(textoMio);
-                let faltanOriginal = contarTotal(misDatos.faltan), misFaltan = aplanarDiccionario(misDatos.faltan), misRepetidas = aplanarDiccionario(misDatos.repetidas);
+                rutaData.faltan = aplanarDiccionario(misDatos.faltan);
+                rutaData.repes = aplanarDiccionario(misDatos.repetidas);
+                rutaData.amigos = [];
+                rutaData.pasoActual = 1;
+                vaciarCarrito(); // Se vacía el carrito al iniciar una ruta nueva
 
-                let amigosData = [];
                 await Promise.all(amigos.map(async (amigo) => {
-                    try { const snap = await get(child(ref(db), `usuarios/${amigo}`)); if (snap.exists()) { let d = parsearTexto(snap.val().textoOriginal); amigosData.push({ nombre: amigo, faltan: aplanarDiccionario(d.faltan), repetidas: aplanarDiccionario(d.repetidas) }); } } catch (e) {}
+                    const snap = await get(child(ref(db), `usuarios/${amigo}`));
+                    if (snap.exists()) {
+                        let d = parsearTexto(snap.val().textoOriginal);
+                        rutaData.amigos.push({ nombre: amigo, f: aplanarDiccionario(d.faltan), r: aplanarDiccionario(d.repetidas) });
+                    }
                 }));
 
-                let planDeAccion = [], conseguidasTotal = 0, iteracionSeguridad = 0;
-
-                while (misFaltan.length > 0 && iteracionSeguridad < 50) {
-                    iteracionSeguridad++;
-                    let mejorAmigo = null, mejorCantidad = 0, mejorMeDa = [], mejorLeDoy = [];
-                    for (let amigo of amigosData) {
-                        let mePuedeDar = amigo.repetidas.filter(f => misFaltan.includes(f)), lePuedoDar = amigo.faltan.filter(f => misRepetidas.includes(f));
-                        let posibles = Math.min(mePuedeDar.length, lePuedoDar.length);
-                        if (posibles > mejorCantidad) { mejorCantidad = posibles; mejorAmigo = amigo; mejorMeDa = mePuedeDar.slice(0, posibles); mejorLeDoy = lePuedoDar.slice(0, posibles); }
-                    }
-                    if (mejorCantidad === 0) break; 
-
-                    planDeAccion.push({ nombre: mejorAmigo.nombre, cantidad: mejorCantidad, recibo: desaplanarArray(mejorMeDa), doy: desaplanarArray(mejorLeDoy) });
-                    conseguidasTotal += mejorCantidad;
-                    
-                    misFaltan = misFaltan.filter(f => !mejorMeDa.includes(f));
-                    mejorLeDoy.forEach(f => { let idx = misRepetidas.indexOf(f); if (idx > -1) misRepetidas.splice(idx, 1); });
-                    mejorMeDa.forEach(f => { let idx = mejorAmigo.repetidas.indexOf(f); if (idx > -1) mejorAmigo.repetidas.splice(idx, 1); });
-                    mejorLeDoy.forEach(f => { let idx = mejorAmigo.faltan.indexOf(f); if (idx > -1) mejorAmigo.faltan.splice(idx, 1); });
-                }
-
                 document.getElementById('resultados').style.display = 'block'; document.getElementById('rutaCompletarResultados').style.display = 'block'; document.getElementById('rankingResultados').style.display = 'none'; document.getElementById('mercadoGlobalResultados').style.display = 'none'; document.getElementById('detalleIndividual').style.display = 'none';
-                let resumenDiv = document.getElementById('resumenRuta'), listaContainer = document.getElementById('listaRuta'); listaContainer.innerHTML = '';
+                
+                siguientePasoRuta();
+                document.getElementById('statusAmigo').innerText = "";
+                if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
+            } catch(e) { console.error(e); alert("Ocurrió un error al iniciar la ruta."); document.getElementById('statusAmigo').innerText = ""; }
+        }
 
-                if (planDeAccion.length === 0) { resumenDiv.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">No hay combinaciones equitativas con los seleccionados. 😢</p>'; } 
-                else {
-                    resumenDiv.innerHTML = `<div style="background:#e9ecef;padding:15px;border-radius:8px;">🔹 Te faltaban: <b>${faltanOriginal}</b><br>✅ Conseguirías siguiendo estos pasos: <b>${conseguidasTotal}</b><br>⚠️ Te seguirán faltando: <b style="color:var(--danger);">${misFaltan.length}</b></div>`;
-                    planDeAccion.forEach((paso, index) => {
-                        let div = document.createElement('div'); div.className = 'step-box';
-                        div.innerHTML = `<div class="step-title">Paso ${index + 1}: Cambiá ${paso.cantidad} con ${paso.nombre}</div><div style="font-size:13px;margin-top:8px;"><b style="color:var(--success);">Vos recibís:</b><br>${Object.keys(paso.recibo).map(e=>`&nbsp;&nbsp;• <b>${e}:</b> ${paso.recibo[e].join(', ')}<br>`).join('')}<b style="color:var(--danger);margin-top:5px;display:inline-block;">Vos le das:</b><br>${Object.keys(paso.doy).map(e=>`&nbsp;&nbsp;• <b>${e}:</b> ${paso.doy[e].join(', ')}<br>`).join('')}</div>`;
-                        listaContainer.appendChild(div);
-                    });
-                }
-                if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' }); status.innerText = "";
-            } catch(e) { console.error(e); alert("Ocurrió un error al calcular. Revisá que tus listas no estén vacías."); document.getElementById('statusAmigo').innerText = ""; }
+        function siguientePasoRuta() {
+            let container = document.getElementById('wizardRutaContainer');
+            let mejorAmigo = null, mejorCantidad = 0, mejorMeDa = [], mejorLeDoy = [];
+
+            for (let a of rutaData.amigos) {
+                let meDa = a.r.filter(x => rutaData.faltan.includes(x)), leDoy = a.f.filter(x => rutaData.repes.includes(x)), pos = Math.min(meDa.length, leDoy.length);
+                if (pos > mejorCantidad) { mejorCantidad = pos; mejorAmigo = a; mejorMeDa = meDa; mejorLeDoy = leDoy; }
+            }
+
+            if (mejorCantidad === 0) {
+                container.innerHTML = `
+                    <div style="background:#d4edda; padding:20px; border-radius:8px; text-align:center;">
+                        <h4>🏁 ¡Ruta Terminada!</h4><p>Ya no hay más intercambios posibles con los amigos seleccionados.</p>
+                        <button class="btn-yellow" style="margin-top:10px;" onclick="generarListaProyectada()">✨ Ver Mi Nueva Lista Final</button>
+                    </div>`;
+                return;
+            }
+
+            ultimoNombreAmigo = mejorAmigo.nombre;
+            seleccionesActuales = { recibir: [], dar: [] };
+            
+            container.innerHTML = `
+                <div class="step-box">
+                    <div class="step-title">Paso ${rutaData.pasoActual}: Cambio sugerido con ${mejorAmigo.nombre}</div>
+                    <p style="font-size: 13px; margin-bottom: 15px;">Seleccioná las que querés intercambiar ahora (se preseleccionó un cambio justo):</p>
+                    
+                    <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                        <button class="btn-mini" style="background:#28a745; color:white; border:none;" onclick="seleccionarTodoRuta()">☑️ Sel. Todas</button>
+                        <button class="btn-mini" style="background:#dc3545; color:white; border:none;" onclick="deseleccionarTodoRuta()">🔲 Ninguna</button>
+                    </div>
+                    
+                    <h4 style="margin:0 0 5px 0;">✅ ${mejorAmigo.nombre} te da:</h4><div id="rutaMeSirven"></div>
+                    <h4 style="margin:15px 0 5px 0;">🎁 Vos le das:</h4><div id="rutaLeSirven"></div>
+
+                    <div class="contador-simulador">
+                        <div>📥 Seleccionadas a recibir: <b id="rutaCountRecibir">0</b> &nbsp;|&nbsp; 📤 Seleccionadas a dar: <b id="rutaCountDar">0</b></div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-secondary" style="width: auto; padding: 8px 15px; margin: 0;" onclick="confirmarPasoRuta('${mejorAmigo.nombre}')">Saltar Amigo</button>
+                            <button class="btn-success" style="width: auto; padding: 8px 15px; margin: 0;" onclick="confirmarPasoRuta('${mejorAmigo.nombre}')">Confirmar y Seguir ➡️</button>
+                        </div>
+                    </div>
+                </div>`;
+
+            renderizarResultadosInteractivos('rutaMeSirven', desaplanarArray(mejorMeDa), 'recibir');
+            renderizarResultadosInteractivos('rutaLeSirven', desaplanarArray(mejorLeDoy), 'dar');
+            
+            // Preseleccionar cantidad justa equitativa
+            let btnR = document.querySelectorAll('#rutaMeSirven .sticker-btn'), btnD = document.querySelectorAll('#rutaLeSirven .sticker-btn');
+            for(let i=0; i<mejorCantidad; i++) { if(btnR[i]) btnR[i].classList.add('selected'); if(btnD[i]) btnD[i].classList.add('selected'); }
+            actualizarContadoresRuta();
         }
 
         // =====================================
