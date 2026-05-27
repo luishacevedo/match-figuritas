@@ -23,7 +23,7 @@
         .btn-wsp { background-color: var(--wsp); box-shadow: 0 4px 6px rgba(37,211,102,0.3); }
         .btn-wsp-small { background-color: var(--wsp); color: white; }
         
-        /* ESTILOS BOTONES AMIGOS: DISEÑO SEPARADO E INDESTRUCTIBLE */
+        /* ESTILOS BOTONES AMIGOS */
         #botonesAmigos { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-bottom: 15px; }
         .amigo-wrapper { display: flex; align-items: center; background: white; border: 1px solid #ced4da; border-radius: 8px; padding: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .amigo-checkbox { width: 18px; height: 18px; margin: 0 8px 0 4px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
@@ -46,10 +46,12 @@
         .team-row { margin: 5px 0; font-size: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 5px;}
         
         /* ESTILOS DEL SIMULADOR INTERACTIVO */
-        .sticker-btn { background: #e9ecef; border: 1px solid #ced4da; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; user-select: none; }
+        .sticker-btn { background: #e9ecef; border: 1px solid #ced4da; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; user-select: none; display: inline-flex; align-items: center; gap: 4px;}
+        .sticker-badge { font-size: 10px; opacity: 0.8; }
         .sticker-btn.receive.selected { background: var(--success); color: white; border-color: var(--success); }
         .sticker-btn.give.selected { background: var(--danger); color: white; border-color: var(--danger); }
-        .contador-simulador { background: #343a40; color: white; padding: 10px 15px; border-radius: 8px; margin-top: 15px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .contador-simulador { background: #343a40; color: white; padding: 15px; border-radius: 8px; margin-top: 15px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; gap: 15px;}
+        .breakdown-text { font-size: 11px; color: #adb5bd; display: block; margin-top: 4px;}
         
         .ranking-item { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; }
         .ranking-header { display: flex; justify-content: space-between; align-items: center; }
@@ -65,10 +67,11 @@
         .tab-btn.active { background: var(--primary); color: white; }
         .tab-btn.inactive { background: transparent; color: #495057; border: none; }
         .tab-btn.inactive:hover { background: rgba(0,0,0,0.05); }
+        .sim-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #e9ecef;}
         
         .footer { text-align: center; margin-top: 30px; color: #6c757d; font-size: 13px; padding-top: 20px; border-top: 1px solid #dee2e6; }
         .footer a { color: var(--primary); font-weight: bold; text-decoration: none; }
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; gap: 15px; } .botones-resultados { flex-direction: column; gap: 10px; } #botonesAmigos { grid-template-columns: 1fr; } .contador-simulador { flex-direction: column; gap: 10px; align-items: stretch; text-align: center;} }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; gap: 15px; } .botones-resultados { flex-direction: column; gap: 10px; } #botonesAmigos { grid-template-columns: 1fr; } .contador-simulador { flex-direction: column; gap: 10px; align-items: stretch; text-align: left;} .sim-header { flex-direction: column; align-items: flex-start; gap: 10px;} }
     </style>
 </head>
 <body>
@@ -107,8 +110,8 @@
             <div id="botonesAmigos"></div>
             
             <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 15px;">
-                <button id="btnEscanearAmigos" class="btn-yellow" style="padding: 8px; font-size: 13px; display: none;">⚡ Ranking de los Seleccionados</button>
-                <button id="btnRutaCompletar" class="btn-success" style="padding: 8px; font-size: 13px; display: none;">🚀 Ruta al 100% (Automática)</button>
+                <button id="btnEscanearAmigos" class="btn-yellow" style="padding: 8px; font-size: 13px; display: none;">⚡ Ranking de Seleccionados</button>
+                <button id="btnRutaCompletar" class="btn-success" style="padding: 8px; font-size: 13px; display: none;">🚀 Completa el Álbum (Interactivo)</button>
                 <button id="btnMercadoGlobal" class="btn-primary" style="padding: 8px; font-size: 13px; display: none;">🌐 Cruces entre Seleccionados</button>
             </div>
             
@@ -122,16 +125,19 @@
     </div>
 
     <div id="areaCarrito" class="resultados" style="border-color: var(--yellow);">
-        <h3 style="border-color: var(--yellow);">🛒 Mi Simulador de Cambios</h3>
-        <div id="carritoVacio" style="font-size: 13px; color: #6c757d;">Todavía no guardaste ningún cambio. Seleccioná el Modo Simulador en un amigo y guardá el intercambio.</div>
+        <h3 style="border-color: var(--yellow); display: flex; justify-content: space-between; align-items: center;">
+            <span>🛒 Tu Simulador / Plan</span>
+            <span id="badgeRuta" style="font-size: 12px; background: var(--success); color: white; padding: 4px 8px; border-radius: 4px; display: none;">Modo Ruta Activo</span>
+        </h3>
+        <div id="carritoVacio" style="font-size: 13px; color: #6c757d;">No guardaste ningún cambio. Seleccioná el Modo Simulador en un amigo y guardá el intercambio.</div>
         <div id="carritoLleno" style="display: none;">
             <div id="listaCarritoItems"></div>
             <button id="btnProyectarLista" class="btn-yellow" style="margin-top: 15px;">✨ Generar mi Nueva Lista Proyectada</button>
-            <button id="btnVaciarCarrito" class="btn-danger" style="margin-top: 8px; padding: 8px; font-size: 12px; width: auto;">🗑 Vaciar Simulador</button>
+            <button id="btnVaciarCarrito" class="btn-danger" style="margin-top: 8px; padding: 8px; font-size: 12px; width: auto;">🗑 Vaciar y reiniciar</button>
         </div>
         
         <div id="areaProyeccion" style="display: none; margin-top: 20px; border-top: 1px solid #dee2e6; padding-top: 15px;">
-            <h4 style="margin: 0 0 10px 0;">Tu lista proyectada:</h4>
+            <h4 style="margin: 0 0 10px 0;">Tu lista proyectada final:</h4>
             <textarea id="listaProyectada" style="height: 200px; font-size: 12px;"></textarea>
             <div style="display: flex; gap: 10px;">
                 <button id="btnCopiarProyeccion" class="btn-primary">📋 Copiar Lista</button>
@@ -142,7 +148,6 @@
 
     <div id="resultados" class="resultados">
         <div id="rankingResultados" style="display: none;"><h3>🏆 Ranking de Opciones</h3><div id="listaRanking"></div></div>
-        <div id="rutaCompletarResultados" style="display: none;"><h3>🚀 Plan de Acción Automático</h3><div id="resumenRuta"></div><div id="listaRuta"></div></div>
         <div id="mercadoGlobalResultados" style="display: none;"><h3>🌐 Triangulación de Grupo</h3><div id="listaMercadoGlobal"></div></div>
         
         <div id="detalleIndividual" style="display: none;">
@@ -163,20 +168,41 @@
             </div>
 
             <div id="vistaSimulador" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                    <p style="font-size: 12px; color: #6c757d; margin: 0;">💡 Tocá las figuritas para armar un cambio a medida.</p>
-                    <div style="display: flex; gap: 8px;">
-                        <button id="btnSimTodos" class="btn-mini" style="background:#28a745; color:white; border:none;">☑️ Sel. Todas</button>
-                        <button id="btnSimNinguno" class="btn-mini" style="background:#dc3545; color:white; border:none;">🔲 Ninguna</button>
+                <div class="step-box" id="infoPasoRuta" style="display: none; margin-bottom: 15px;"></div>
+                
+                <div class="sim-header">
+                    <h3 id="tituloMeSirvenSim" style="margin: 0; color: var(--success);">✅ Vos recibís:</h3>
+                    <div>
+                        <button id="btnSimRecibirTodas" class="btn-mini" style="background:var(--success); color:white; border:none;">☑️ Todas</button>
+                        <button id="btnSimRecibirNinguna" class="btn-mini">🔲 Ninguna</button>
                     </div>
                 </div>
+                <div id="meSirvenSim" style="margin-bottom: 20px;"></div>
                 
-                <h3 id="tituloMeSirvenSim">✅ Me sirven:</h3><div id="meSirvenSim" style="margin-bottom: 20px;"></div>
-                <h3 id="tituloLeSirvenSim">🎁 Le sirven:</h3><div id="leSirvenSim"></div>
+                <div class="sim-header">
+                    <h3 id="tituloLeSirvenSim" style="margin: 0; color: var(--danger);">🎁 Vos entregás:</h3>
+                    <div>
+                        <button id="btnSimDarTodas" class="btn-mini" style="background:var(--danger); color:white; border:none;">☑️ Todas</button>
+                        <button id="btnSimDarNinguna" class="btn-mini">🔲 Ninguna</button>
+                    </div>
+                </div>
+                <div id="leSirvenSim"></div>
                 
                 <div class="contador-simulador">
-                    <div>📥 Seleccionadas a recibir: <b id="countRecibir">0</b> &nbsp;|&nbsp; 📤 Seleccionadas a dar: <b id="countDar">0</b></div>
-                    <button id="btnGuardarEnCarrito" class="btn-yellow" style="width: auto; padding: 8px 15px; margin: 0;">🛒 Guardar en Simulador</button>
+                    <div style="flex: 1;">
+                        <div style="margin-bottom: 8px;">
+                            📥 <b>Recibir: <span id="countRecibir">0</span></b>
+                            <span class="breakdown-text" id="breakdownRecibir">0 fig.</span>
+                        </div>
+                        <div>
+                            📤 <b>Dar: <span id="countDar">0</span></b>
+                            <span class="breakdown-text" id="breakdownDar">0 fig.</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button id="btnGuardarEnCarrito" class="btn-yellow" style="width: 100%; padding: 10px 15px; margin: 0;">🛒 Guardar Cambio</button>
+                        <button id="btnSaltarPasoRuta" class="btn-secondary" style="display: none; font-size: 12px; padding: 6px;">⏭️ Saltar amigo y buscar otro</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -187,16 +213,25 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        
         const firebaseConfig = { apiKey: "AIzaSyAPGcn1zq1NPTrfcAZ1a1xLIjZ6IwDwMoY", authDomain: "match-figuritas-app.firebaseapp.com", databaseURL: "https://match-figuritas-app-default-rtdb.firebaseio.com", projectId: "match-figuritas-app", storageBucket: "match-figuritas-app.firebasestorage.app", messagingSenderId: "13972953348", appId: "1:13972953348:web:2d60c62f4bd2e5e0ac5851" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let ultimoMatchMeSirven = {}, ultimoMatchLeSirven = {}, ultimoNombreAmigo = "";
+        // Variables Globales
+        let ultimoMatchMeSirven = {};
+        let ultimoMatchLeSirven = {};
+        let ultimoNombreAmigo = "";
         window.amigosDataGlobal = [];
         window.carritoSimulador = []; 
         let seleccionesActuales = { recibir: [], dar: [] };
+        
+        // Estado para la Ruta Interactiva en memoria
+        let rutaState = { activo: false, misFaltan: [], misRepetidas: [], amigos: [], pasoActual: 0 };
 
-        // UI Listeners principales
+        // =====================================
+        // EVENT LISTENERS PRINCIPALES
+        // =====================================
         document.getElementById('btnCargarPerfil').addEventListener('click', cargarMiPerfil);
         document.getElementById('btnGuardarNube').addEventListener('click', guardarMisDatos);
         document.getElementById('btnCompararLocal').addEventListener('click', compararListasLocales);
@@ -209,53 +244,87 @@
         document.getElementById('btnGuardarAmigoNuevo').addEventListener('click', guardarAmigoNuevo);
         document.getElementById('btnEscanearAmigos').addEventListener('click', escanearMisCambios);
         document.getElementById('btnMercadoGlobal').addEventListener('click', analizarMercadoGlobal);
-        document.getElementById('btnRutaCompletar').addEventListener('click', calcularRutaCompletar);
+        document.getElementById('btnRutaCompletar').addEventListener('click', iniciarRutaInteractiva);
+        
         document.getElementById('btnBuscarAmigo').addEventListener('click', () => {
             let user = document.getElementById('amigoUsuario').value.trim();
-            if(user) { document.getElementById('statusAmigo').innerText = "Buscando..."; cargarAmigoYComparar(user); }
+            if(user) { 
+                document.getElementById('statusAmigo').innerText = "Buscando..."; 
+                cargarAmigoYComparar(user); 
+            }
         });
         
-        // Controles de Selección Rápida
-        document.getElementById('btnSeleccionarTodos').addEventListener('click', (e) => { e.preventDefault(); document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = true); });
-        document.getElementById('btnDeseleccionarTodos').addEventListener('click', (e) => { e.preventDefault(); document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = false); });
+        // Controles de Selección
+        document.getElementById('btnSeleccionarTodos').addEventListener('click', (e) => { 
+            e.preventDefault(); 
+            document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = true); 
+        });
+        document.getElementById('btnDeseleccionarTodos').addEventListener('click', (e) => { 
+            e.preventDefault(); 
+            document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = false); 
+        });
 
-        // Pestañas Vista Texto / Simulador
+        // Pestañas
         document.getElementById('tabVistaTexto').addEventListener('click', () => {
-            document.getElementById('tabVistaTexto').className = 'tab-btn active';
+            document.getElementById('tabVistaTexto').className = 'tab-btn active'; 
             document.getElementById('tabVistaSimulador').className = 'tab-btn inactive';
-            document.getElementById('vistaTexto').style.display = 'block';
+            document.getElementById('vistaTexto').style.display = 'block'; 
             document.getElementById('vistaSimulador').style.display = 'none';
         });
         document.getElementById('tabVistaSimulador').addEventListener('click', () => {
-            document.getElementById('tabVistaSimulador').className = 'tab-btn active';
+            document.getElementById('tabVistaSimulador').className = 'tab-btn active'; 
             document.getElementById('tabVistaTexto').className = 'tab-btn inactive';
-            document.getElementById('vistaSimulador').style.display = 'block';
+            document.getElementById('vistaSimulador').style.display = 'block'; 
             document.getElementById('vistaTexto').style.display = 'none';
         });
 
-        // Controles Internos del Simulador
-        document.getElementById('btnSimTodos').addEventListener('click', () => {
-            document.querySelectorAll('#vistaSimulador .sticker-btn').forEach(btn => btn.classList.add('selected'));
-            actualizarContadoresSeleccion();
+        // Controles Simulador
+        document.getElementById('btnSimRecibirTodas').addEventListener('click', () => { 
+            document.querySelectorAll('#meSirvenSim .sticker-btn').forEach(btn => btn.classList.add('selected')); 
+            actualizarContadoresSeleccion(); 
         });
-        document.getElementById('btnSimNinguno').addEventListener('click', () => {
-            document.querySelectorAll('#vistaSimulador .sticker-btn').forEach(btn => btn.classList.remove('selected'));
-            actualizarContadoresSeleccion();
+        document.getElementById('btnSimRecibirNinguna').addEventListener('click', () => { 
+            document.querySelectorAll('#meSirvenSim .sticker-btn').forEach(btn => btn.classList.remove('selected')); 
+            actualizarContadoresSeleccion(); 
         });
+        document.getElementById('btnSimDarTodas').addEventListener('click', () => { 
+            document.querySelectorAll('#leSirvenSim .sticker-btn').forEach(btn => btn.classList.add('selected')); 
+            actualizarContadoresSeleccion(); 
+        });
+        document.getElementById('btnSimDarNinguna').addEventListener('click', () => { 
+            document.querySelectorAll('#leSirvenSim .sticker-btn').forEach(btn => btn.classList.remove('selected')); 
+            actualizarContadoresSeleccion(); 
+        });
+        
         document.getElementById('btnGuardarEnCarrito').addEventListener('click', agregarAlCarrito);
         document.getElementById('btnVaciarCarrito').addEventListener('click', vaciarCarrito);
         document.getElementById('btnProyectarLista').addEventListener('click', generarListaProyectada);
+        
         document.getElementById('btnCopiarProyeccion').addEventListener('click', () => {
-            let txt = document.getElementById('listaProyectada'); txt.select(); navigator.clipboard.writeText(txt.value);
-            document.getElementById('btnCopiarProyeccion').innerText = "¡Copiado!"; setTimeout(() => document.getElementById('btnCopiarProyeccion').innerText = "📋 Copiar Lista", 2000);
+            let txt = document.getElementById('listaProyectada'); 
+            txt.select(); 
+            navigator.clipboard.writeText(txt.value);
+            document.getElementById('btnCopiarProyeccion').innerText = "¡Copiado!"; 
+            setTimeout(() => document.getElementById('btnCopiarProyeccion').innerText = "📋 Copiar Lista", 2000);
         });
+        
         document.getElementById('btnAplicarProyeccion').addEventListener('click', () => {
-            if(confirm("¿Seguro querés reemplazar tu lista actual por esta proyección? (Luego acordate de apretar Guardar en la Nube)")) {
-                document.getElementById('miLista').value = document.getElementById('listaProyectada').value; vaciarCarrito(); alert("Lista aplicada al perfil. ¡Apretá Guardar en la Nube!");
+            if(confirm("¿Reemplazar tu lista actual por esta proyección? (Luego acordate de Guardar en la Nube)")) {
+                document.getElementById('miLista').value = document.getElementById('listaProyectada').value; 
+                vaciarCarrito(); 
+                alert("Lista aplicada. ¡Apretá Guardar en la Nube!");
             }
         });
+        
+        document.getElementById('btnSaltarPasoRuta').addEventListener('click', () => {
+            // Elimina al amigo actual de la memoria y busca el siguiente
+            rutaState.amigos = rutaState.amigos.filter(a => a.nombre !== ultimoNombreAmigo);
+            calcularSiguientePasoRuta();
+        });
 
-        // Core Parsing
+        // =====================================
+        // CORE PARSING Y MATEMATICA
+        // =====================================
         function limpiarNombreEquipo(textoRaw) {
             let limpio = textoRaw.replace(/[^A-Za-z]/g, '').toUpperCase();
             let siglas = ["FWC", "MEX", "RSA", "KOR", "CZE", "CAN", "BIH", "QAT", "SUI", "BRA", "MAR", "HAI", "SCO", "USA", "PAR", "AUS", "TUR", "GER", "CUW", "CIV", "ECU", "NED", "JPN", "SWE", "TUN", "BEL", "EGY", "IRN", "NZL", "ESP", "CPV", "KSA", "URU", "FRA", "SEN", "IRQ", "NOR", "ARG", "ALG", "AUT", "JOR", "POR", "COD", "UZB", "COL", "ENG", "CRO", "GHA", "PAN", "CC"];
@@ -268,8 +337,8 @@
             if (!texto || typeof texto !== 'string') return datos; 
             let seccion = null;
             texto.split('\n').forEach(linea => {
-                let l = linea.trim();
-                if(!l) return;
+                let l = linea.trim(); 
+                if(!l) return; 
                 let lm = l.toLowerCase();
                 if(lm.includes('faltan') || lm.includes('need')) seccion = 'faltan';
                 else if(lm.includes('repetidas') || lm.includes('swaps')) seccion = 'repetidas';
@@ -280,12 +349,16 @@
                     datos[seccion][eq].push(...nums);
                 }
             });
-            for(let s in datos) for(let e in datos[s]) datos[s][e].sort((a,b)=>a-b);
+            for(let s in datos) {
+                for(let e in datos[s]) {
+                    datos[s][e].sort((a,b)=>a-b);
+                }
+            }
             return datos;
         }
 
         function encontrarInterseccion(buscadas, ofrecidas) {
-            let matches = {};
+            let matches = {}; 
             let copiaOfrecidas = JSON.parse(JSON.stringify(ofrecidas));
             for (let eq in buscadas) {
                 if (copiaOfrecidas[eq]) {
@@ -293,13 +366,35 @@
                         let index = copiaOfrecidas[eq].indexOf(num);
                         if (index !== -1) {
                             if (!matches[eq]) matches[eq] = [];
-                            matches[eq].push(num);
+                            matches[eq].push(num); 
                             copiaOfrecidas[eq].splice(index, 1);
                         }
                     });
                 }
-            }
+            } 
             return matches;
+        }
+
+        function aplanarDiccionario(dict) { 
+            let arr = []; 
+            for (let eq in dict) { 
+                dict[eq].forEach(num => arr.push(`${eq} ${num}`)); 
+            } 
+            return arr; 
+        }
+
+        function desaplanarArray(arr) {
+            let dict = {};
+            arr.forEach(item => { 
+                let partes = item.split(' '); 
+                let eq = partes[0], num = partes[1]; 
+                if (!dict[eq]) dict[eq] = []; 
+                dict[eq].push(num); 
+            });
+            for (let eq in dict) { 
+                dict[eq].sort((a,b) => parseInt(a) - parseInt(b)); 
+            } 
+            return dict;
         }
 
         function obtenerDesglose(d) {
@@ -311,66 +406,115 @@
             let tot = c.esp + c.esc + c.eq + c.jug;
             return tot > 0 ? `${tot} fig. (${c.esp}🌟, ${c.esc}🛡️, ${c.eq}👥, ${c.jug}🏃)` : "0 fig.";
         }
-
-        function contarTotal(d) { let t = 0; for(let e in d) t += d[e].length; return t; }
-
-        function aplanarDiccionario(dict) {
-            let arr = []; for (let eq in dict) { dict[eq].forEach(num => arr.push(`${eq} ${num}`)); } return arr;
+        
+        function obtenerDesglosePlano(arr) {
+            let c = { esp: 0, esc: 0, eq: 0, jug: 0 };
+            arr.forEach(item => {
+                let p = item.split(' '), eq = p[0], num = parseInt(p[1]);
+                if(eq.includes('FWC') || eq.includes('CC')) c.esp++; 
+                else if(num === 1) c.esc++; 
+                else if(num === 13) c.eq++; 
+                else c.jug++;
+            });
+            let tot = c.esp + c.esc + c.eq + c.jug; 
+            return tot > 0 ? `${tot} fig. (${c.esp}🌟, ${c.esc}🛡️, ${c.eq}👥, ${c.jug}🏃)` : "0 fig.";
         }
 
-        function desaplanarArray(arr) {
-            let dict = {};
-            arr.forEach(item => { let partes = item.split(' '); let eq = partes[0], num = partes[1]; if (!dict[eq]) dict[eq] = []; dict[eq].push(num); });
-            for (let eq in dict) { dict[eq].sort((a,b) => parseInt(a) - parseInt(b)); } return dict;
+        function contarTotal(d) { 
+            let t = 0; 
+            for(let e in d) t += d[e].length; 
+            return t; 
         }
 
         // =====================================
-        // RENDERIZADO VISTAS (TEXTO Y SIMULADOR)
+        // RENDERIZADO VISTAS
         // =====================================
         function renderizarResultadosTexto(divId, d) {
-            let div = document.getElementById(divId); div.innerHTML = '';
+            let div = document.getElementById(divId); 
+            div.innerHTML = ''; 
             let hayMatches = false;
+            
+            // Creamos un diccionario sin duplicados para la vista de texto clásico
+            let cleanD = {};
             for(let e in d) {
+                cleanD[e] = [...new Set(d[e])];
+            }
+
+            for(let e in cleanD) {
                 hayMatches = true;
-                div.innerHTML += `<div class="team-row" style="display:block;"><b>${e}:</b> ${d[e].join(', ')}</div>`;
+                div.innerHTML += `<div class="team-row" style="display:block;"><b>${e}:</b> ${cleanD[e].join(', ')}</div>`;
             }
             if(!hayMatches) div.innerHTML = '<p style="color:#856404; background:#fff3cd; padding:10px; border-radius:5px; font-size:13px;">No hay coincidencias.</p>';
         }
 
-        function renderizarResultadosInteractivos(divId, d, tipo) {
-            let div = document.getElementById(divId); div.innerHTML = '';
-            let hayMatches = false; let claseBtn = tipo === 'recibir' ? 'receive' : 'give';
+        function renderizarResultadosInteractivos(divId, d, tipo, diccionarioOriginalDeEseTipo) {
+            let div = document.getElementById(divId); 
+            div.innerHTML = '';
+            let hayMatches = false; 
+            let claseBtn = tipo === 'recibir' ? 'receive' : 'give';
+            
+            // Agrupamos para mostrar el badge multiplicador (ej: 5 (x3))
+            let agrupado = {};
             for(let e in d) {
-                hayMatches = true;
-                let fila = document.createElement('div'); fila.className = 'team-row'; fila.innerHTML = `<b style="width: 45px;">${e}:</b>`;
+                agrupado[e] = {};
                 d[e].forEach(num => {
-                    let btn = document.createElement('span'); btn.className = `sticker-btn ${claseBtn}`; btn.innerText = num; btn.dataset.id = `${e} ${num}`;
-                    btn.onclick = function() { this.classList.toggle('selected'); actualizarContadoresSeleccion(); };
-                    fila.appendChild(btn);
+                    agrupado[e][num] = (agrupado[e][num] || 0) + 1;
                 });
+            }
+
+            for(let e in agrupado) {
+                hayMatches = true;
+                let fila = document.createElement('div'); 
+                fila.className = 'team-row'; 
+                fila.innerHTML = `<b style="width: 45px;">${e}:</b>`;
+                
+                for(let num in agrupado[e]) {
+                    // Calculamos cuántas copias reales tiene en su mazo original
+                    let totalCopiasOriginal = 1;
+                    if (diccionarioOriginalDeEseTipo && diccionarioOriginalDeEseTipo[e]) {
+                        totalCopiasOriginal = diccionarioOriginalDeEseTipo[e].filter(x => x == num).length;
+                    }
+
+                    // Por cada match real que tenemos, creamos 1 boton
+                    let cantidadDeMatches = agrupado[e][num];
+                    for(let i=0; i < cantidadDeMatches; i++) {
+                        let btn = document.createElement('span'); 
+                        btn.className = `sticker-btn ${claseBtn}`; 
+                        
+                        // Generamos un ID único sumándole el índice
+                        btn.dataset.id = `${e} ${num}#${i}`; 
+                        
+                        let badgeText = "";
+                        if (totalCopiasOriginal > 1 && i === 0) {
+                            badgeText = ` <span class="sticker-badge">(tiene ${totalCopiasOriginal})</span>`;
+                        }
+                        
+                        btn.innerHTML = `${num}${badgeText}`;
+                        btn.onclick = function() { 
+                            this.classList.toggle('selected'); 
+                            actualizarContadoresSeleccion(); 
+                        };
+                        fila.appendChild(btn);
+                    }
+                }
                 div.appendChild(fila);
             }
             if(!hayMatches) div.innerHTML = '<p style="color:#856404; font-size:13px;">No hay coincidencias.</p>';
         }
 
         function actualizarContadoresSeleccion() {
-            seleccionesActuales.recibir = Array.from(document.querySelectorAll('#meSirvenSim .sticker-btn.selected')).map(el => el.dataset.id);
-            seleccionesActuales.dar = Array.from(document.querySelectorAll('#leSirvenSim .sticker-btn.selected')).map(el => el.dataset.id);
+            // Removemos el '#i' del ID temporal usado para los botones al momento de guardar
+            let rawRecibir = Array.from(document.querySelectorAll('#meSirvenSim .sticker-btn.selected')).map(el => el.dataset.id);
+            let rawDar = Array.from(document.querySelectorAll('#leSirvenSim .sticker-btn.selected')).map(el => el.dataset.id);
+            
+            seleccionesActuales.recibir = rawRecibir.map(id => id.split('#')[0]);
+            seleccionesActuales.dar = rawDar.map(id => id.split('#')[0]);
+            
             document.getElementById('countRecibir').innerText = seleccionesActuales.recibir.length;
+            document.getElementById('breakdownRecibir').innerText = obtenerDesglosePlano(seleccionesActuales.recibir);
+            
             document.getElementById('countDar').innerText = seleccionesActuales.dar.length;
-        }
-
-        window.cargarAmigoYComparar = async function(amigo) {
-            document.getElementById('amigoUsuario').value = amigo;
-            let m = document.getElementById('miLista').value.trim(); if(!m) { alert("Pegá tu lista a la izquierda primero."); return; }
-            try {
-                const snap = await get(child(ref(db), `usuarios/${amigo}`));
-                if(snap.exists()) {
-                    document.getElementById('amigoLista').value = snap.val().textoOriginal;
-                    ejecutarComparacion(m, snap.val().textoOriginal, amigo);
-                    document.getElementById('statusAmigo').style.color="green"; document.getElementById('statusAmigo').innerText = "¡Lista cargada!";
-                } else { document.getElementById('statusAmigo').style.color="red"; document.getElementById('statusAmigo').innerText = "No encontrado."; }
-            } catch(e) { document.getElementById('statusAmigo').innerText = "Error."; }
+            document.getElementById('breakdownDar').innerText = obtenerDesglosePlano(seleccionesActuales.dar);
         }
 
         function ejecutarComparacion(mio, otro, nombre) {
@@ -382,101 +526,314 @@
             // Render Vista Texto
             renderizarResultadosTexto('meSirvenTexto', ultimoMatchMeSirven);
             renderizarResultadosTexto('leSirvenTexto', ultimoMatchLeSirven);
+            
+            seleccionesActuales = { recibir: [], dar: [] };
+            
+            // Render Vista Simulador
+            renderizarResultadosInteractivos('meSirvenSim', ultimoMatchMeSirven, 'recibir', oD.repetidas);
+            renderizarResultadosInteractivos('leSirvenSim', ultimoMatchLeSirven, 'dar', mD.repetidas);
+            actualizarContadoresSeleccion();
+            
             document.getElementById('tituloMeSirvenTexto').innerText = `✅ Me sirven ${obtenerDesglose(ultimoMatchMeSirven)} de ${nombre}:`;
             document.getElementById('tituloLeSirvenTexto').innerText = `🎁 A ${nombre} le sirven ${obtenerDesglose(ultimoMatchLeSirven)} tuyas:`;
-
-            // Render Vista Simulador
-            seleccionesActuales = { recibir: [], dar: [] };
-            renderizarResultadosInteractivos('meSirvenSim', ultimoMatchMeSirven, 'recibir');
-            renderizarResultadosInteractivos('leSirvenSim', ultimoMatchLeSirven, 'dar');
-            actualizarContadoresSeleccion();
-            document.getElementById('tituloMeSirvenSim').innerText = `✅ Me sirven de ${nombre}:`;
-            document.getElementById('tituloLeSirvenSim').innerText = `🎁 A ${nombre} le sirven tuyas:`;
             
-            // Mostrar Contenedores
-            document.getElementById('resultados').style.display = 'block';
-            document.getElementById('detalleIndividual').style.display = 'block';
+            document.getElementById('tituloMeSirvenSim').innerText = `✅ Vos recibís de ${nombre}:`;
+            document.getElementById('tituloLeSirvenSim').innerText = `🎁 Vos entregás a ${nombre}:`;
             
-            // Volver por defecto a la pestaña de texto
-            document.getElementById('tabVistaTexto').click();
-
-            // Ocultar otras herramientas
-            document.getElementById('rankingResultados').style.display = 'none';
+            document.getElementById('resultados').style.display = 'block'; 
+            document.getElementById('detalleIndividual').style.display = 'block'; 
+            document.getElementById('rankingResultados').style.display = 'none'; 
             document.getElementById('mercadoGlobalResultados').style.display = 'none';
-            document.getElementById('rutaCompletarResultados').style.display = 'none';
+            document.getElementById('infoPasoRuta').style.display = 'none';
+            
+            document.getElementById('tabVistaTexto').click(); 
             
             if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
         }
 
         // =====================================
-        // LOGICA DEL CARRITO SIMULADOR
+        // LOGICA DE LA RUTA EN MEMORIA (CAMPAÑA)
         // =====================================
-        function agregarAlCarrito() {
-            if(seleccionesActuales.recibir.length === 0 && seleccionesActuales.dar.length === 0) { alert("No seleccionaste ninguna figurita para intercambiar."); return; }
-            if(seleccionesActuales.recibir.length !== seleccionesActuales.dar.length) { if(!confirm(`Estás recibiendo ${seleccionesActuales.recibir.length} y entregando ${seleccionesActuales.dar.length}. ¿Guardar igual?`)) return; }
-            window.carritoSimulador.push({ nombre: ultimoNombreAmigo, recibo: seleccionesActuales.recibir, doy: seleccionesActuales.dar });
-            actualizarVistaCarrito();
-            document.querySelectorAll('.sticker-btn.selected').forEach(el => el.classList.remove('selected')); actualizarContadoresSeleccion();
-            alert(`¡Cambio con ${ultimoNombreAmigo} guardado en el simulador!`);
-            document.getElementById('areaCarrito').style.display = 'block';
-            if(window.innerWidth <= 768) document.getElementById('areaCarrito').scrollIntoView({ behavior: 'smooth' });
+        async function iniciarRutaInteractiva() {
+            try {
+                let textoMio = document.getElementById('miLista').value.trim(); 
+                if (!textoMio) { alert("Primero pegá tu lista."); return; }
+                
+                let amigosSeleccionados = obtenerAmigosSeleccionados(); 
+                if (amigosSeleccionados.length === 0) return;
+                
+                document.getElementById('statusAmigo').style.color = "#005c98"; 
+                document.getElementById('statusAmigo').innerText = "Iniciando Plan Estratégico...";
+                
+                let misDatos = parsearTexto(textoMio);
+                rutaState.misFaltan = aplanarDiccionario(misDatos.faltan);
+                rutaState.misRepetidas = aplanarDiccionario(misDatos.repetidas);
+                rutaState.amigos = []; 
+                rutaState.pasoActual = 0; 
+                rutaState.activo = true;
+                
+                document.getElementById('badgeRuta').style.display = 'inline-block';
+                document.getElementById('btnGuardarEnCarrito').innerText = "✅ Confirmar Paso y Buscar Siguiente";
+                document.getElementById('btnSaltarPasoRuta').style.display = 'inline-block';
+                
+                vaciarCarrito(); 
+                
+                await Promise.all(amigosSeleccionados.map(async (amigo) => {
+                    try { 
+                        const snap = await get(child(ref(db), `usuarios/${amigo}`)); 
+                        if (snap.exists()) { 
+                            let d = parsearTexto(snap.val().textoOriginal); 
+                            rutaState.amigos.push({ 
+                                nombre: amigo, 
+                                faltan: aplanarDiccionario(d.faltan), 
+                                repetidas: aplanarDiccionario(d.repetidas), 
+                                textoOriginal: snap.val().textoOriginal 
+                            }); 
+                        } 
+                    } catch (e) {}
+                }));
+                
+                calcularSiguientePasoRuta();
+            } catch(e) {
+                console.error(e);
+                alert("Error al iniciar la ruta.");
+                document.getElementById('statusAmigo').innerText = "";
+            }
         }
 
-        function vaciarCarrito() { window.carritoSimulador = []; document.getElementById('areaProyeccion').style.display = 'none'; actualizarVistaCarrito(); }
+        function calcularSiguientePasoRuta() {
+            document.getElementById('statusAmigo').innerText = "";
+            let mejorAmigo = null, mejorCantidad = 0, mejorMeDa = [], mejorLeDoy = [];
+            
+            for (let amigo of rutaState.amigos) {
+                let mePuedeDar = amigo.repetidas.filter(f => rutaState.misFaltan.includes(f));
+                let lePuedoDar = amigo.faltan.filter(f => rutaState.misRepetidas.includes(f));
+                let posibles = Math.min(mePuedeDar.length, lePuedoDar.length);
+                if (posibles > mejorCantidad) { 
+                    mejorCantidad = posibles; 
+                    mejorAmigo = amigo; 
+                    mejorMeDa = mePuedeDar; 
+                    mejorLeDoy = lePuedoDar; 
+                }
+            }
+
+            if (mejorCantidad === 0) {
+                rutaState.activo = false;
+                document.getElementById('badgeRuta').style.display = 'none';
+                document.getElementById('btnGuardarEnCarrito').innerText = "🛒 Guardar en Simulador";
+                document.getElementById('btnSaltarPasoRuta').style.display = 'none';
+                document.getElementById('infoPasoRuta').style.display = 'none';
+                document.getElementById('resultados').style.display = 'none';
+                alert("¡Plan Finalizado! Ya no hay más cambios posibles con los amigos restantes. Revisá tu carrito y generá tu nueva lista.");
+                generarListaProyectada();
+                return;
+            }
+            
+            rutaState.pasoActual++;
+            ultimoNombreAmigo = mejorAmigo.nombre;
+            
+            let dictMeSirven = desaplanarArray(mejorMeDa);
+            let dictLeSirven = desaplanarArray(mejorLeDoy);
+            
+            seleccionesActuales = { recibir: [], dar: [] };
+            
+            renderizarResultadosInteractivos('meSirvenSim', dictMeSirven, 'recibir', desaplanarArray(mejorAmigo.repetidas));
+            renderizarResultadosInteractivos('leSirvenSim', dictLeSirven, 'dar', desaplanarArray(rutaState.misRepetidas));
+            
+            document.getElementById('btnSimRecibirTodas').click();
+            document.getElementById('btnSimDarTodas').click();
+            
+            let info = document.getElementById('infoPasoRuta');
+            info.style.display = 'block';
+            info.innerHTML = `<b style="color:var(--success); font-size:16px;">Paso ${rutaState.pasoActual} de tu Plan:</b><br>Estás analizando a <b>${mejorAmigo.nombre}</b>. Tienen <b>${mejorCantidad}</b> cambios parejos potenciales. Ajustá las opciones abajo y confirmá.`;
+            
+            document.getElementById('tituloMeSirvenSim').innerText = `✅ Vos recibís de ${mejorAmigo.nombre}:`;
+            document.getElementById('tituloLeSirvenSim').innerText = `🎁 Vos entregás a ${mejorAmigo.nombre}:`;
+
+            document.getElementById('resultados').style.display = 'block'; 
+            document.getElementById('detalleIndividual').style.display = 'block'; 
+            document.getElementById('rankingResultados').style.display = 'none'; 
+            document.getElementById('mercadoGlobalResultados').style.display = 'none';
+            
+            document.getElementById('tabVistaSimulador').click(); 
+            
+            if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // =====================================
+        // CARRITO SIMULADOR GENERAL
+        // =====================================
+        function agregarAlCarrito() {
+            if(seleccionesActuales.recibir.length === 0 && seleccionesActuales.dar.length === 0) { 
+                alert("No seleccionaste nada."); 
+                return; 
+            }
+            if(seleccionesActuales.recibir.length !== seleccionesActuales.dar.length) { 
+                if(!confirm(`Estás recibiendo ${seleccionesActuales.recibir.length} y entregando ${seleccionesActuales.dar.length}. ¿Guardar igual?`)) return; 
+            }
+            
+            window.carritoSimulador.push({ 
+                nombre: ultimoNombreAmigo, 
+                recibo: seleccionesActuales.recibir, 
+                doy: seleccionesActuales.dar 
+            });
+            
+            actualizarVistaCarrito();
+            
+            if(rutaState.activo) {
+                // Modo Ruta: Descontar de memoria y avanzar
+                rutaState.misFaltan = rutaState.misFaltan.filter(f => !seleccionesActuales.recibir.includes(f));
+                
+                seleccionesActuales.dar.forEach(d => { 
+                    let idx = rutaState.misRepetidas.indexOf(d); 
+                    if(idx > -1) rutaState.misRepetidas.splice(idx, 1); 
+                });
+                
+                let amigoIndex = rutaState.amigos.findIndex(a => a.nombre === ultimoNombreAmigo);
+                if(amigoIndex > -1) rutaState.amigos.splice(amigoIndex, 1);
+                
+                calcularSiguientePasoRuta();
+            } else {
+                // Modo Libre
+                document.querySelectorAll('.sticker-btn.selected').forEach(el => el.classList.remove('selected')); 
+                actualizarContadoresSeleccion();
+                alert(`¡Cambio guardado en el simulador!`);
+                if(window.innerWidth <= 768) document.getElementById('areaCarrito').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function vaciarCarrito() { 
+            window.carritoSimulador = []; 
+            document.getElementById('areaProyeccion').style.display = 'none'; 
+            actualizarVistaCarrito(); 
+            
+            rutaState.activo = false; 
+            document.getElementById('badgeRuta').style.display = 'none'; 
+            document.getElementById('btnGuardarEnCarrito').innerText = "🛒 Guardar en Simulador"; 
+            document.getElementById('btnSaltarPasoRuta').style.display = 'none'; 
+            document.getElementById('infoPasoRuta').style.display = 'none';
+        }
 
         function actualizarVistaCarrito() {
             let cv = document.getElementById('carritoVacio'), cl = document.getElementById('carritoLleno'), lista = document.getElementById('listaCarritoItems');
             document.getElementById('areaCarrito').style.display = 'block';
-            if(window.carritoSimulador.length === 0) { cv.style.display = 'block'; cl.style.display = 'none'; return; }
-            cv.style.display = 'none'; cl.style.display = 'block'; lista.innerHTML = '';
-            window.carritoSimulador.forEach((item, index) => { lista.innerHTML += `<div class="cart-item"><b>${index+1}. Con ${item.nombre}:</b> Recibís ${item.recibo.length} / Das ${item.doy.length}</div>`; });
+            if(window.carritoSimulador.length === 0) { 
+                cv.style.display = 'block'; 
+                cl.style.display = 'none'; 
+                return; 
+            }
+            cv.style.display = 'none'; 
+            cl.style.display = 'block'; 
+            lista.innerHTML = '';
+            
+            window.carritoSimulador.forEach((item, index) => { 
+                lista.innerHTML += `<div class="cart-item"><b>${index+1}. Con ${item.nombre}:</b> Recibís ${item.recibo.length} / Das ${item.doy.length}</div>`; 
+            });
         }
 
         function generarListaProyectada() {
-            let textoOriginal = document.getElementById('miLista').value; if(!textoOriginal) return;
-            let misDatos = parsearTexto(textoOriginal), faltan = aplanarDiccionario(misDatos.faltan), repes = aplanarDiccionario(misDatos.repetidas);
+            let textoOriginal = document.getElementById('miLista').value; 
+            if(!textoOriginal) return;
+            
+            let misDatos = parsearTexto(textoOriginal);
+            let faltan = aplanarDiccionario(misDatos.faltan);
+            let repes = aplanarDiccionario(misDatos.repetidas);
+            
             window.carritoSimulador.forEach(trade => {
                 trade.recibo.forEach(r => { let idx = faltan.indexOf(r); if(idx > -1) faltan.splice(idx, 1); });
                 trade.doy.forEach(d => { let idx = repes.indexOf(d); if(idx > -1) repes.splice(idx, 1); });
             });
-            let faltanNuevas = desaplanarArray(faltan), repesNuevas = desaplanarArray(repes);
+            
+            let faltanNuevas = desaplanarArray(faltan);
+            let repesNuevas = desaplanarArray(repes);
+            
             let txt = "Figuritas App - Lista\nUsa Méx Can 26\n\nMe faltan\n";
             for(let eq in faltanNuevas) { txt += `${eq}: ${faltanNuevas[eq].join(', ')}\n`; }
             txt += "\nRepetidas\n";
             for(let eq in repesNuevas) { txt += `${eq}: ${repesNuevas[eq].join(', ')}\n`; }
-            document.getElementById('listaProyectada').value = txt; document.getElementById('areaProyeccion').style.display = 'block';
+            
+            document.getElementById('listaProyectada').value = txt; 
+            document.getElementById('areaProyeccion').style.display = 'block';
         }
 
         // =====================================
-        // CREACION DOM BLINDADA
+        // DOM Y EVENTOS DE AMIGOS
         // =====================================
+        window.cargarAmigoYComparar = async function(amigo) {
+            document.getElementById('amigoUsuario').value = amigo;
+            let m = document.getElementById('miLista').value.trim(); 
+            if(!m) { alert("Pegá tu lista a la izquierda primero."); return; }
+            
+            try { 
+                const snap = await get(child(ref(db), `usuarios/${amigo}`)); 
+                if(snap.exists()) { 
+                    document.getElementById('amigoLista').value = snap.val().textoOriginal; 
+                    ejecutarComparacion(m, snap.val().textoOriginal, amigo); 
+                    document.getElementById('statusAmigo').style.color="green"; 
+                    document.getElementById('statusAmigo').innerText = "¡Lista cargada!"; 
+                } else { 
+                    document.getElementById('statusAmigo').style.color="red"; 
+                    document.getElementById('statusAmigo').innerText = "No encontrado."; 
+                } 
+            } catch(e) { 
+                document.getElementById('statusAmigo').innerText = "Error."; 
+            }
+        }
+        
         window.borrarAmigo = function(amigo) {
-            if(confirm(`¿Borrar a ${amigo}?`)) {
-                let input = document.getElementById('misAmigos');
-                input.value = input.value.split(',').map(x=>x.trim()).filter(x=>x!=="" && x!==amigo).join(', ');
-                let u = document.getElementById('miUsuario').value.trim();
-                if(u) set(ref(db, `usuarios/${u}`), {textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toLocaleString()}).then(()=>renderizarBotonesAmigos()); else renderizarBotonesAmigos();
+            if(confirm(`¿Borrar a ${amigo}?`)) { 
+                let input = document.getElementById('misAmigos'); 
+                input.value = input.value.split(',').map(x=>x.trim()).filter(x=>x!=="" && x!==amigo).join(', '); 
+                let u = document.getElementById('miUsuario').value.trim(); 
+                if(u) {
+                    set(ref(db, `usuarios/${u}`), {textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toLocaleString()}).then(()=>renderizarBotonesAmigos()); 
+                } else {
+                    renderizarBotonesAmigos(); 
+                }
             }
         }
 
         function renderizarBotonesAmigos() {
-            let container = document.getElementById('botonesAmigos'); container.innerHTML = '';
-            let amigosTexto = document.getElementById('misAmigos').value;
-            let btnEscanear = document.getElementById('btnEscanearAmigos'), btnMercado = document.getElementById('btnMercadoGlobal'), btnRuta = document.getElementById('btnRutaCompletar'), controlesSelec = document.getElementById('controlesSeleccion');
+            let container = document.getElementById('botonesAmigos'); 
+            container.innerHTML = ''; 
             
-            if (!amigosTexto) { btnEscanear.style.display = 'none'; btnMercado.style.display = 'none'; btnRuta.style.display = 'none'; controlesSelec.style.display = 'none'; return; }
+            let amigosTexto = document.getElementById('misAmigos').value; 
+            let btnEscanear = document.getElementById('btnEscanearAmigos');
+            let btnMercado = document.getElementById('btnMercadoGlobal');
+            let btnRuta = document.getElementById('btnRutaCompletar');
+            let controlesSelec = document.getElementById('controlesSeleccion');
+            
+            if (!amigosTexto) { 
+                btnEscanear.style.display = 'none'; 
+                btnMercado.style.display = 'none'; 
+                btnRuta.style.display = 'none'; 
+                controlesSelec.style.display = 'none'; 
+                return; 
+            }
+            
             let amigos = amigosTexto.split(',').map(a => a.trim()).filter(a => a !== "");
-            if(amigos.length > 0) { btnEscanear.style.display = 'block'; btnRuta.style.display = 'block'; if(amigos.length > 1) { btnMercado.style.display = 'block'; controlesSelec.style.display = 'flex'; } else { controlesSelec.style.display = 'none'; } }
+            if(amigos.length > 0) { 
+                btnEscanear.style.display = 'block'; 
+                btnRuta.style.display = 'block'; 
+                if(amigos.length > 1) { 
+                    btnMercado.style.display = 'block'; 
+                    controlesSelec.style.display = 'flex'; 
+                } else { 
+                    controlesSelec.style.display = 'none'; 
+                } 
+            }
 
-            let html = '';
-            amigos.forEach(amigo => {
+            let html = ''; 
+            amigos.forEach(amigo => { 
                 html += `
                 <div class="amigo-wrapper">
-                    <div class="chk-container"><input type="checkbox" class="amigo-checkbox" value="${amigo}" checked></div>
+                    <div class="chk-container">
+                        <input type="checkbox" class="amigo-checkbox" value="${amigo}" checked>
+                    </div>
                     <button class="btn-amigo-match" title="${amigo}" onclick="cargarAmigoYComparar('${amigo}')">🆚 ${amigo}</button>
                     <button class="btn-amigo-delete" onclick="borrarAmigo('${amigo}')">✖</button>
-                </div>`;
-            });
+                </div>`; 
+            }); 
             container.innerHTML = html;
         }
 
@@ -487,161 +844,344 @@
         }
 
         // =====================================
-        // OPTIMIZADORES GRUPALES CON TRY/CATCH
+        // OPTIMIZADORES GRUPALES TEXTO
         // =====================================
         async function escanearMisCambios() {
             try {
-                let textoMio = document.getElementById('miLista').value.trim(); if (!textoMio) { alert("Pegá tu lista primero."); return; }
-                let amigos = obtenerAmigosSeleccionados(); if (amigos.length === 0) return;
-                let status = document.getElementById('statusAmigo'); status.style.color = "#005c98"; status.innerText = "⚡ Escaneando opciones...";
+                let textoMio = document.getElementById('miLista').value.trim(); 
+                if (!textoMio) { alert("Pegá tu lista primero."); return; }
+                
+                let amigos = obtenerAmigosSeleccionados(); 
+                if (amigos.length === 0) return;
+                
+                let status = document.getElementById('statusAmigo'); 
+                status.style.color = "#005c98"; 
+                status.innerText = "⚡ Escaneando opciones..."; 
+                
                 let misDatos = parsearTexto(textoMio);
 
                 let promesasDescarga = amigos.map(async (amigo) => {
                     try {
                         const snap = await get(child(ref(db), `usuarios/${amigo}`));
                         if (snap.exists()) {
-                            let aTexto = snap.val().textoOriginal, aDatos = parsearTexto(aTexto);
+                            let aTexto = snap.val().textoOriginal;
+                            let aDatos = parsearTexto(aTexto);
                             let mMe = encontrarInterseccion(misDatos.faltan, aDatos.repetidas);
                             let mLe = encontrarInterseccion(aDatos.faltan, misDatos.repetidas);
-                            let cMe = contarTotal(mMe), cLe = contarTotal(mLe), pos = Math.min(cMe, cLe);
+                            let cMe = contarTotal(mMe), cLe = contarTotal(mLe);
+                            let pos = Math.min(cMe, cLe);
                             if (cMe > 0 || cLe > 0) return { nombre: amigo, me: cMe, le: cLe, pos: pos, txt: aTexto };
                         }
-                    } catch (e) { console.error("Error al leer amigo: " + amigo, e); } return null;
+                    } catch (e) { } 
+                    return null;
                 });
 
                 let res = (await Promise.all(promesasDescarga)).filter(r => r !== null);
                 res.sort((a, b) => b.pos !== a.pos ? b.pos - a.pos : b.me - a.me);
 
-                document.getElementById('resultados').style.display = 'block'; document.getElementById('rankingResultados').style.display = 'block'; document.getElementById('detalleIndividual').style.display = 'none'; document.getElementById('mercadoGlobalResultados').style.display = 'none'; document.getElementById('rutaCompletarResultados').style.display = 'none';
-                let list = document.getElementById('listaRanking'); list.innerHTML = '';
-                if (res.length === 0) { list.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">No hay intercambios posibles.</p>'; status.innerText = ""; return; }
+                document.getElementById('resultados').style.display = 'block'; 
+                document.getElementById('rankingResultados').style.display = 'block'; 
+                document.getElementById('detalleIndividual').style.display = 'none'; 
+                document.getElementById('mercadoGlobalResultados').style.display = 'none';
+                
+                let list = document.getElementById('listaRanking'); 
+                list.innerHTML = ''; 
+                
+                if (res.length === 0) { 
+                    list.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">No hay intercambios posibles.</p>'; 
+                    status.innerText = ""; 
+                    return; 
+                }
 
                 res.forEach((r, i) => {
-                    let div = document.createElement('div'); div.className = 'ranking-item'; div.style = r.pos === 0 ? 'opacity:0.7;' : '';
-                    div.innerHTML = `<div class="ranking-header"><div class="ranking-text"><div class="ranking-name">${i<3?['🥇','🥈','🥉'][i]:'🔹'} ${r.nombre} - 🔄 ${r.pos} mano a mano</div>
-                        <div class="ranking-stats"><span style="color:var(--success);">Te da <b>${r.me}</b></span> | <span style="color:var(--primary);">Le das <b>${r.le}</b></span></div></div>
-                        <button class="btn-primary" style="width:auto;padding:8px 12px;font-size:12px;" onclick="cargarAmigoYComparar('${r.nombre}')">🔍 Ver Match</button></div>`;
+                    let div = document.createElement('div'); 
+                    div.className = 'ranking-item'; 
+                    div.style = r.pos === 0 ? 'opacity:0.7;' : '';
+                    div.innerHTML = `
+                        <div class="ranking-header">
+                            <div class="ranking-text">
+                                <div class="ranking-name">${i<3?['🥇','🥈','🥉'][i]:'🔹'} ${r.nombre} - 🔄 ${r.pos} mano a mano</div>
+                                <div class="ranking-stats"><span style="color:var(--success);">Te da <b>${r.me}</b></span> | <span style="color:var(--primary);">Le das <b>${r.le}</b></span></div>
+                            </div>
+                            <button class="btn-primary" style="width:auto;padding:8px 12px;font-size:12px;" onclick="cargarAmigoYComparar('${r.nombre}')">🔍 Ver Match</button>
+                        </div>`;
                     list.appendChild(div);
                 });
-                if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' }); status.innerText = "";
-            } catch(e) { console.error(e); alert("Error en el ranking. Asegurate de que tu lista no esté vacía."); document.getElementById('statusAmigo').innerText = ""; }
+                
+                if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' }); 
+                status.innerText = "";
+            } catch(e) { 
+                console.error(e); 
+                alert("Error en el ranking. Asegurate de que tu lista no esté vacía."); 
+                document.getElementById('statusAmigo').innerText = ""; 
+            }
         }
 
         async function analizarMercadoGlobal() {
             try {
-                let amigos = obtenerAmigosSeleccionados(); if (amigos.length < 2) { alert("Necesitás al menos 2 amigos tildados para triangular."); return; }
-                let status = document.getElementById('statusAmigo'); status.style.color = "#005c98"; status.innerText = "🌐 Analizando matriz...";
+                let amigos = obtenerAmigosSeleccionados(); 
+                if (amigos.length < 2) { alert("Necesitás al menos 2 amigos tildados para triangular."); return; }
+                
+                let status = document.getElementById('statusAmigo'); 
+                status.style.color = "#005c98"; 
+                status.innerText = "🌐 Analizando matriz..."; 
                 window.amigosDataGlobal = [];
+                
                 await Promise.all(amigos.map(async (amigo) => {
-                    try { const snap = await get(child(ref(db), `usuarios/${amigo}`)); if (snap.exists()) window.amigosDataGlobal.push({ nombre: amigo, datos: parsearTexto(snap.val().textoOriginal) }); } catch (e) { }
+                    try { 
+                        const snap = await get(child(ref(db), `usuarios/${amigo}`)); 
+                        if (snap.exists()) {
+                            window.amigosDataGlobal.push({ nombre: amigo, datos: parsearTexto(snap.val().textoOriginal) });
+                        }
+                    } catch (e) { }
                 }));
 
                 let cruces = [];
                 for (let i = 0; i < window.amigosDataGlobal.length; i++) {
                     for (let j = i + 1; j < window.amigosDataGlobal.length; j++) {
                         let A = window.amigosDataGlobal[i], B = window.amigosDataGlobal[j];
-                        let aDaB = contarTotal(encontrarInterseccion(B.datos.faltan, A.datos.repetidas)), bDaA = contarTotal(encontrarInterseccion(A.datos.faltan, B.datos.repetidas));
-                        if (Math.min(aDaB, bDaA) > 0) cruces.push({ A: A.nombre, B: B.nombre, pos: Math.min(aDaB, bDaA), aDaB: aDaB, bDaA: bDaA });
+                        let aDaB = contarTotal(encontrarInterseccion(B.datos.faltan, A.datos.repetidas));
+                        let bDaA = contarTotal(encontrarInterseccion(A.datos.faltan, B.datos.repetidas));
+                        let pos = Math.min(aDaB, bDaA);
+                        
+                        if (pos > 0) {
+                            cruces.push({ A: A.nombre, B: B.nombre, pos: pos, aDaB: aDaB, bDaA: bDaA });
+                        }
                     }
                 }
                 cruces.sort((a, b) => b.pos - a.pos);
 
-                document.getElementById('resultados').style.display = 'block'; document.getElementById('mercadoGlobalResultados').style.display = 'block'; document.getElementById('rankingResultados').style.display = 'none'; document.getElementById('detalleIndividual').style.display = 'none'; document.getElementById('rutaCompletarResultados').style.display = 'none';
-                let list = document.getElementById('listaMercadoGlobal'); list.innerHTML = '';
-                if (cruces.length === 0) { list.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">Los amigos seleccionados no tienen intercambios entre ellos.</p>'; status.innerText = ""; return; }
+                document.getElementById('resultados').style.display = 'block'; 
+                document.getElementById('mercadoGlobalResultados').style.display = 'block'; 
+                document.getElementById('rankingResultados').style.display = 'none'; 
+                document.getElementById('detalleIndividual').style.display = 'none';
+                
+                let list = document.getElementById('listaMercadoGlobal'); 
+                list.innerHTML = ''; 
+                
+                if (cruces.length === 0) { 
+                    list.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">Los amigos seleccionados no tienen intercambios entre ellos.</p>'; 
+                    status.innerText = ""; 
+                    return; 
+                }
 
                 cruces.slice(0, 15).forEach((res) => {
-                    let div = document.createElement('div'); div.className = 'ranking-item';
-                    let aA = window.amigosDataGlobal.find(a=>a.nombre===res.A).datos, aB = window.amigosDataGlobal.find(a=>a.nombre===res.B).datos;
-                    div.innerHTML = `<div class="ranking-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'"><div class="ranking-text"><div class="ranking-name">🤝 ${res.A} & ${res.B}</div><div class="ranking-stats">Posibles cambios: <b>${res.pos}</b> (Tocá para detalle)</div></div></div>
-                        <div class="ranking-content"><p><b>${res.A} da a ${res.B}:</b><br>${formatearDiccionario(encontrarInterseccion(aB.faltan, aA.repetidas), false)}</p><p><b>${res.B} da a ${res.A}:</b><br>${formatearDiccionario(encontrarInterseccion(aA.faltan, aB.repetidas), false)}</p></div>`;
+                    let div = document.createElement('div'); 
+                    div.className = 'ranking-item';
+                    
+                    let aA = window.amigosDataGlobal.find(a=>a.nombre===res.A).datos;
+                    let aB = window.amigosDataGlobal.find(a=>a.nombre===res.B).datos;
+                    
+                    // Solo mostramos sin duplicados para no ensuciar la vista texto
+                    let A_da_B = encontrarInterseccion(aB.faltan, aA.repetidas);
+                    let B_da_A = encontrarInterseccion(aA.faltan, aB.repetidas);
+                    
+                    let cleanA = {}, cleanB = {};
+                    for(let e in A_da_B) cleanA[e] = [...new Set(A_da_B[e])];
+                    for(let e in B_da_A) cleanB[e] = [...new Set(B_da_A[e])];
+
+                    div.innerHTML = `
+                        <div class="ranking-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'">
+                            <div class="ranking-text">
+                                <div class="ranking-name">🤝 ${res.A} & ${res.B}</div>
+                                <div class="ranking-stats">Posibles cambios: <b>${res.pos}</b> (Tocá para detalle)</div>
+                            </div>
+                        </div>
+                        <div class="ranking-content">
+                            <p><b>${res.A} da a ${res.B}:</b><br>${formatearDiccionario(cleanA, false)}</p>
+                            <p><b>${res.B} da a ${res.A}:</b><br>${formatearDiccionario(cleanB, false)}</p>
+                        </div>
+                    `;
                     list.appendChild(div);
                 });
-                if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' }); status.innerText = "";
-            } catch(e) { console.error(e); alert("Error al cruzar datos. Alguna lista podría estar corrupta."); document.getElementById('statusAmigo').innerText = ""; }
-        }
-
-        async function calcularRutaCompletar() {
-            try {
-                let textoMio = document.getElementById('miLista').value.trim(); if (!textoMio) { alert("Primero pegá tu lista."); return; }
-                let amigos = obtenerAmigosSeleccionados(); if (amigos.length === 0) return;
-                let status = document.getElementById('statusAmigo'); status.style.color = "#005c98"; status.innerText = "🚀 Calculando...";
                 
-                let misDatos = parsearTexto(textoMio);
-                let faltanOriginal = contarTotal(misDatos.faltan), misFaltan = aplanarDiccionario(misDatos.faltan), misRepetidas = aplanarDiccionario(misDatos.repetidas);
-
-                let amigosData = [];
-                await Promise.all(amigos.map(async (amigo) => {
-                    try { const snap = await get(child(ref(db), `usuarios/${amigo}`)); if (snap.exists()) { let d = parsearTexto(snap.val().textoOriginal); amigosData.push({ nombre: amigo, faltan: aplanarDiccionario(d.faltan), repetidas: aplanarDiccionario(d.repetidas) }); } } catch (e) {}
-                }));
-
-                let planDeAccion = [], conseguidasTotal = 0, iteracionSeguridad = 0;
-
-                while (misFaltan.length > 0 && iteracionSeguridad < 50) {
-                    iteracionSeguridad++;
-                    let mejorAmigo = null, mejorCantidad = 0, mejorMeDa = [], mejorLeDoy = [];
-                    for (let amigo of amigosData) {
-                        let mePuedeDar = amigo.repetidas.filter(f => misFaltan.includes(f)), lePuedoDar = amigo.faltan.filter(f => misRepetidas.includes(f));
-                        let posibles = Math.min(mePuedeDar.length, lePuedoDar.length);
-                        if (posibles > mejorCantidad) { mejorCantidad = posibles; mejorAmigo = amigo; mejorMeDa = mePuedeDar.slice(0, posibles); mejorLeDoy = lePuedoDar.slice(0, posibles); }
-                    }
-                    if (mejorCantidad === 0) break; 
-
-                    planDeAccion.push({ nombre: mejorAmigo.nombre, cantidad: mejorCantidad, recibo: desaplanarArray(mejorMeDa), doy: desaplanarArray(mejorLeDoy) });
-                    conseguidasTotal += mejorCantidad;
-                    
-                    misFaltan = misFaltan.filter(f => !mejorMeDa.includes(f));
-                    mejorLeDoy.forEach(f => { let idx = misRepetidas.indexOf(f); if (idx > -1) misRepetidas.splice(idx, 1); });
-                    mejorMeDa.forEach(f => { let idx = mejorAmigo.repetidas.indexOf(f); if (idx > -1) mejorAmigo.repetidas.splice(idx, 1); });
-                    mejorLeDoy.forEach(f => { let idx = mejorAmigo.faltan.indexOf(f); if (idx > -1) mejorAmigo.faltan.splice(idx, 1); });
-                }
-
-                document.getElementById('resultados').style.display = 'block'; document.getElementById('rutaCompletarResultados').style.display = 'block'; document.getElementById('rankingResultados').style.display = 'none'; document.getElementById('mercadoGlobalResultados').style.display = 'none'; document.getElementById('detalleIndividual').style.display = 'none';
-                let resumenDiv = document.getElementById('resumenRuta'), listaContainer = document.getElementById('listaRuta'); listaContainer.innerHTML = '';
-
-                if (planDeAccion.length === 0) { resumenDiv.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">No hay combinaciones equitativas con los seleccionados. 😢</p>'; } 
-                else {
-                    resumenDiv.innerHTML = `<div style="background:#e9ecef;padding:15px;border-radius:8px;">🔹 Te faltaban: <b>${faltanOriginal}</b><br>✅ Conseguirías siguiendo estos pasos: <b>${conseguidasTotal}</b><br>⚠️ Te seguirán faltando: <b style="color:var(--danger);">${misFaltan.length}</b></div>`;
-                    planDeAccion.forEach((paso, index) => {
-                        let div = document.createElement('div'); div.className = 'step-box';
-                        div.innerHTML = `
-                        <div class="step-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 8px;">
-                            <span>Paso ${index + 1}: Cambiá ${paso.cantidad} con ${paso.nombre}</span>
-                            <button class="btn-primary" style="width:auto; padding:4px 10px; font-size:11px; margin:0;" onclick="cargarAmigoYComparar('${paso.nombre}'); setTimeout(()=>document.getElementById('tabVistaSimulador').click(), 500);">🎮 Simular este paso</button>
-                        </div>
-                        <div style="font-size:13px;margin-top:8px;"><b style="color:var(--success);">Vos recibís:</b><br>${Object.keys(paso.recibo).map(e=>`&nbsp;&nbsp;• <b>${e}:</b> ${paso.recibo[e].join(', ')}<br>`).join('')}<b style="color:var(--danger);margin-top:5px;display:inline-block;">Vos le das:</b><br>${Object.keys(paso.doy).map(e=>`&nbsp;&nbsp;• <b>${e}:</b> ${paso.doy[e].join(', ')}<br>`).join('')}</div>`;
-                        listaContainer.appendChild(div);
-                    });
-                }
-                if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' }); status.innerText = "";
-            } catch(e) { console.error(e); alert("Ocurrió un error al calcular. Revisá que tus listas no estén vacías."); document.getElementById('statusAmigo').innerText = ""; }
+                if(window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' }); 
+                status.innerText = "";
+            } catch(e) { 
+                console.error(e); 
+                alert("Error al cruzar datos. Alguna lista podría estar corrupta."); 
+                document.getElementById('statusAmigo').innerText = ""; 
+            }
         }
 
-        // Utilidades Links y Firebase
-        function actualizarLinkDirecto(usuario) { let url = window.location.origin + window.location.pathname; document.getElementById('linkCompartir').value = url + '?buscar=' + encodeURIComponent(usuario); document.getElementById('linkPrivado').value = url + '?u=' + encodeURIComponent(usuario); }
-        function compartirWhatsAppPublico() { let link = document.getElementById('linkCompartir').value; if (!link) { alert("Primero guardá tu perfil para generar tu link."); return; } window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`⚽ ¡Hola! Fijate si nos sirven figuritas para cambiar.\n\nEntrá a mi link, cruzá tus repetidas con las mías y veamos el Match acá:\n👉 ${link}`)}`, '_blank'); }
-        function copiarLink(inputId, btnId, colorOriginal, esPrivado = false) { let inputLink = document.getElementById(inputId); if (!inputLink.value) return; inputLink.select(); navigator.clipboard.writeText(inputLink.value).then(() => { if (esPrivado) alert("¡Link Privado copiado!\n\n⚠️ ADVERTENCIA: NO compartas este link. Guardalo solo en favoritos."); let btn = document.getElementById(btnId); btn.innerText = "¡Copiado!"; btn.style.backgroundColor = "#28a745"; setTimeout(() => { btn.innerText = "📋 Copiar"; btn.style.backgroundColor = colorOriginal; }, 2000); }); }
-        function mostrarInstruccionesAndroid() { let linkPrivado = document.getElementById('linkPrivado').value; if(!linkPrivado) { alert("Primero guardá tu perfil."); return; } alert("Para instalar en Android:\n\n1. Abrí tu 'Link Privado' en Chrome.\n2. Tocá los 3 puntitos (⋮).\n3. Elegí 'Agregar a la pantalla principal'."); }
-        function formatearDiccionario(d, w) { let t="",h=false; for(let e in d) {h=true; t+= w?`• *${e}:* ${d[e].join(', ')}\n`:`• ${e}: ${d[e].join(', ')}\n`;} return h?t:"Nada\n"; }
+        // =====================================
+        // UTILIDADES VARIAS
+        // =====================================
+        function formatearDiccionario(d, w) { 
+            let t="", h=false; 
+            for(let e in d) {
+                h=true; 
+                // Quitamos duplicados para el texto plano de whatsapp
+                let unicos = [...new Set(d[e])];
+                t += w ? `• *${e}:* ${unicos.join(', ')}\n` : `• ${e}: ${unicos.join(', ')}\n`;
+            } 
+            return h ? t : "Nada\n"; 
+        }
+
         function generarTextoResultados(esWhatsApp = false) {
-            let miUsuario = document.getElementById('miUsuario').value.trim() || "MÍ", textoMeSirven = obtenerDesglose(ultimoMatchMeSirven), textoLeSirven = obtenerDesglose(ultimoMatchLeSirven), linkPublico = document.getElementById('linkCompartir').value || "https://luishacevedo.github.io/match-figuritas/", texto = "";
-            if (esWhatsApp) { texto = `⚽ *MATCH DE FIGURITAS* ⚽\n\n✅ *A mí (${miUsuario.toUpperCase()}) me sirven de ${ultimoNombreAmigo}:*\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, true)}\n🎁 *A ${ultimoNombreAmigo} le sirven de las mías:*\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, true)}\n🔍 _Cruzá tus repetidas conmigo acá:_\n👉 ${linkPublico}`; } 
-            else { texto = `⚽ MATCH DE FIGURITAS ⚽\n\n✅ A mí (${miUsuario.toUpperCase()}) me sirven de ${ultimoNombreAmigo}:\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, false)}\n🎁 A ${ultimoNombreAmigo} le sirven de las mías:\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, false)}\n🔍 Cruzá tus repetidas conmigo acá:\n👉 ${linkPublico}`; }
+            let miUsuario = document.getElementById('miUsuario').value.trim() || "MÍ";
+            let textoMeSirven = obtenerDesglose(ultimoMatchMeSirven);
+            let textoLeSirven = obtenerDesglose(ultimoMatchLeSirven);
+            let linkPublico = document.getElementById('linkCompartir').value || "https://luishacevedo.github.io/match-figuritas/";
+            let texto = "";
+            
+            if (esWhatsApp) { 
+                texto = `⚽ *MATCH DE FIGURITAS* ⚽\n\n✅ *A mí (${miUsuario.toUpperCase()}) me sirven de ${ultimoNombreAmigo}:*\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, true)}\n🎁 *A ${ultimoNombreAmigo} le sirven de las mías:*\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, true)}\n🔍 _Cruzá tus repetidas conmigo acá:_\n👉 ${linkPublico}`; 
+            } else { 
+                texto = `⚽ MATCH DE FIGURITAS ⚽\n\n✅ A mí (${miUsuario.toUpperCase()}) me sirven de ${ultimoNombreAmigo}:\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, false)}\n🎁 A ${ultimoNombreAmigo} le sirven de las mías:\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, false)}\n🔍 Cruzá tus repetidas conmigo acá:\n👉 ${linkPublico}`; 
+            }
             return texto;
         }
-        function copiarTextoPortapapeles() { navigator.clipboard.writeText(generarTextoResultados(false)).then(() => { let btn = document.getElementById('btnCopiarPortapapeles'); btn.innerText = "¡Copiado! ✅"; btn.style.backgroundColor = "#28a745"; setTimeout(() => { btn.innerText = "📋 Copiar Texto"; btn.style.backgroundColor = "var(--primary)"; }, 3000); }); }
-        function abrirWhatsAppConTexto() { window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(generarTextoResultados(true))}`, '_blank'); }
 
-        async function cargarMiPerfil() { let u = document.getElementById('miUsuario').value.trim(); let s = document.getElementById('statusMiNube'); if (!u) return; s.style.color = "#005c98"; s.innerText = "Cargando..."; try { const snap = await get(child(ref(db), `usuarios/${u}`)); if (snap.exists()) { let d = snap.val(); document.getElementById('miLista').value = d.textoOriginal || ""; document.getElementById('misAmigos').value = d.amigos || ""; renderizarBotonesAmigos(); actualizarLinkDirecto(u); s.style.color = "green"; s.innerText = "¡Perfil cargado!"; } else { s.style.color = "red"; s.innerText = "No se encontró el perfil."; } } catch (e) { s.style.color = "red"; s.innerText = "Error."; } }
-        async function guardarMisDatos() { let u = document.getElementById('miUsuario').value.trim(), t = document.getElementById('miLista').value.trim(), a = document.getElementById('misAmigos').value.trim(), s = document.getElementById('statusMiNube'); if (!u || !t) return; s.style.color = "#005c98"; s.innerText = "Guardando..."; try { await set(ref(db, `usuarios/${u}`), { textoOriginal: t, amigos: a, ultimaActualizacion: new Date().toLocaleString() }); renderizarBotonesAmigos(); actualizarLinkDirecto(u); s.style.color = "green"; s.innerText = "¡Guardado con éxito!"; } catch (e) { s.style.color = "red"; s.innerText = "Error al guardar."; } }
-        async function guardarAmigoNuevo() { let mu = document.getElementById('miUsuario').value.trim(), au = document.getElementById('amigoUsuario').value.trim(), at = document.getElementById('amigoLista').value.trim(), s = document.getElementById('statusAmigo'); if (!mu) { alert("Cargá tu usuario a la izquierda."); return; } if (!au || !at) return; s.style.color = "#005c98"; s.innerText = "Guardando..."; try { await set(ref(db, `usuarios/${au}`), { textoOriginal: at, amigos: "", ultimaActualizacion: new Date().toLocaleString() }); let input = document.getElementById('misAmigos'); let curr = input.value.split(',').map(x => x.trim()).filter(x => x !== ""); if (!curr.includes(au)) { curr.push(au); input.value = curr.join(', '); await set(ref(db, `usuarios/${mu}`), { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toLocaleString() }); } renderizarBotonesAmigos(); s.style.color = "green"; s.innerText = `¡Guardado!`; } catch (e) { s.style.color = "red"; s.innerText = "Error."; } }
-        function compararListasLocales() { let textoMio = document.getElementById('miLista').value.trim(), textoAmigo = document.getElementById('amigoLista').value.trim(); if (!textoMio || !textoAmigo) { alert("Faltan listas para comparar."); return; } ejecutarComparacion(textoMio, textoAmigo, document.getElementById('amigoUsuario').value.trim() || "TU AMIGO"); document.getElementById('statusAmigo').innerText = ""; }
-        function limpiarBuscador() { document.getElementById('amigoUsuario').value = ''; document.getElementById('amigoLista').value = ''; document.getElementById('statusAmigo').innerText = ''; document.getElementById('resultados').style.display = 'none'; document.getElementById('areaCarrito').style.display = 'none'; }
+        function copiarTextoPortapapeles() { 
+            navigator.clipboard.writeText(generarTextoResultados(false)).then(() => { 
+                let btn = document.getElementById('btnCopiarPortapapeles'); 
+                btn.innerText = "¡Copiado! ✅"; 
+                btn.style.backgroundColor = "#28a745"; 
+                setTimeout(() => { btn.innerText = "📋 Copiar Texto"; btn.style.backgroundColor = "var(--primary)"; }, 3000); 
+            }); 
+        }
+
+        function abrirWhatsAppConTexto() { 
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(generarTextoResultados(true))}`, '_blank'); 
+        }
+
+        function actualizarLinkDirecto(usuario) { 
+            let url = window.location.origin + window.location.pathname; 
+            document.getElementById('linkCompartir').value = url + '?buscar=' + encodeURIComponent(usuario); 
+            document.getElementById('linkPrivado').value = url + '?u=' + encodeURIComponent(usuario); 
+        }
+
+        function compartirWhatsAppPublico() { 
+            let link = document.getElementById('linkCompartir').value; 
+            if (!link) { alert("Primero guardá tu perfil para generar tu link."); return; } 
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`⚽ ¡Hola! Fijate si nos sirven figuritas para cambiar.\n\nEntrá a mi link, cruzá tus repetidas con las mías y veamos el Match acá:\n👉 ${link}`)}`, '_blank'); 
+        }
+
+        function copiarLink(inputId, btnId, colorOriginal, esPrivado = false) { 
+            let inputLink = document.getElementById(inputId); 
+            if (!inputLink.value) return; 
+            inputLink.select(); 
+            navigator.clipboard.writeText(inputLink.value).then(() => { 
+                if (esPrivado) alert("¡Link Privado copiado!\n\n⚠️ ADVERTENCIA: NO compartas este link. Guardalo solo en favoritos."); 
+                let btn = document.getElementById(btnId); 
+                btn.innerText = "¡Copiado!"; 
+                btn.style.backgroundColor = "#28a745"; 
+                setTimeout(() => { btn.innerText = "📋 Copiar"; btn.style.backgroundColor = colorOriginal; }, 2000); 
+            }); 
+        }
+
+        function mostrarInstruccionesAndroid() { 
+            alert("Para instalar en Android:\n1. Abrí tu 'Link Privado' en Chrome.\n2. Tocá los 3 puntitos (⋮).\n3. Elegí 'Agregar a la pantalla principal'."); 
+        }
+
+        function compararListasLocales() { 
+            let textoMio = document.getElementById('miLista').value.trim();
+            let textoAmigo = document.getElementById('amigoLista').value.trim(); 
+            if (!textoMio || !textoAmigo) { alert("Faltan listas para comparar."); return; } 
+            ejecutarComparacion(textoMio, textoAmigo, document.getElementById('amigoUsuario').value.trim() || "TU AMIGO"); 
+            document.getElementById('statusAmigo').innerText = ""; 
+        }
+
+        function limpiarBuscador() { 
+            document.getElementById('amigoUsuario').value = ''; 
+            document.getElementById('amigoLista').value = ''; 
+            document.getElementById('statusAmigo').innerText = ''; 
+            document.getElementById('resultados').style.display = 'none'; 
+            document.getElementById('areaCarrito').style.display = 'none'; 
+        }
+        
+        async function cargarMiPerfil() { 
+            let u = document.getElementById('miUsuario').value.trim(); 
+            let s = document.getElementById('statusMiNube'); 
+            if (!u) return; 
+            s.style.color = "#005c98"; 
+            s.innerText = "Cargando..."; 
+            try { 
+                const snap = await get(child(ref(db), `usuarios/${u}`)); 
+                if (snap.exists()) { 
+                    let d = snap.val(); 
+                    document.getElementById('miLista').value = d.textoOriginal || ""; 
+                    document.getElementById('misAmigos').value = d.amigos || ""; 
+                    renderizarBotonesAmigos(); 
+                    actualizarLinkDirecto(u); 
+                    s.style.color = "green"; 
+                    s.innerText = "¡Perfil cargado!"; 
+                } else { 
+                    s.style.color = "red"; 
+                    s.innerText = "No se encontró el perfil."; 
+                } 
+            } catch (e) { 
+                s.style.color = "red"; 
+                s.innerText = "Error."; 
+            } 
+        }
+
+        async function guardarMisDatos() { 
+            let u = document.getElementById('miUsuario').value.trim();
+            let t = document.getElementById('miLista').value.trim();
+            let a = document.getElementById('misAmigos').value.trim();
+            let s = document.getElementById('statusMiNube'); 
+            if (!u || !t) return; 
+            s.style.color = "#005c98"; 
+            s.innerText = "Guardando..."; 
+            try { 
+                await set(ref(db, `usuarios/${u}`), { textoOriginal: t, amigos: a, ultimaActualizacion: new Date().toLocaleString() }); 
+                renderizarBotonesAmigos(); 
+                actualizarLinkDirecto(u); 
+                s.style.color = "green"; 
+                s.innerText = "¡Guardado con éxito!"; 
+            } catch (e) { 
+                s.style.color = "red"; 
+                s.innerText = "Error al guardar."; 
+            } 
+        }
+
+        async function guardarAmigoNuevo() { 
+            let mu = document.getElementById('miUsuario').value.trim();
+            let au = document.getElementById('amigoUsuario').value.trim();
+            let at = document.getElementById('amigoLista').value.trim();
+            let s = document.getElementById('statusAmigo'); 
+            if (!mu) { alert("Cargá tu usuario a la izquierda."); return; } 
+            if (!au || !at) return; 
+            s.style.color = "#005c98"; 
+            s.innerText = "Guardando..."; 
+            try { 
+                await set(ref(db, `usuarios/${au}`), { textoOriginal: at, amigos: "", ultimaActualizacion: new Date().toLocaleString() }); 
+                let input = document.getElementById('misAmigos'); 
+                let curr = input.value.split(',').map(x => x.trim()).filter(x => x !== ""); 
+                if (!curr.includes(au)) { 
+                    curr.push(au); 
+                    input.value = curr.join(', '); 
+                    await set(ref(db, `usuarios/${mu}`), { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toLocaleString() }); 
+                } 
+                renderizarBotonesAmigos(); 
+                s.style.color = "green"; 
+                s.innerText = `¡Guardado!`; 
+            } catch (e) { 
+                s.style.color = "red"; 
+                s.innerText = "Error."; 
+            } 
+        }
 
         window.onload = async function() {
             const url = new URLSearchParams(window.location.search);
-            if(url.get('u')) { document.getElementById('miUsuario').value = url.get('u'); await cargarMiPerfil(); }
-            if(url.get('buscar')) { document.getElementById('amigoUsuario').value = url.get('buscar'); document.getElementById('statusAmigo').innerText="Cargando compartida..."; try { const snap=await get(child(ref(db), `usuarios/${url.get('buscar')}`)); if(snap.exists()) { document.getElementById('amigoLista').value=snap.val().textoOriginal; document.getElementById('statusAmigo').innerText="¡Descargada! Compará."; document.getElementById('statusAmigo').style.color="green"; } }catch(e){} }
+            if(url.get('u')) { 
+                document.getElementById('miUsuario').value = url.get('u'); 
+                await cargarMiPerfil(); 
+            }
+            if(url.get('buscar')) { 
+                document.getElementById('amigoUsuario').value = url.get('buscar'); 
+                document.getElementById('statusAmigo').innerText="Cargando compartida..."; 
+                try { 
+                    const snap=await get(child(ref(db), `usuarios/${url.get('buscar')}`)); 
+                    if(snap.exists()) { 
+                        document.getElementById('amigoLista').value=snap.val().textoOriginal; 
+                        document.getElementById('statusAmigo').innerText="¡Descargada! Compará."; 
+                        document.getElementById('statusAmigo').style.color="green"; 
+                    } 
+                }catch(e){} 
+            }
         };
     </script>
 </body>
