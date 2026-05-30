@@ -751,13 +751,14 @@
         }
 
         function generarTextoContacto(tipo, dato) {
+            let d = dato.trim();
             switch (tipo) {
-                case 'telegram': return `@${dato.replace(/^@/, '')} (Telegram)`;
-                case 'whatsapp': return `+${dato.replace(/\D/g, '')} (WhatsApp)`;
-                case 'instagram': return `@${dato.replace(/^@/, '')} (Instagram)`;
-                case 'facebook': return `${dato} (Facebook)`;
-                case 'mail': return dato;
-                default: return dato;
+                case 'telegram':  return `https://t.me/${d.replace(/^@/, '')}`;
+                case 'whatsapp':  return `https://wa.me/${d.replace(/\D/g, '')}`;
+                case 'instagram': return `https://instagram.com/${d.replace(/^@/, '')}`;
+                case 'facebook':  return d.startsWith('http') ? d : `https://www.facebook.com/${d}`;
+                case 'mail':      return `mailto:${d}`;
+                default:          return d;
             }
         }
 
