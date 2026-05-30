@@ -112,9 +112,6 @@
         .breakdown-text { font-size: 11px; color: #adb5bd; margin-top: 2px; }
         .contador-actions { display: flex; flex-direction: column; gap: 8px; min-width: 170px; }
 
-        /* BOTONES DEL SIMULADOR - OFERTA */
-        .sim-action-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-
         .ranking-item { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; }
         .ranking-header { display: flex; justify-content: space-between; align-items: center; }
         .ranking-content { display: none; padding-top: 10px; font-size: 13px; border-top: 1px solid #ddd; margin-top: 10px; }
@@ -146,8 +143,7 @@
             .sim-grid { grid-template-columns: 1fr; gap: 12px; }
             .contador-inner { flex-direction: column; gap: 12px; align-items: stretch; }
             .contador-stats { gap: 15px; }
-            .contador-actions { min-width: unset; }
-            .sim-action-btns { grid-template-columns: 1fr; }
+            .contador-actions { min-width: unset; flex-direction: column; }
             .contacto-row { grid-template-columns: 1fr; }
         }
     </style>
@@ -291,30 +287,16 @@
             <div id="vistaSimulador" style="display: none;">
                 <div class="step-box" id="infoPasoRuta" style="display: none; margin-bottom: 15px;"></div>
 
-                <!-- CONTADOR -->
+                <!-- CONTADOR + BOTONES ACCIÓN -->
                 <div class="contador-simulador">
                     <div class="contador-inner">
-                        <div class="contador-stats">
-                            <div class="contador-stat">
-                                <strong>📥 Recibir: <span id="countRecibir">0</span></strong>
-                                <span class="breakdown-text" id="breakdownRecibir">0 fig.</span>
-                            </div>
-                            <div class="contador-stat">
-                                <strong>📤 Dar: <span id="countDar">0</span></strong>
-                                <span class="breakdown-text" id="breakdownDar">0 fig.</span>
-                            </div>
-                        </div>
-                        <div class="contador-actions">
-                            <button id="btnGuardarEnCarrito" class="btn-yellow" style="margin: 0; padding: 10px 15px;">🛒 Guardar Cambio</button>
-                            <button id="btnSaltarPasoRuta" class="btn-secondary" style="display: none; font-size: 12px; padding: 6px; margin: 0;">⏭️ Saltar amigo</button>
+                        <div class="contador-actions" style="flex-direction: row; gap: 8px; min-width: unset; flex: 1; flex-wrap: wrap;">
+                            <button id="btnCopiarOferta" class="btn-primary" style="flex:1; margin:0; padding: 10px 15px;">📋 Copiar Oferta</button>
+                            <button id="btnContactarAmigo" class="btn-tg" style="flex:1; margin:0; padding: 10px 15px;">📲 Contactar</button>
+                            <button id="btnGuardarEnCarrito" class="btn-yellow" style="flex:1; margin:0; padding: 10px 15px;">🛒 Guardar Cambio</button>
+                            <button id="btnSaltarPasoRuta" class="btn-secondary" style="display: none; font-size: 12px; padding: 6px; margin: 0; flex:1;">⏭️ Saltar amigo</button>
                         </div>
                     </div>
-                </div>
-
-                <!-- BOTONES DE OFERTA -->
-                <div class="sim-action-btns">
-                    <button id="btnCopiarOferta" class="btn-primary">📋 Copiar Oferta</button>
-                    <button id="btnContactarAmigo" class="btn-tg">📲 Contactar</button>
                 </div>
 
                 <!-- GRID DE DOS PANELES -->
@@ -328,6 +310,9 @@
                                 <button id="btnSimRecibirNinguna" class="btn-mini">🔲 Ninguna</button>
                             </div>
                         </div>
+                        <div class="sim-panel-counter" style="font-size:12px; font-weight:bold; color:var(--success); margin-bottom:8px; padding: 4px 6px; background: #e9f7ef; border-radius:6px;">
+                            📥 Recibir: <span id="countRecibir">0</span> &nbsp;<span class="breakdown-text" id="breakdownRecibir" style="color:#555; font-weight:normal;">0 fig.</span>
+                        </div>
                         <div id="meSirvenSim"></div>
                     </div>
                     <!-- PANEL DAR -->
@@ -338,6 +323,9 @@
                                 <button id="btnSimDarTodas" class="btn-mini" style="background:var(--danger); color:white; border:none;">☑️ Todas</button>
                                 <button id="btnSimDarNinguna" class="btn-mini">🔲 Ninguna</button>
                             </div>
+                        </div>
+                        <div class="sim-panel-counter" style="font-size:12px; font-weight:bold; color:var(--danger); margin-bottom:8px; padding: 4px 6px; background: #fde8ea; border-radius:6px;">
+                            📤 Dar: <span id="countDar">0</span> &nbsp;<span class="breakdown-text" id="breakdownDar" style="color:#555; font-weight:normal;">0 fig.</span>
                         </div>
                         <div id="leSirvenSim"></div>
                     </div>
@@ -720,6 +708,7 @@
             let miZona = document.getElementById('miZona').value.trim();
             let miTipo = document.getElementById('miContactoTipo').value;
             let miDato = document.getElementById('miContactoDato').value.trim();
+            let linkPublico = document.getElementById('linkCompartir').value || "https://luishacevedo.github.io/match-figuritas/";
 
             // Construir grupos para las seleccionadas
             let recibirDict = desaplanarArray(seleccionesActuales.recibir);
@@ -734,34 +723,30 @@
             let desgloseDar = obtenerDesglosePlano(seleccionesActuales.dar);
 
             let nombreAmigo = ultimoNombreAmigo || "tu amigo";
-
             let sep = esWhatsApp ? "*" : "";
+            let ital = esWhatsApp ? "_" : "";
 
-            let lineasRecibir = [];
-            for (let e in recibirDict) { lineasRecibir.push(`• ${e}: ${recibirDict[e].join(', ')}`); }
-            let lineasDar = [];
-            for (let e in darDict) { lineasDar.push(`• ${e}: ${darDict[e].join(', ')}`); }
+            // Líneas de figuritas por equipo
+            let lineasRecibir = formatearDiccionario(recibirDict, esWhatsApp);
+            let lineasDar = formatearDiccionario(darDict, esWhatsApp);
 
-            let textoContacto = "";
+            // Identificador del usuario (nombre + zona si tiene)
+            let miId = miZona ? `${miUsuario} (${miZona})` : miUsuario;
+
+            let txt = `⚽ ${sep}MATCH DE FIGURITAS${sep} ⚽\n\n`;
+            txt += `✅ ${sep}A mí (${miId}) me sirven de ${nombreAmigo}:${sep}\n`;
+            txt += `${desgloseRecibir}\n`;
+            txt += lineasRecibir.trim() ? lineasRecibir : "Nada seleccionado\n";
+            txt += `\n🎁 ${sep}A ${nombreAmigo} le sirven de las mías:${sep}\n`;
+            txt += `${desgloseDar}\n`;
+            txt += lineasDar.trim() ? lineasDar : "Nada seleccionado\n";
+
             if (miDato) {
-                textoContacto = `\n📲 ${esWhatsApp ? sep : ""}Contactame${esWhatsApp ? sep : ""}: ${generarTextoContacto(miTipo, miDato)}`;
+                txt += `\n📲 ${sep}Contactame${sep}: ${generarTextoContacto(miTipo, miDato)}`;
             }
 
-            let txt = `⚽ ${sep}MATCH DE FIGURITAS - MUNDIAL 2026${sep} ⚽\n\n`;
-            txt += `🎁 ${sep}Te ofrezco (a ${nombreAmigo} le sirven de las mías):${sep}\n`;
-            if (lineasDar.length > 0) {
-                txt += lineasDar.join('\n') + `\n→ ${desgloseDar}\n\n`;
-            } else {
-                txt += "Nada seleccionado\n\n";
-            }
-            txt += `✅ ${sep}Me interesan de las tuyas (${nombreAmigo}):${sep}\n`;
-            if (lineasRecibir.length > 0) {
-                txt += lineasRecibir.join('\n') + `\n→ ${desgloseRecibir}\n`;
-            } else {
-                txt += "Nada seleccionado\n";
-            }
-            txt += textoContacto;
-            if (miZona) { txt += `\n📍 Zona: ${miZona}`; }
+            txt += `\n🔍 ${ital}Cruzá tus repetidas conmigo acá:${ital}\n👉 ${linkPublico}`;
+
             return txt;
         }
 
