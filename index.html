@@ -7,33 +7,41 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
     <style>
         :root {
-            --primary: #005c98;
-            --secondary: #6c757d;
-            --success: #28a745;
-            --danger: #dc3545;
-            --yellow: #ffc107;
+            --primary: #4a9eda;
+            --secondary: #868e96;
+            --success: #51cf66;
+            --danger: #ff6b6b;
+            --yellow: #fcc419;
             --wsp: #25D366;
             --tg: #0088cc;
+            --bg: #121212;
+            --bg2: #1e1e1e;
+            --bg3: #2a2a2a;
+            --border: #383838;
+            --text: #e9ecef;
+            --text2: #adb5bd;
+            --card: #1e1e1e;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+            background-color: var(--bg);
+            color: var(--text);
             padding: 20px;
             max-width: 1000px;
             margin: auto;
         }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e9ecef; }
-        label { font-size: 14px; color: #333; margin-bottom: 5px; display: block; font-weight: bold; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; box-sizing: border-box; margin-bottom: 15px; font-size: 14px; }
-        textarea { width: 100%; height: 140px; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; font-family: monospace; box-sizing: border-box; font-size: 13px; resize: vertical; margin-bottom: 5px; }
+        .box { background: var(--card); padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid var(--border); }
+        label { font-size: 14px; color: var(--text2); margin-bottom: 5px; display: block; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; margin-bottom: 15px; font-size: 14px; background: var(--bg3); color: var(--text); }
+        textarea { width: 100%; height: 140px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-family: monospace; box-sizing: border-box; font-size: 13px; resize: vertical; margin-bottom: 5px; background: var(--bg3); color: var(--text); }
         button { width: 100%; padding: 10px 15px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; transition: filter 0.2s; font-size: 14px; }
-        button:hover { filter: brightness(1.1); }
+        button:hover { filter: brightness(1.15); }
         .btn-primary { background-color: var(--primary); }
-        .btn-success { background-color: var(--success); }
+        .btn-success { background-color: var(--success); color: #111; }
         .btn-danger { background-color: var(--danger); }
         .btn-secondary { background-color: var(--secondary); }
-        .btn-yellow { background-color: var(--yellow); color: #333; }
+        .btn-yellow { background-color: var(--yellow); color: #111; }
         .btn-wsp { background-color: var(--wsp); box-shadow: 0 4px 6px rgba(37,211,102,0.3); }
         .btn-wsp-small { background-color: var(--wsp); color: white; }
         .btn-tg { background-color: var(--tg); }
@@ -45,7 +53,7 @@
 
         /* ESTILOS BOTONES AMIGOS */
         #botonesAmigos { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-bottom: 15px; }
-        .amigo-wrapper { display: flex; align-items: center; background: white; border: 1px solid #ced4da; border-radius: 8px; padding: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .amigo-wrapper { display: flex; align-items: center; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .amigo-checkbox { width: 18px; height: 18px; margin: 0 8px 0 4px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
         .btn-amigo-match { flex: 1; background: var(--primary); color: white; border: none; border-radius: 6px; padding: 8px 10px; font-size: 13px; font-weight: bold; text-align: left; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; margin: 0; }
         .btn-amigo-match:hover { filter: brightness(1.1); }
@@ -54,16 +62,16 @@
 
         /* CONTROLES MINI Y LAYOUT */
         .controles-seleccion { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 12px; }
-        .btn-mini { background: #e9ecef; border: 1px solid #ced4da; padding: 5px 10px; border-radius: 20px; font-size: 11px; cursor: pointer; font-weight: bold; color: #495057; text-decoration: none; display: inline-flex; align-items: center; width: auto; margin: 0; }
-        .btn-mini:hover { background: #dde0e3; color: #212529; }
+        .btn-mini { background: var(--bg2); border: 1px solid var(--border); padding: 5px 10px; border-radius: 20px; font-size: 11px; cursor: pointer; font-weight: bold; color: var(--text2); text-decoration: none; display: inline-flex; align-items: center; width: auto; margin: 0; }
+        .btn-mini:hover { background: var(--border); color: var(--text); }
         .flex-row { display: flex; gap: 8px; margin-bottom: 15px; align-items: stretch; }
         .flex-row input { margin-bottom: 0; flex: 1; }
         .flex-row button { width: auto; white-space: nowrap; margin: 0; padding: 0 15px; }
         .botones-resultados { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
         .botones-resultados button { flex: 1; min-width: 140px; }
-        .resultados { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-top: 20px; display: none; border: 1px solid #e9ecef; }
-        h2 { text-align: center; color: #1a1a1a; margin-bottom: 5px; font-size: 24px; }
-        h3 { color: #1a1a1a; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-top: 0; font-size: 18px; }
+        .resultados { background: var(--card); padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.4); margin-top: 20px; display: none; border: 1px solid var(--border); }
+        h2 { text-align: center; color: var(--text); margin-bottom: 5px; font-size: 24px; }
+        h3 { color: var(--text); border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-top: 0; font-size: 18px; }
         .team-row { margin: 5px 0; font-size: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
 
         /* SIMULADOR - LAYOUT CSS GRID */
@@ -74,10 +82,10 @@
             margin-bottom: 16px;
         }
         .sim-panel {
-            background: #f8f9fa;
+            background: var(--bg3);
             border-radius: 10px;
             padding: 12px;
-            border: 1px solid #e9ecef;
+            border: 1px solid var(--border);
         }
         .sim-panel-header {
             display: flex;
@@ -85,7 +93,7 @@
             align-items: center;
             margin-bottom: 10px;
             padding-bottom: 8px;
-            border-bottom: 1px solid #dee2e6;
+            border-bottom: 1px solid var(--border);
             flex-wrap: wrap;
             gap: 6px;
         }
@@ -99,12 +107,12 @@
         .sim-mini-controls { display: flex; gap: 5px; }
 
         /* ESTILOS DEL SIMULADOR INTERACTIVO */
-        .sticker-btn { background: #e9ecef; border: 1px solid #ced4da; padding: 5px 9px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; user-select: none; display: inline-flex; align-items: center; gap: 3px; }
+        .sticker-btn { background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 5px 9px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; user-select: none; display: inline-flex; align-items: center; gap: 3px; }
         .sticker-badge { font-size: 10px; opacity: 0.75; background: rgba(0,0,0,0.12); border-radius: 4px; padding: 0 3px; }
         .sticker-btn.receive.selected { background: var(--success); color: white; border-color: var(--success); }
         .sticker-btn.give.selected { background: var(--danger); color: white; border-color: var(--danger); }
 
-        .contador-simulador { background: #343a40; color: white; padding: 14px 16px; border-radius: 8px; margin-bottom: 12px; }
+        .contador-simulador { background: #0d0d0d; color: white; padding: 14px 16px; border-radius: 8px; margin-bottom: 12px; }
         .contador-inner { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
         .contador-stats { flex: 1; display: flex; gap: 20px; }
         .contador-stat { display: flex; flex-direction: column; }
@@ -112,24 +120,34 @@
         .breakdown-text { font-size: 11px; color: #adb5bd; margin-top: 2px; }
         .contador-actions { display: flex; flex-direction: column; gap: 8px; min-width: 170px; }
 
-        .ranking-item { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; }
+        .ranking-item { background: var(--bg3); padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.3); cursor: pointer; }
         .ranking-header { display: flex; justify-content: space-between; align-items: center; }
-        .ranking-content { display: none; padding-top: 10px; font-size: 13px; border-top: 1px solid #ddd; margin-top: 10px; }
-        .step-box { background: #e9f7ef; border-left: 4px solid var(--success); padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+        .ranking-content { display: none; padding-top: 10px; font-size: 13px; border-top: 1px solid var(--border); margin-top: 10px; }
+        .step-box { background: #1a2e22; border-left: 4px solid var(--success); padding: 15px; margin-bottom: 15px; border-radius: 8px; }
 
-        .cart-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .cart-item { font-size: 13px; border-bottom: 1px solid #ffeeba; padding: 8px 0; }
+        .cart-box { background: #2a2210; border: 1px solid #4a3a10; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .cart-item { font-size: 13px; border-bottom: 1px solid #4a3a10; padding: 8px 0; }
 
-        /* PESTAÑAS */
-        .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; background: #e9ecef; padding: 5px; border-radius: 8px; }
-        .tab-btn { margin: 0; border-radius: 6px; flex: 1; padding: 8px; font-size: 14px; }
-        .tab-btn.active { background: var(--primary); color: white; }
-        .tab-btn.inactive { background: transparent; color: #495057; border: none; }
-        .tab-btn.inactive:hover { background: rgba(0,0,0,0.05); }
 
-        .footer { text-align: center; margin-top: 30px; color: #6c757d; font-size: 13px; padding-top: 20px; border-top: 1px solid #dee2e6; }
+        .footer { text-align: center; margin-top: 30px; color: var(--text2); font-size: 13px; padding-top: 20px; border-top: 1px solid var(--border); }
         .footer a { color: var(--primary); font-weight: bold; text-decoration: none; }
         .status { font-size: 13px; min-height: 18px; margin-top: 5px; }
+
+
+        /* BARRA DE PROGRESO */
+        .progress-wrap { margin: 12px 0 4px 0; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 5px; }
+        .progress-bar-bg { width: 100%; height: 14px; background: var(--bg2); border-radius: 8px; overflow: hidden; display: flex; border: 1px solid var(--border); }
+        .progress-seg-tengo { background: var(--success); transition: width 0.5s; }
+        .progress-seg-faltan { background: var(--danger); transition: width 0.5s; opacity: 0.85; }
+        .progress-seg-repes { background: var(--yellow); transition: width 0.5s; opacity: 0.9; }
+        .progress-stats { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px; font-size: 11px; }
+        .progress-stat { display: flex; align-items: center; gap: 3px; }
+        .progress-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+        .progress-mini-wrap { margin: 6px 0 8px 0; }
+        .progress-mini-bg { width: 100%; height: 8px; background: var(--bg2); border-radius: 6px; overflow: hidden; display: flex; border: 1px solid var(--border); }
+        .progress-mini-label { font-size: 10px; color: var(--text2); margin-bottom: 3px; }
 
         /* RESPONSIVE MOVIL */
         @media (max-width: 768px) {
@@ -151,8 +169,8 @@
 <body>
 
     <div style="text-align: center; margin-bottom: 25px;">
-        <h2><a href="#" onclick="window.location.href=window.location.pathname; return false;" style="text-decoration: none; color: #1a1a1a;">⚽ Match Mundial 2026 ⚽</a></h2>
-        <p style="font-size: 13px; color: #6c757d; margin-top: 0;">Complemento inspirado en <a href="https://www.figuritas.app/es/descargar" target="_blank">Figuritas App</a></p>
+        <h2><a href="#" onclick="window.location.href=window.location.pathname; return false;" style="text-decoration: none; color: var(--text);">⚽ Match Mundial 2026 ⚽</a></h2>
+        <p style="font-size: 13px; color: var(--text2); margin-top: 0;">Complemento inspirado en <a href="https://www.figuritas.app/es/descargar" target="_blank">Figuritas App</a></p>
     </div>
 
     <div class="grid">
@@ -187,18 +205,35 @@
             <label>Tus Figuritas:</label>
             <textarea id="miLista" placeholder="Pegá tu lista acá..."></textarea>
 
+            <div id="barraProgresoMio" class="progress-wrap" style="display:none;">
+                <div class="progress-label">
+                    <span>📊 Mi Álbum</span>
+                    <span id="pctMio">—</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-seg-tengo" id="segTengoMio" style="width:0%"></div>
+                    <div class="progress-seg-faltan" id="segFaltanMio" style="width:0%"></div>
+                    <div class="progress-seg-repes" id="segRepesMio" style="width:0%"></div>
+                </div>
+                <div class="progress-stats">
+                    <span class="progress-stat"><span class="progress-dot" style="background:var(--success)"></span><span id="statTengoMio">0 tenés</span></span>
+                    <span class="progress-stat"><span class="progress-dot" style="background:var(--danger)"></span><span id="statFaltanMio">0 faltan</span></span>
+                    <span class="progress-stat"><span class="progress-dot" style="background:var(--yellow)"></span><span id="statRepesMio">0 repetidas</span></span>
+                </div>
+            </div>
+
             <button id="btnGuardarNube" class="btn-success">☁️ Guardar en la Nube</button>
             <div id="statusMiNube" class="status"></div>
 
             <div style="margin-top: 20px; border-top: 1px solid #dee2e6; padding-top: 15px;">
-                <label style="color: var(--primary);">📢 Link Público:</label>
+                <label style="color: var(--primary); font-weight:bold;">📢 Link Público:</label>
                 <div class="flex-row">
-                    <input type="text" id="linkCompartir" readonly style="background: #e9ecef; font-size: 11px;">
+                    <input type="text" id="linkCompartir" readonly style="background: var(--bg2); font-size: 11px; color: var(--text2);">
                     <button id="btnCompartirPublico" class="btn-wsp-small" style="padding: 0 10px;">📲 WA</button>
                 </div>
                 <label style="color: var(--danger);">🔒 Link Privado:</label>
                 <div class="flex-row">
-                    <input type="text" id="linkPrivado" readonly style="background: #f8d7da; border-color: #f5c6cb; font-size: 11px;">
+                    <input type="text" id="linkPrivado" readonly style="background: #2e1515; border-color: #5a2020; font-size: 11px; color: #ff9999;">
                     <button id="btnCopiarPrivado" class="btn-secondary" style="padding: 0 10px;">📋</button>
                 </div>
                 <button id="btnInstalar" class="btn-yellow">📱 Instalar Android</button>
@@ -240,18 +275,18 @@
 
     <!-- CARRITO -->
     <div id="areaCarrito" class="resultados" style="border-color: var(--yellow);">
-        <h3 style="border-color: var(--yellow); display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="color:var(--text); border-color: var(--yellow); display: flex; justify-content: space-between; align-items: center;">
             <span>🛒 Tu Simulador / Plan</span>
             <span id="badgeRuta" style="font-size: 12px; background: var(--success); color: white; padding: 4px 8px; border-radius: 4px; display: none;">Modo Ruta Activo</span>
         </h3>
-        <div id="carritoVacio" style="font-size: 13px; color: #6c757d;">No guardaste ningún cambio. Seleccioná el Modo Simulador en un amigo y guardá el intercambio.</div>
+        <div id="carritoVacio" style="font-size: 13px; color: var(--text2);">No guardaste ningún cambio. Seleccioná el Modo Simulador en un amigo y guardá el intercambio.</div>
         <div id="carritoLleno" style="display: none;">
             <div id="listaCarritoItems"></div>
             <button id="btnProyectarLista" class="btn-yellow" style="margin-top: 15px;">✨ Generar mi Nueva Lista Proyectada</button>
             <button id="btnVaciarCarrito" class="btn-danger" style="margin-top: 8px; padding: 8px; font-size: 12px; width: auto;">🗑 Vaciar y reiniciar</button>
         </div>
         <div id="areaProyeccion" style="display: none; margin-top: 20px; border-top: 1px solid #dee2e6; padding-top: 15px;">
-            <h4 style="margin: 0 0 10px 0;">Tu lista proyectada final:</h4>
+            <h4 style="margin: 0 0 10px 0; color:var(--text);">Tu lista proyectada final:</h4>
             <textarea id="listaProyectada" style="height: 200px; font-size: 12px;"></textarea>
             <div style="display: flex; gap: 10px;">
                 <button id="btnCopiarProyeccion" class="btn-primary">📋 Copiar Lista</button>
@@ -266,25 +301,17 @@
         <div id="mercadoGlobalResultados" style="display: none;"><h3>🌐 Triangulación de Grupo</h3><div id="listaMercadoGlobal"></div></div>
 
         <div id="detalleIndividual" style="display: none;">
-            <div class="tabs-container">
-                <button id="tabVistaTexto" class="tab-btn active">📝 Vista Texto</button>
-                <button id="tabVistaSimulador" class="tab-btn inactive">🎮 Modo Simulador</button>
-            </div>
-
-            <!-- VISTA TEXTO -->
-            <div id="vistaTexto">
-                <h3 id="tituloMeSirvenTexto">✅ Me sirven:</h3>
-                <div id="meSirvenTexto" style="margin-bottom: 20px;"></div>
-                <h3 id="tituloLeSirvenTexto">🎁 Le sirven:</h3>
+            <!-- SIMULADOR DIRECTO (sin pestañas) -->
+            <!-- IDs ocultos para compatibilidad con funciones existentes -->
+            <div id="vistaTexto" style="display:none;">
+                <h3 id="tituloMeSirvenTexto"></h3>
+                <div id="meSirvenTexto"></div>
+                <h3 id="tituloLeSirvenTexto"></h3>
                 <div id="leSirvenTexto"></div>
-                <div class="botones-resultados">
-                    <button id="btnCopiarPortapapeles" class="btn-primary">📋 Copiar Texto</button>
-                    <button id="btnCopiarWhatsApp" class="btn-wsp">📲 Enviar Match por WhatsApp</button>
-                </div>
+                <button id="btnCopiarPortapapeles" style="display:none;"></button>
+                <button id="btnCopiarWhatsApp" style="display:none;"></button>
             </div>
-
-            <!-- VISTA SIMULADOR -->
-            <div id="vistaSimulador" style="display: none;">
+            <div id="vistaSimulador">
                 <div class="step-box" id="infoPasoRuta" style="display: none; margin-bottom: 15px;"></div>
 
                 <!-- CONTADOR + BOTONES ACCIÓN -->
@@ -310,8 +337,22 @@
                                 <button id="btnSimRecibirNinguna" class="btn-mini">🔲 Ninguna</button>
                             </div>
                         </div>
-                        <div class="sim-panel-counter" style="font-size:12px; font-weight:bold; color:var(--success); margin-bottom:8px; padding: 4px 6px; background: #e9f7ef; border-radius:6px;">
-                            📥 Recibir: <span id="countRecibir">0</span> &nbsp;<span class="breakdown-text" id="breakdownRecibir" style="color:#555; font-weight:normal;">0 fig.</span>
+                        <div class="sim-panel-counter" style="font-size:12px; font-weight:bold; color:var(--success); margin-bottom:8px; padding: 4px 6px; background: #1a2e22; border-radius:6px;">
+                            📥 Recibir: <span id="countRecibir">0</span> &nbsp;<span class="breakdown-text" id="breakdownRecibir" style="color:var(--text2); font-weight:normal;">0 fig.</span>
+                        </div>
+
+                        <div id="barraProgresoAmigo" class="progress-mini-wrap" style="display:none;">
+                            <div class="progress-mini-label" id="labelBarraAmigo">📊 Álbum del amigo</div>
+                            <div class="progress-mini-bg">
+                                <div class="progress-seg-tengo" id="segTengoAmigo" style="width:0%"></div>
+                                <div class="progress-seg-faltan" id="segFaltanAmigo" style="width:0%"></div>
+                                <div class="progress-seg-repes" id="segRepesAmigo" style="width:0%"></div>
+                            </div>
+                            <div class="progress-stats" style="margin-top:3px;">
+                                <span class="progress-stat" style="font-size:10px;"><span class="progress-dot" style="background:var(--success)"></span><span id="statTengoAmigo"></span></span>
+                                <span class="progress-stat" style="font-size:10px;"><span class="progress-dot" style="background:var(--danger)"></span><span id="statFaltanAmigo"></span></span>
+                                <span class="progress-stat" style="font-size:10px;"><span class="progress-dot" style="background:var(--yellow)"></span><span id="statRepesAmigo"></span></span>
+                            </div>
                         </div>
                         <div id="meSirvenSim"></div>
                     </div>
@@ -324,8 +365,22 @@
                                 <button id="btnSimDarNinguna" class="btn-mini">🔲 Ninguna</button>
                             </div>
                         </div>
-                        <div class="sim-panel-counter" style="font-size:12px; font-weight:bold; color:var(--danger); margin-bottom:8px; padding: 4px 6px; background: #fde8ea; border-radius:6px;">
+                        <div class="sim-panel-counter" style="font-size:12px; font-weight:bold; color:var(--danger); margin-bottom:8px; padding: 4px 6px; background: #2e1a1a; border-radius:6px;">
                             📤 Dar: <span id="countDar">0</span> &nbsp;<span class="breakdown-text" id="breakdownDar" style="color:#555; font-weight:normal;">0 fig.</span>
+                        </div>
+
+                        <div id="barraProgresoMiaSim" class="progress-mini-wrap" style="display:none;">
+                            <div class="progress-mini-label">📊 Mi álbum</div>
+                            <div class="progress-mini-bg">
+                                <div class="progress-seg-tengo" id="segTengoMiaSim" style="width:0%"></div>
+                                <div class="progress-seg-faltan" id="segFaltanMiaSim" style="width:0%"></div>
+                                <div class="progress-seg-repes" id="segRepesMiaSim" style="width:0%"></div>
+                            </div>
+                            <div class="progress-stats" style="margin-top:3px;">
+                                <span class="progress-stat" style="font-size:10px;"><span class="progress-dot" style="background:var(--success)"></span><span id="statTengoMiaSim"></span></span>
+                                <span class="progress-stat" style="font-size:10px;"><span class="progress-dot" style="background:var(--danger)"></span><span id="statFaltanMiaSim"></span></span>
+                                <span class="progress-stat" style="font-size:10px;"><span class="progress-dot" style="background:var(--yellow)"></span><span id="statRepesMiaSim"></span></span>
+                            </div>
                         </div>
                         <div id="leSirvenSim"></div>
                     </div>
@@ -399,20 +454,6 @@
             document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = false);
         });
 
-        // Pestañas
-        document.getElementById('tabVistaTexto').addEventListener('click', () => {
-            document.getElementById('tabVistaTexto').className = 'tab-btn active';
-            document.getElementById('tabVistaSimulador').className = 'tab-btn inactive';
-            document.getElementById('vistaTexto').style.display = 'block';
-            document.getElementById('vistaSimulador').style.display = 'none';
-        });
-        document.getElementById('tabVistaSimulador').addEventListener('click', () => {
-            document.getElementById('tabVistaSimulador').className = 'tab-btn active';
-            document.getElementById('tabVistaTexto').className = 'tab-btn inactive';
-            document.getElementById('vistaSimulador').style.display = 'block';
-            document.getElementById('vistaTexto').style.display = 'none';
-        });
-
         // Controles simulador selección masiva
         document.getElementById('btnSimRecibirTodas').addEventListener('click', () => {
             document.querySelectorAll('#meSirvenSim .sticker-btn').forEach(btn => btn.classList.add('selected'));
@@ -459,6 +500,7 @@
 
         // Botones de oferta (simulador)
         document.getElementById('btnCopiarOferta').addEventListener('click', copiarOfertaSimulador);
+        document.getElementById('miLista').addEventListener('input', actualizarBarraPerfil);
         document.getElementById('btnContactarAmigo').addEventListener('click', contactarAmigo);
 
         // =====================================
@@ -603,7 +645,7 @@
                 hayMatches = true;
                 div.innerHTML += `<div class="team-row" style="display:block;"><b>${e}:</b> ${cleanD[e].join(', ')}</div>`;
             }
-            if (!hayMatches) div.innerHTML = '<p style="color:#856404; background:#fff3cd; padding:10px; border-radius:5px; font-size:13px;">No hay coincidencias.</p>';
+            if (!hayMatches) div.innerHTML = '<p style="color:#f0c060; background:#2a2000; padding:10px; border-radius:5px; font-size:13px;">No hay coincidencias.</p>';
         }
 
         function renderizarResultadosInteractivos(divId, d, tipo, diccionarioOriginalDeEseTipo) {
@@ -650,7 +692,7 @@
                 }
                 div.appendChild(fila);
             }
-            if (!hayMatches) div.innerHTML = '<p style="color:#856404; font-size:13px;">No hay coincidencias.</p>';
+            if (!hayMatches) div.innerHTML = '<p style="color:#f0c060; font-size:13px;">No hay coincidencias.</p>';
         }
 
         function actualizarContadoresSeleccion() {
@@ -666,8 +708,126 @@
             document.getElementById('breakdownDar').innerText = obtenerDesglosePlano(seleccionesActuales.dar);
         }
 
+
+
+        // =====================================
+        // BARRAS DE PROGRESO
+        // =====================================
+        const TOTAL_ALBUM = 980;
+
+        function calcularEstadisticasAlbum(textoLista) {
+            let d = parsearTexto(textoLista);
+            let totalFaltan = 0, totalRepes = 0;
+            for (let eq in d.faltan) totalFaltan += d.faltan[eq].length;
+            for (let eq in d.repetidas) totalRepes += d.repetidas[eq].length;
+            let tengo = TOTAL_ALBUM - totalFaltan;
+            if (tengo < 0) tengo = 0;
+            return { tengo, faltan: totalFaltan, repes: totalRepes };
+        }
+
+        function renderizarBarraGrande(stats, prefijo) {
+            let pctTengo = Math.min(100, (stats.tengo / TOTAL_ALBUM) * 100);
+            let pctFaltan = Math.min(100 - pctTengo, (stats.faltan / TOTAL_ALBUM) * 100);
+            // Repes como overlay visual (no suman al 100%, son bonus)
+            let pctRepes = Math.min(15, (stats.repes / TOTAL_ALBUM) * 100); // max 15% visual
+            document.getElementById(`segTengo${prefijo}`).style.width = pctTengo + '%';
+            document.getElementById(`segFaltan${prefijo}`).style.width = pctFaltan + '%';
+            document.getElementById(`segRepes${prefijo}`).style.width = pctRepes + '%';
+            let pct = Math.round((stats.tengo / TOTAL_ALBUM) * 100);
+            if (document.getElementById(`pct${prefijo}`)) document.getElementById(`pct${prefijo}`).innerText = `${pct}% completo`;
+            document.getElementById(`statTengo${prefijo}`).innerText = `${stats.tengo} tenés`;
+            document.getElementById(`statFaltan${prefijo}`).innerText = `${stats.faltan} faltan`;
+            document.getElementById(`statRepes${prefijo}`).innerText = `${stats.repes} repetidas`;
+        }
+
+        function renderizarBarraMini(stats, prefijo) {
+            let pctTengo = Math.min(100, (stats.tengo / TOTAL_ALBUM) * 100);
+            let pctFaltan = Math.min(100 - pctTengo, (stats.faltan / TOTAL_ALBUM) * 100);
+            let pctRepes = Math.min(15, (stats.repes / TOTAL_ALBUM) * 100);
+            document.getElementById(`segTengo${prefijo}`).style.width = pctTengo + '%';
+            document.getElementById(`segFaltan${prefijo}`).style.width = pctFaltan + '%';
+            document.getElementById(`segRepes${prefijo}`).style.width = pctRepes + '%';
+            document.getElementById(`statTengo${prefijo}`).innerText = `${stats.tengo}✅`;
+            document.getElementById(`statFaltan${prefijo}`).innerText = `${stats.faltan}❌`;
+            document.getElementById(`statRepes${prefijo}`).innerText = `${stats.repes}🔄`;
+        }
+
+        function actualizarBarraPerfil() {
+            let txt = document.getElementById('miLista').value.trim();
+            let wrap = document.getElementById('barraProgresoMio');
+            if (!txt) { wrap.style.display = 'none'; return; }
+            wrap.style.display = 'block';
+            let stats = calcularEstadisticasAlbum(txt);
+            renderizarBarraGrande(stats, 'Mio');
+        }
+
+        function actualizarBarrasSimulador(textoMio, textoAmigo, nombreAmigo) {
+            // Barra del amigo (panel recibir)
+            let wrapAmigo = document.getElementById('barraProgresoAmigo');
+            let wrapMia = document.getElementById('barraProgresoMiaSim');
+            if (textoAmigo) {
+                let statsAmigo = calcularEstadisticasAlbum(textoAmigo);
+                document.getElementById('labelBarraAmigo').innerText = `📊 Álbum de ${nombreAmigo}`;
+                renderizarBarraMini(statsAmigo, 'Amigo');
+                wrapAmigo.style.display = 'block';
+            } else {
+                wrapAmigo.style.display = 'none';
+            }
+            // Barra mía (panel dar)
+            if (textoMio) {
+                let statsMia = calcularEstadisticasAlbum(textoMio);
+                renderizarBarraMini(statsMia, 'MiaSim');
+                wrapMia.style.display = 'block';
+            } else {
+                wrapMia.style.display = 'none';
+            }
+        }
+
+        // =====================================
+        // SELECCIÓN PAREADA INTELIGENTE
+        // =====================================
+        function seleccionarPareado() {
+            // Limpiar todo primero
+            document.querySelectorAll('#meSirvenSim .sticker-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('#leSirvenSim .sticker-btn').forEach(b => b.classList.remove('selected'));
+
+            // Obtener todos los botones por categoría
+            function getBtnsPorCategoria(selector) {
+                let cats = { esp: [], esc: [], eq: [], cc: [], jug: [] };
+                document.querySelectorAll(selector + ' .sticker-btn').forEach(btn => {
+                    let parts = btn.dataset.id.split('#')[0].split(' ');
+                    let eq = parts[0], num = parseInt(parts[1]);
+                    let cat = categorizarFigu(eq, num);
+                    if (cat.emoji === '🌟') cats.esp.push(btn);
+                    else if (cat.emoji === '🛡️') cats.esc.push(btn);
+                    else if (cat.emoji === '👥') cats.eq.push(btn);
+                    else if (cat.emoji === '🥤') cats.cc.push(btn);
+                    else cats.jug.push(btn);
+                });
+                return cats;
+            }
+
+            let recibir = getBtnsPorCategoria('#meSirvenSim');
+            let dar = getBtnsPorCategoria('#leSirvenSim');
+
+            // Seleccionar mínimo de cada categoría en ambos lados
+            let orden = ['esp', 'esc', 'eq', 'cc', 'jug'];
+            for (let cat of orden) {
+                let min = Math.min(recibir[cat].length, dar[cat].length);
+                for (let i = 0; i < min; i++) {
+                    recibir[cat][i].classList.add('selected');
+                    dar[cat][i].classList.add('selected');
+                }
+            }
+
+            // Si quedaron sin seleccionar por falta de paridad en alguna categoría,
+            // no seleccionar — el usuario puede ajustar manualmente.
+            actualizarContadoresSeleccion();
+        }
+
         function ejecutarComparacion(mio, otro, nombre, contactoAmigo) {
             let mD = parsearTexto(mio), oD = parsearTexto(otro);
+            actualizarBarrasSimulador(mio, otro, nombre);
             ultimoMatchMeSirven = encontrarInterseccion(mD.faltan, oD.repetidas);
             ultimoMatchLeSirven = encontrarInterseccion(oD.faltan, mD.repetidas);
             ultimoNombreAmigo = nombre;
@@ -682,7 +842,7 @@
 
             renderizarResultadosInteractivos('meSirvenSim', ultimoMatchMeSirven, 'recibir', oD.repetidas);
             renderizarResultadosInteractivos('leSirvenSim', ultimoMatchLeSirven, 'dar', mD.repetidas);
-            actualizarContadoresSeleccion();
+            seleccionarPareado();
 
             document.getElementById('tituloMeSirvenTexto').innerText = `✅ Me sirven ${obtenerDesglose(ultimoMatchMeSirven)} de ${nombre}:`;
             document.getElementById('tituloLeSirvenTexto').innerText = `🎁 A ${nombre} le sirven ${obtenerDesglose(ultimoMatchLeSirven)} tuyas:`;
@@ -694,8 +854,6 @@
             document.getElementById('rankingResultados').style.display = 'none';
             document.getElementById('mercadoGlobalResultados').style.display = 'none';
             document.getElementById('infoPasoRuta').style.display = 'none';
-
-            document.getElementById('tabVistaTexto').click();
 
             if (window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
         }
@@ -822,19 +980,42 @@
             let link = generarLinkContacto(tipo, dato);
 
             if (tipo === 'whatsapp') {
+                // WhatsApp soporta pre-carga del mensaje — un solo paso
                 let wLink = `https://wa.me/${dato.replace(/\D/g, '')}`;
                 if (txtOferta) wLink += `?text=${encodeURIComponent(txtOferta)}`;
                 window.open(wLink, '_blank');
             } else if (tipo === 'mail') {
-                let miUsuario = (document.getElementById('miUsuario').value.trim() || "Match Figuritas").toUpperCase();
+                // Mail soporta subject+body — un solo paso
                 let asunto = `Match de Figuritas Mundial 2026 - Propuesta de intercambio`;
                 let cuerpo = txtOferta || "";
                 window.open(`mailto:${dato}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`, '_blank');
             } else if (link) {
-                window.open(link, '_blank');
+                // Telegram, Instagram, Facebook — dos pasos: copiar + abrir
+                let txt = txtOferta || generarTextoResultados(false);
+                navigator.clipboard.writeText(txt).then(() => {
+                    mostrarToast('📋 ¡Mensaje copiado! Solo pegalo en la app y envialo.');
+                    setTimeout(() => window.open(link, '_blank'), 800);
+                }).catch(() => {
+                    mostrarToast('📋 Copiá el mensaje manualmente, luego abrí la app.');
+                    setTimeout(() => window.open(link, '_blank'), 1500);
+                });
             } else {
                 alert(`Contacto de ${ultimoNombreAmigo}: ${dato}`);
             }
+        }
+
+        function mostrarToast(msg) {
+            let toast = document.getElementById('toast-notif');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast-notif';
+                toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:bold;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.5);max-width:90vw;text-align:center;transition:opacity 0.4s;';
+                document.body.appendChild(toast);
+            }
+            toast.innerText = msg;
+            toast.style.opacity = '1';
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => { toast.style.opacity = '0'; }, 3500);
         }
 
         // =====================================
@@ -928,8 +1109,7 @@
             renderizarResultadosInteractivos('meSirvenSim', dictMeSirven, 'recibir', desaplanarArray(mejorAmigo.repetidas));
             renderizarResultadosInteractivos('leSirvenSim', dictLeSirven, 'dar', desaplanarArray(rutaState.misRepetidas));
 
-            document.getElementById('btnSimRecibirTodas').click();
-            document.getElementById('btnSimDarTodas').click();
+            seleccionarPareado();
 
             let info = document.getElementById('infoPasoRuta');
             info.style.display = 'block';
@@ -942,8 +1122,6 @@
             document.getElementById('detalleIndividual').style.display = 'block';
             document.getElementById('rankingResultados').style.display = 'none';
             document.getElementById('mercadoGlobalResultados').style.display = 'none';
-
-            document.getElementById('tabVistaSimulador').click();
 
             if (window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
         }
@@ -1174,7 +1352,7 @@
                 list.innerHTML = '';
 
                 if (res.length === 0) {
-                    list.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">No hay intercambios posibles.</p>';
+                    list.innerHTML = '<p style="color:#f0c060;background:#2a2000;padding:10px;border-radius:5px;">No hay intercambios posibles.</p>';
                     status.innerText = "";
                     return;
                 }
@@ -1182,12 +1360,12 @@
                 res.forEach((r, i) => {
                     let div = document.createElement('div');
                     div.className = 'ranking-item';
-                    div.style = r.pos === 0 ? 'opacity:0.7;' : '';
+                    div.style.opacity = r.pos === 0 ? '0.5' : '1';
                     div.innerHTML = `
                         <div class="ranking-header">
                             <div class="ranking-text">
                                 <div class="ranking-name">${i < 3 ? ['🥇', '🥈', '🥉'][i] : '🔹'} ${r.nombre} - 🔄 ${r.pos} mano a mano</div>
-                                <div class="ranking-stats"><span style="color:var(--success);">Te da <b>${r.me}</b></span> | <span style="color:var(--primary);">Le das <b>${r.le}</b></span></div>
+                                <div class="ranking-stats" style="color:var(--text2);"><span style="color:var(--success);">Te da <b>${r.me}</b></span> | <span style="color:var(--primary);">Le das <b>${r.le}</b></span></div>
                             </div>
                             <button class="btn-primary" style="width:auto;padding:8px 12px;font-size:12px;" onclick="cargarAmigoYComparar('${r.nombre}')">🔍 Ver Match</button>
                         </div>`;
@@ -1382,6 +1560,7 @@
                     document.getElementById('miContactoDato').value = d.contacto_dato || "";
                     renderizarBotonesAmigos();
                     actualizarLinkDirecto(u);
+                    actualizarBarraPerfil();
                     s.style.color = "green";
                     s.innerText = "¡Perfil cargado!";
                 } else {
@@ -1416,6 +1595,7 @@
                 await set(ref(db, `usuarios/${u}`), datos);
                 renderizarBotonesAmigos();
                 actualizarLinkDirecto(u);
+                actualizarBarraPerfil();
                 s.style.color = "green";
                 s.innerText = "¡Guardado con éxito!";
             } catch (e) {
