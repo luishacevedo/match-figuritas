@@ -1068,11 +1068,17 @@
                 input.value = input.value.split(',').map(x => x.trim()).filter(x => x !== "" && x !== amigo).join(', ');
                 let u = document.getElementById('miUsuario').value.trim();
                 if (u) {
-                    set(ref(db, `usuarios/${u}`), {
+                    let z = document.getElementById('miZona').value.trim();
+                    let ct = document.getElementById('miContactoTipo').value;
+                    let cd = document.getElementById('miContactoDato').value.trim();
+                    let datos = {
                         textoOriginal: document.getElementById('miLista').value.trim(),
                         amigos: input.value,
                         ultimaActualizacion: new Date().toLocaleString()
-                    }).then(() => renderizarBotonesAmigos());
+                    };
+                    if (z) datos.zona = z;
+                    if (cd) { datos.contacto_tipo = ct; datos.contacto_dato = cd; }
+                    set(ref(db, `usuarios/${u}`), datos).then(() => renderizarBotonesAmigos());
                 } else {
                     renderizarBotonesAmigos();
                 }
@@ -1434,11 +1440,17 @@
                 if (!curr.includes(au)) {
                     curr.push(au);
                     input.value = curr.join(', ');
-                    await set(ref(db, `usuarios/${mu}`), {
+                    let z2 = document.getElementById('miZona').value.trim();
+                    let ct2 = document.getElementById('miContactoTipo').value;
+                    let cd2 = document.getElementById('miContactoDato').value.trim();
+                    let datosMios = {
                         textoOriginal: document.getElementById('miLista').value.trim(),
                         amigos: input.value,
                         ultimaActualizacion: new Date().toLocaleString()
-                    });
+                    };
+                    if (z2) datosMios.zona = z2;
+                    if (cd2) { datosMios.contacto_tipo = ct2; datosMios.contacto_dato = cd2; }
+                    await set(ref(db, `usuarios/${mu}`), datosMios);
                 }
                 renderizarBotonesAmigos();
                 s.style.color = "green";
