@@ -623,7 +623,6 @@
             if (!val) {
                 limpiarCamposAmigo();
             } else if (val !== _amigoAnterior) {
-                // El nombre cambió — limpiar datos del usuario anterior
                 limpiarCamposAmigo();
                 document.getElementById('amigoZonaPanel').style.display = 'block';
             }
@@ -1496,8 +1495,16 @@
         let rankingDataGlobal = [];
 
         function renderizarChipsZona(datos) {
-            // datos = array de { nombre, zona, ... }
-            let zonas = [...new Set(datos.map(d => d.zona).filter(z => z && z.trim() !== ""))];
+            // Separar zonas compuestas por coma en chips individuales
+            let partes = new Set();
+            datos.forEach(d => {
+                if (!d.zona || d.zona.trim() === "") return;
+                d.zona.split(',').forEach(p => {
+                    let t = p.trim();
+                    if (t) partes.add(t);
+                });
+            });
+            let zonas = [...partes].sort();
             let wrap = document.getElementById('zonaFiltroWrap');
             let chipsContainer = document.getElementById('zonaChips');
             if (zonas.length === 0) { wrap.style.display = 'none'; return; }
@@ -1505,19 +1512,24 @@
             zonaFiltroActiva = "todas";
             let html = `<span class="zona-chip active" data-zona="todas" onclick="filtrarPorZona('todas')">🌐 Todas</span>`;
             zonas.forEach(z => {
-                html += `<span class="zona-chip" data-zona="${z}" onclick="filtrarPorZona('${z}')">${z}</span>`;
+                let zSafe = z.replace(/'/g, "\'");
+                html += `<span class="zona-chip" data-zona="${z}" onclick="filtrarPorZona('${zSafe}')">${z}</span>`;
             });
             chipsContainer.innerHTML = html;
         }
 
         window.filtrarPorZona = function filtrarPorZona(zona) {
             zonaFiltroActiva = zona;
-            // Actualizar chips activos
             document.querySelectorAll('.zona-chip').forEach(c => {
                 c.classList.toggle('active', c.dataset.zona === zona);
             });
-            // Re-renderizar lista
-            let filtrados = zona === "todas" ? rankingDataGlobal : rankingDataGlobal.filter(r => r.zona === zona);
+            // Filtro por coincidencia parcial: el barrio elegido está dentro de la zona del usuario
+            let filtrados = zona === "todas"
+                ? rankingDataGlobal
+                : rankingDataGlobal.filter(r => {
+                    if (!r.zona) return false;
+                    return r.zona.split(',').map(p => p.trim()).includes(zona);
+                });
             renderizarListaRanking(filtrados);
         }
 
