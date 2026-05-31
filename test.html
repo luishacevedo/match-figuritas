@@ -1797,7 +1797,7 @@
                     document.getElementById('miContactoTipo').value = d.contacto_tipo || "telegram";
                     document.getElementById('miContactoDato').value = d.contacto_dato || "";
                     // Verificar en usuarios_publicos también (por si el campo publico no se guardó)
-                    document.getElementById('miPublico').checked = d.publico === true || d.publico === 1;
+                    document.getElementById('miPublico').checked = !!d.publico;
                     if (!d.publico) {
                         // Doble check: ver si existe en el directorio público
                         try {
@@ -1838,7 +1838,7 @@
                     textoOriginal: t,
                     amigos: a,
                     ultimaActualizacion: new Date().toLocaleString(),
-                    publico: esPublico ? 1 : 0
+                    publico: esPublico === true ? true : false
                 };
                 if (z) datos.zona = z;
                 if (r) datos.region = r;
