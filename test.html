@@ -1560,6 +1560,34 @@
                 if (publicosSnap && publicosSnap.exists()) {
                     publicosNombres = Object.keys(publicosSnap.val()).filter(n => n !== miUsuario);
                 }
+                // Fallback: si usuarios_publicos está vacío, escanear usuarios/ buscando publico===true
+                if (publicosNombres.length === 0) {
+                    try {
+                        const todosSnap = await get(ref(db, 'usuarios'));
+                        if (todosSnap.exists()) {
+                            let todos = todosSnap.val();
+                            for (let nombre in todos) {
+                                if (nombre !== miUsuario && (todos[nombre].publico === true || todos[nombre].publico === 1)) {
+                                    publicosNombres.push(nombre);
+                                    // Aprovechar y escribir en usuarios_publicos para la próxima vez
+                                    let d = todos[nombre];
+                                    let stats = calcularEstadisticasAlbum(d.textoOriginal || "");
+                                    set(ref(db, `usuarios_publicos/${nombre}`), {
+                                        nombre: nombre,
+                                        zona: d.zona || "",
+                                        region: d.region || "",
+                                        contacto_tipo: d.contacto_tipo || "",
+                                        contacto_dato: d.contacto_dato || "",
+                                        tengo: stats.tengo,
+                                        faltan: stats.faltan,
+                                        repes: stats.repes,
+                                        ultimaActualizacion: d.ultimaActualizacion || ""
+                                    }).catch(() => {});
+                                }
+                            }
+                        }
+                    } catch(ef) { console.warn("Fallback público:", ef); }
+                }
                 let todosANalizar = [...new Set([...amigos, ...publicosNombres])];
                 if (todosANalizar.length === 0) { alert("No hay amigos seleccionados ni usuarios con perfil público para analizar. Agregá amigos frecuentes o esperá que alguien active su perfil público."); return; }
 
