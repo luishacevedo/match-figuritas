@@ -143,7 +143,6 @@
 
         /* ZONA DEL AMIGO (panel derecho) */
         .amigo-zona-panel { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: none; }
-        .amigo-zona-panel label { font-size: 12px; margin-bottom: 4px; }
         .zona-region-row { display: grid; grid-template-columns: 140px 1fr; gap: 8px; margin-bottom: 8px; }
         .zona-region-row select { margin-bottom: 0; }
         .zona-region-row input { margin-bottom: 0; }
@@ -227,20 +226,20 @@
                     <option value="Interior">Interior</option>
                     <option value="Exterior">Exterior</option>
                 </select>
-                <input type="text" id="miZona" placeholder="Ej: Barracas, Palermo..." list="sugerenciasBarrio">
-                <datalist id="sugerenciasBarrio">
-                    <option value="Barracas"><option value="Palermo"><option value="Belgrano"><option value="Caballito">
-                    <option value="Villa Crespo"><option value="Almagro"><option value="Flores"><option value="San Telmo">
-                    <option value="La Boca"><option value="Recoleta"><option value="Núñez"><option value="Saavedra">
-                    <option value="Floresta"><option value="Villa Urquiza"><option value="Colegiales"><option value="Parque Patricios">
-                    <option value="Boedo"><option value="Villa del Parque"><option value="Devoto"><option value="Mataderos">
-                    <option value="San Martín"><option value="Quilmes"><option value="Lanús"><option value="Avellaneda">
-                    <option value="Lomas de Zamora"><option value="Tigre"><option value="San Isidro"><option value="Vicente López">
-                    <option value="Morón"><option value="La Matanza"><option value="Merlo"><option value="Moreno">
-                    <option value="Rosario"><option value="Córdoba"><option value="Mendoza"><option value="Tucumán">
-                    <option value="Mar del Plata"><option value="La Plata"><option value="Bahía Blanca"><option value="Salta">
-                </datalist>
+                <input type="text" id="miZona" placeholder="Barrio / Ciudad..." list="sugerenciasBarrio">
             </div>
+            <datalist id="sugerenciasBarrio">
+                <option value="Barracas"><option value="Palermo"><option value="Belgrano"><option value="Caballito">
+                <option value="Villa Crespo"><option value="Almagro"><option value="Flores"><option value="San Telmo">
+                <option value="La Boca"><option value="Recoleta"><option value="Núñez"><option value="Saavedra">
+                <option value="Floresta"><option value="Villa Urquiza"><option value="Colegiales"><option value="Parque Patricios">
+                <option value="Boedo"><option value="Villa del Parque"><option value="Devoto"><option value="Mataderos">
+                <option value="San Martín"><option value="Quilmes"><option value="Lanús"><option value="Avellaneda">
+                <option value="Lomas de Zamora"><option value="Tigre"><option value="San Isidro"><option value="Vicente López">
+                <option value="Morón"><option value="La Matanza"><option value="Merlo"><option value="Moreno">
+                <option value="Rosario"><option value="Córdoba"><option value="Mendoza"><option value="Tucumán">
+                <option value="Mar del Plata"><option value="La Plata"><option value="Bahía Blanca"><option value="Salta">
+            </datalist>
 
             <label class="toggle-publico-wrap" for="miPublico">
                 <input type="checkbox" id="miPublico">
@@ -327,7 +326,6 @@
                 <button id="btnBuscarAmigo" class="btn-primary">🔍 Buscar</button>
             </div>
 
-            <!-- ZONA DEL AMIGO: aparece cuando hay texto en amigoUsuario -->
             <div class="amigo-zona-panel" id="amigoZonaPanel">
                 <label style="color:var(--text2); font-size:11px; margin-bottom:6px; display:block;">📍 Zona y contacto del amigo (opcional, se guarda con su perfil):</label>
                 <div class="zona-region-row">
@@ -597,7 +595,6 @@
         // Botones de oferta (simulador)
         document.getElementById('btnCopiarOferta').addEventListener('click', copiarOfertaSimulador);
         document.getElementById('miLista').addEventListener('input', actualizarBarraPerfil);
-        document.getElementById('misAmigos').addEventListener('input', actualizarDatalistAmigos);
         document.getElementById('btnContactarAmigo').addEventListener('click', contactarAmigo);
 
         // =====================================
@@ -606,13 +603,9 @@
         async function cargarUsuariosPublicosEnDatalist() {
             try {
                 const snap = await get(ref(db, 'usuarios_publicos'));
-                if (snap.exists()) {
-                    usuariosPublicosCache = Object.keys(snap.val());
-                } else {
-                    usuariosPublicosCache = [];
-                }
-                actualizarDatalistAmigos();
-            } catch(e) {}
+                usuariosPublicosCache = snap.exists() ? Object.keys(snap.val()) : [];
+            } catch(e) { usuariosPublicosCache = []; }
+            actualizarDatalistAmigos();
         }
 
         function actualizarDatalistAmigos() {
@@ -620,17 +613,18 @@
                 .split(',').map(x => x.trim()).filter(x => x !== "");
             let todos = [...new Set([...frecuentes, ...usuariosPublicosCache])];
             let dl = document.getElementById('sugerenciasAmigos');
-            if (!dl) return;
-            dl.innerHTML = todos.map(n => `<option value="${n}">`).join('');
+            if (dl) dl.innerHTML = todos.map(n => `<option value="${n}">`).join('');
         }
 
-        // Mostrar/ocultar panel de zona del amigo según si hay texto en el input
+        // Mostrar panel zona del amigo cuando hay texto en el buscador
         document.getElementById('amigoUsuario').addEventListener('input', function() {
-            let panel = document.getElementById('amigoZonaPanel');
-            panel.style.display = this.value.trim() ? 'block' : 'none';
+            document.getElementById('amigoZonaPanel').style.display = this.value.trim() ? 'block' : 'none';
         });
 
-        // Cuando se carga un amigo desde Firebase, llenar sus campos de zona/contacto
+        // Actualizar datalist cuando cambia la lista de frecuentes
+        document.getElementById('misAmigos').addEventListener('input', actualizarDatalistAmigos);
+
+        // Rellenar campos del amigo cuando se carga desde Firebase
         function rellenarCamposAmigo(d) {
             if (!d) return;
             if (d.region) document.getElementById('amigoRegion').value = d.region;
@@ -646,15 +640,11 @@
             if (!amigo) return;
             let input = document.getElementById('misAmigos');
             let curr = input.value.split(',').map(x => x.trim()).filter(x => x !== "");
-            if (curr.includes(amigo)) {
-                mostrarToast(`${amigo} ya está en tus frecuentes`);
-                return;
-            }
+            if (curr.includes(amigo)) { mostrarToast(`${amigo} ya está en tus frecuentes`); return; }
             curr.push(amigo);
             input.value = curr.join(', ');
             renderizarBotonesAmigos();
             actualizarDatalistAmigos();
-            // Guardar en nube si hay usuario cargado
             let mu = document.getElementById('miUsuario').value.trim();
             if (mu) {
                 let z = document.getElementById('miZona').value.trim();
@@ -662,12 +652,7 @@
                 let ct = document.getElementById('miContactoTipo').value;
                 let cd = document.getElementById('miContactoDato').value.trim();
                 let esPublico = document.getElementById('miPublico').checked;
-                let datos = {
-                    textoOriginal: document.getElementById('miLista').value.trim(),
-                    amigos: input.value,
-                    ultimaActualizacion: new Date().toLocaleString(),
-                    publico: esPublico
-                };
+                let datos = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toLocaleString(), publico: esPublico };
                 if (z) datos.zona = z;
                 if (r) datos.region = r;
                 if (cd) { datos.contacto_tipo = ct; datos.contacto_dato = cd; }
@@ -677,7 +662,7 @@
             this.style.display = 'none';
         });
 
-        // =====================================
+                // =====================================
         // CORE PARSING Y MATEMATICA
         // =====================================
         function limpiarNombreEquipo(textoRaw) {
@@ -1004,13 +989,13 @@
             actualizarContadoresSeleccion();
         }
 
-        function ejecutarComparacion(mio, otro, nombre, contactoAmigo) {
+        function ejecutarComparacion(mio, otro, nombre, contactoAmigo, zonaAmigo) {
             let mD = parsearTexto(mio), oD = parsearTexto(otro);
+            ultimoZonaAmigo = zonaAmigo || "";
             actualizarBarrasSimulador(mio, otro, nombre);
             ultimoMatchMeSirven = encontrarInterseccion(mD.faltan, oD.repetidas);
             ultimoMatchLeSirven = encontrarInterseccion(oD.faltan, mD.repetidas);
             ultimoNombreAmigo = nombre;
-            ultimoZonaAmigo = snap.exists() ? (snap.val().zona || "") : "";
             ultimoContactoAmigo = contactoAmigo || { tipo: "", dato: "" };
 
             actualizarBotonContactar();
@@ -1035,11 +1020,9 @@
             document.getElementById('mercadoGlobalResultados').style.display = 'none';
             document.getElementById('infoPasoRuta').style.display = 'none';
 
-            // Mostrar botón "Agregar a Frecuentes" si no es amigo frecuente
-            let frecuentes = document.getElementById('misAmigos').value
-                .split(',').map(x => x.trim()).filter(x => x !== "");
-            let btnAgregar = document.getElementById('btnAgregarFrecuente');
-            btnAgregar.style.display = frecuentes.includes(nombre) ? 'none' : 'flex';
+            // Mostrar "Agregar a Frecuentes" solo si no está ya en la lista
+            let _frecuentes = document.getElementById('misAmigos').value.split(',').map(x => x.trim()).filter(x => x !== "");
+            document.getElementById('btnAgregarFrecuente').style.display = _frecuentes.includes(nombre) ? 'none' : 'flex';
 
             if (window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
         }
@@ -1414,7 +1397,8 @@
                         tipo: d.contacto_tipo || "",
                         dato: d.contacto_dato || ""
                     };
-                    ejecutarComparacion(m, d.textoOriginal, amigo, contactoAmigo);
+                    rellenarCamposAmigo(d);
+                    ejecutarComparacion(m, d.textoOriginal, amigo, contactoAmigo, d.zona || "");
                     document.getElementById('statusAmigo').style.color = "green";
                     document.getElementById('statusAmigo').innerText = "¡Lista cargada!";
                 } else {
@@ -1518,7 +1502,7 @@
             chipsContainer.innerHTML = html;
         }
 
-        function filtrarPorZona(zona) {
+        window.filtrarPorZona = function filtrarPorZona(zona) {
             zonaFiltroActiva = zona;
             // Actualizar chips activos
             document.querySelectorAll('.zona-chip').forEach(c => {
@@ -1572,16 +1556,14 @@
                 status.innerText = "⚡ Escaneando opciones...";
                 let misDatos = parsearTexto(textoMio);
 
-                // Cargar usuarios públicos de Firebase
+                // Cargar usuarios públicos y combinar con frecuentes
                 let publicosSnap = await get(ref(db, 'usuarios_publicos')).catch(() => null);
                 let publicosNombres = [];
                 if (publicosSnap && publicosSnap.exists()) {
                     publicosNombres = Object.keys(publicosSnap.val()).filter(n => n !== miUsuario);
                 }
-
-                // Combinar frecuentes + públicos sin duplicar
                 let todosANalizar = [...new Set([...amigos, ...publicosNombres])];
-                if (todosANalizar.length === 0) { alert("Pegá tu lista y asegurate de tener amigos o usuarios públicos."); return; }
+                if (todosANalizar.length === 0) { alert("No hay amigos ni usuarios públicos para analizar."); return; }
 
                 let promesasDescarga = todosANalizar.map(async (amigo) => {
                     let esAmigo = amigos.includes(amigo);
@@ -1603,7 +1585,7 @@
                 });
 
                 let res = (await Promise.all(promesasDescarga)).filter(r => r !== null);
-                // Primero amigos, luego públicos; dentro de cada grupo por matches desc
+                // Amigos primero, luego públicos; dentro de cada grupo por matches desc
                 res.sort((a, b) => {
                     if (a.esAmigo !== b.esAmigo) return a.esAmigo ? -1 : 1;
                     return b.pos !== a.pos ? b.pos - a.pos : b.me - a.me;
@@ -1786,7 +1768,7 @@
             let textoMio = document.getElementById('miLista').value.trim();
             let textoAmigo = document.getElementById('amigoLista').value.trim();
             if (!textoMio || !textoAmigo) { alert("Faltan listas para comparar."); return; }
-            ejecutarComparacion(textoMio, textoAmigo, document.getElementById('amigoUsuario').value.trim() || "TU AMIGO", { tipo: "", dato: "" });
+            ejecutarComparacion(textoMio, textoAmigo, document.getElementById('amigoUsuario').value.trim() || "TU AMIGO", { tipo: "", dato: "" }, "");
             document.getElementById('statusAmigo').innerText = "";
         }
 
@@ -1855,10 +1837,10 @@
                 if (cd) { datos.contacto_tipo = ct; datos.contacto_dato = cd; }
                 await set(ref(db, `usuarios/${u}`), datos);
 
-                // Manejo del directorio público
+                // Directorio público
                 let statsPublico = calcularEstadisticasAlbum(t);
                 if (esPublico) {
-                    let metadatos = {
+                    await set(ref(db, `usuarios_publicos/${u}`), {
                         nombre: u,
                         zona: z || "",
                         region: r || "",
@@ -1868,10 +1850,8 @@
                         faltan: statsPublico.faltan,
                         repes: statsPublico.repes,
                         ultimaActualizacion: new Date().toLocaleString()
-                    };
-                    await set(ref(db, `usuarios_publicos/${u}`), metadatos);
+                    });
                 } else {
-                    // Si desmarcó, removerlo del directorio público
                     try { await set(ref(db, `usuarios_publicos/${u}`), null); } catch(e2) {}
                 }
 
@@ -1937,9 +1917,7 @@
         // INIT
         // =====================================
         window.onload = async function () {
-            // Cargar directorio público al inicio para el datalist
             cargarUsuariosPublicosEnDatalist();
-
             const url = new URLSearchParams(window.location.search);
             if (url.get('u')) {
                 document.getElementById('miUsuario').value = url.get('u');
