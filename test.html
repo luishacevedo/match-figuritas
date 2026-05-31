@@ -1475,9 +1475,7 @@
         }
 
         function obtenerAmigosSeleccionados() {
-            let sel = Array.from(document.querySelectorAll('.amigo-checkbox:checked')).map(cb => cb.value);
-            if (sel.length === 0) alert("Dejá al menos un amigo tildado en la lista para poder analizar.");
-            return sel;
+            return Array.from(document.querySelectorAll('.amigo-checkbox:checked')).map(cb => cb.value);
         }
 
 
@@ -1563,7 +1561,7 @@
                     publicosNombres = Object.keys(publicosSnap.val()).filter(n => n !== miUsuario);
                 }
                 let todosANalizar = [...new Set([...amigos, ...publicosNombres])];
-                if (todosANalizar.length === 0) { alert("No hay amigos ni usuarios públicos para analizar."); return; }
+                if (todosANalizar.length === 0) { alert("No hay amigos seleccionados ni usuarios con perfil público para analizar. Agregá amigos frecuentes o esperá que alguien active su perfil público."); return; }
 
                 let promesasDescarga = todosANalizar.map(async (amigo) => {
                     let esAmigo = amigos.includes(amigo);
