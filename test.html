@@ -616,9 +616,18 @@
             if (dl) dl.innerHTML = todos.map(n => `<option value="${n}">`).join('');
         }
 
-        // Mostrar panel zona del amigo cuando hay texto en el buscador
+        // Mostrar/ocultar y limpiar panel zona del amigo al escribir nuevo nombre
+        let _amigoAnterior = '';
         document.getElementById('amigoUsuario').addEventListener('input', function() {
-            document.getElementById('amigoZonaPanel').style.display = this.value.trim() ? 'block' : 'none';
+            let val = this.value.trim();
+            if (!val) {
+                limpiarCamposAmigo();
+            } else if (val !== _amigoAnterior) {
+                // El nombre cambió — limpiar datos del usuario anterior
+                limpiarCamposAmigo();
+                document.getElementById('amigoZonaPanel').style.display = 'block';
+            }
+            _amigoAnterior = val;
         });
 
         // Actualizar datalist cuando cambia la lista de frecuentes
@@ -1397,6 +1406,7 @@
                         tipo: d.contacto_tipo || "",
                         dato: d.contacto_dato || ""
                     };
+                    limpiarCamposAmigo(); // resetear antes de rellenar con el nuevo usuario
                     rellenarCamposAmigo(d);
                     ejecutarComparacion(m, d.textoOriginal, amigo, contactoAmigo, d.zona || "");
                     document.getElementById('statusAmigo').style.color = "green";
@@ -1486,16 +1496,8 @@
         let rankingDataGlobal = [];
 
         function renderizarChipsZona(datos) {
-            // Separar zonas compuestas por coma en chips individuales
-            let partes = new Set();
-            datos.forEach(d => {
-                if (!d.zona || d.zona.trim() === "") return;
-                d.zona.split(',').forEach(p => {
-                    let t = p.trim();
-                    if (t) partes.add(t);
-                });
-            });
-            let zonas = [...partes].sort();
+            // datos = array de { nombre, zona, ... }
+            let zonas = [...new Set(datos.map(d => d.zona).filter(z => z && z.trim() !== ""))];
             let wrap = document.getElementById('zonaFiltroWrap');
             let chipsContainer = document.getElementById('zonaChips');
             if (zonas.length === 0) { wrap.style.display = 'none'; return; }
@@ -1503,25 +1505,19 @@
             zonaFiltroActiva = "todas";
             let html = `<span class="zona-chip active" data-zona="todas" onclick="filtrarPorZona('todas')">🌐 Todas</span>`;
             zonas.forEach(z => {
-                // Escapar comillas simples para el onclick
-                let zSafe = z.replace(/'/g, "\'");
-                html += `<span class="zona-chip" data-zona="${z}" onclick="filtrarPorZona('${zSafe}')">${z}</span>`;
+                html += `<span class="zona-chip" data-zona="${z}" onclick="filtrarPorZona('${z}')">${z}</span>`;
             });
             chipsContainer.innerHTML = html;
         }
 
         window.filtrarPorZona = function filtrarPorZona(zona) {
             zonaFiltroActiva = zona;
+            // Actualizar chips activos
             document.querySelectorAll('.zona-chip').forEach(c => {
                 c.classList.toggle('active', c.dataset.zona === zona);
             });
-            // Filtrar por coincidencia parcial: si zona del usuario contiene el chip seleccionado
-            let filtrados = zona === "todas"
-                ? rankingDataGlobal
-                : rankingDataGlobal.filter(r => {
-                    if (!r.zona) return false;
-                    return r.zona.split(',').map(p => p.trim()).includes(zona);
-                });
+            // Re-renderizar lista
+            let filtrados = zona === "todas" ? rankingDataGlobal : rankingDataGlobal.filter(r => r.zona === zona);
             renderizarListaRanking(filtrados);
         }
 
@@ -1603,14 +1599,7 @@
                     } catch(ef) { console.warn("Fallback público:", ef); }
                 }
                 let todosANalizar = [...new Set([...amigos, ...publicosNombres])];
-                if (todosANalizar.length === 0) {
-                    document.getElementById('resultados').style.display = 'block';
-                    document.getElementById('rankingResultados').style.display = 'block';
-                    document.getElementById('detalleIndividual').style.display = 'none';
-                    document.getElementById('listaRanking').innerHTML = '<p style="color:#f0c060;background:#2a2000;padding:10px;border-radius:5px;">Aún no hay usuarios públicos con coincidencias. Guardá tu perfil con lista y activá "Hacer mi perfil visible para todos" ⬆️</p>';
-                    status.innerText = "";
-                    return;
-                }
+                if (todosANalizar.length === 0) { alert("No hay amigos seleccionados ni usuarios con perfil público para analizar. Agregá amigos frecuentes o esperá que alguien active su perfil público."); return; }
 
                 let promesasDescarga = todosANalizar.map(async (amigo) => {
                     let esAmigo = amigos.includes(amigo);
@@ -1654,11 +1643,6 @@
 
                 rankingDataGlobal = res;
                 renderizarChipsZona(res);
-                document.getElementById('resultados').style.display = 'block';
-                document.getElementById('rankingResultados').style.display = 'block';
-                document.getElementById('detalleIndividual').style.display = 'none';
-                document.getElementById('mercadoGlobalResultados').style.display = 'none';
-                document.getElementById('infoPasoRuta').style.display = 'none';
                 renderizarListaRanking(res);
 
                 if (window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
@@ -1824,12 +1808,21 @@
             document.getElementById('statusAmigo').innerText = "";
         }
 
+        function limpiarCamposAmigo() {
+            document.getElementById('amigoRegion').value = '';
+            document.getElementById('amigoZonaDetalle').value = '';
+            document.getElementById('amigoContactoTipo').value = 'telegram';
+            document.getElementById('amigoContactoDato').value = '';
+            document.getElementById('amigoZonaPanel').style.display = 'none';
+        }
+
         function limpiarBuscador() {
             document.getElementById('amigoUsuario').value = '';
             document.getElementById('amigoLista').value = '';
             document.getElementById('statusAmigo').innerText = '';
             document.getElementById('resultados').style.display = 'none';
             document.getElementById('areaCarrito').style.display = 'none';
+            limpiarCamposAmigo();
         }
 
         async function cargarMiPerfil() {
@@ -1862,8 +1855,6 @@
                     actualizarBarraPerfil();
                     s.style.color = "green";
                     s.innerText = "¡Perfil cargado!";
-                    // Auto-ejecutar ranking al cargar perfil
-                    escanearMisCambios();
                 } else {
                     s.style.color = "red";
                     s.innerText = "No se encontró el perfil.";
