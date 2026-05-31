@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ayuda — Match Mundial 2026</title>
+    <title>Ayuda — Match de Figuritas Mundial 2026</title>
+    <meta name="description" content="Guía completa de uso de Match de Figuritas Mundial 2026. Aprendé a cruzar tus listas, encontrar intercambios y conectar con otros coleccionistas.">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,208 +14,610 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
-        .hero { background: linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 50%,#0a0a0a 100%); border-bottom:1px solid var(--border); padding:48px 24px 40px; text-align:center; position:relative; overflow:hidden; }
-        .hero::before { content:'⚽'; position:absolute; font-size:200px; opacity:0.04; top:-30px; left:-20px; transform:rotate(-15deg); pointer-events:none; }
-        .hero::after { content:'⚽'; position:absolute; font-size:160px; opacity:0.04; bottom:-20px; right:-10px; transform:rotate(20deg); pointer-events:none; }
-        .hero-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(36px,8vw,64px); letter-spacing:3px; color:var(--accent); line-height:1; margin-bottom:8px; }
-        .hero-sub { font-size:15px; color:var(--text2); margin-bottom:20px; }
-        .hero-back { display:inline-block; padding:8px 20px; border:1px solid var(--border); border-radius:20px; color:var(--text2); text-decoration:none; font-size:13px; transition:all 0.2s; }
-        .hero-back:hover { border-color:var(--accent); color:var(--accent); }
-        .toc { background:var(--bg2); border-bottom:1px solid var(--border); padding:16px 24px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; position:sticky; top:0; z-index:100; }
+
+        /* HERO */
+        .hero { background: linear-gradient(135deg,#0a0a0a 0%,#0d1f35 50%,#0a0a0a 100%); border-bottom:1px solid var(--border); padding:52px 24px 44px; text-align:center; position:relative; overflow:hidden; }
+        .hero::before { content:'⚽'; position:absolute; font-size:220px; opacity:0.04; top:-40px; left:-30px; transform:rotate(-15deg); pointer-events:none; }
+        .hero::after { content:'🏆'; position:absolute; font-size:160px; opacity:0.04; bottom:-20px; right:-10px; transform:rotate(10deg); pointer-events:none; }
+        .hero-badge { display:inline-block; background:#162436; border:1px solid #2a4a6a; border-radius:20px; padding:4px 14px; font-size:12px; color:var(--accent); font-weight:700; letter-spacing:1px; margin-bottom:14px; }
+        .hero-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(38px,9vw,68px); letter-spacing:3px; color:var(--accent); line-height:1; margin-bottom:10px; }
+        .hero-sub { font-size:16px; color:var(--text2); margin-bottom:24px; max-width:500px; margin-left:auto; margin-right:auto; }
+        .hero-back { display:inline-block; padding:10px 24px; border:1px solid var(--border); border-radius:20px; color:var(--text2); text-decoration:none; font-size:13px; font-weight:700; transition:all 0.2s; }
+        .hero-back:hover { border-color:var(--accent); color:var(--accent); background:#0d1f35; }
+
+        /* NAV */
+        .toc { background:var(--bg2); border-bottom:1px solid var(--border); padding:14px 24px; display:flex; flex-wrap:wrap; gap:7px; justify-content:center; position:sticky; top:0; z-index:100; backdrop-filter:blur(8px); }
         .toc-link { padding:5px 14px; border-radius:20px; font-size:12px; font-weight:700; color:var(--text2); text-decoration:none; border:1px solid var(--border); transition:all 0.2s; white-space:nowrap; }
         .toc-link:hover { background:var(--bg3); color:var(--text); border-color:var(--accent); }
-        .container { max-width:760px; margin:0 auto; padding:40px 20px 80px; }
-        .section { margin-bottom:52px; scroll-margin-top:60px; }
+
+        /* LAYOUT */
+        .container { max-width:780px; margin:0 auto; padding:44px 20px 90px; }
+        .section { margin-bottom:56px; scroll-margin-top:64px; }
         .section-header { display:flex; align-items:center; gap:14px; margin-bottom:24px; padding-bottom:12px; border-bottom:2px solid var(--border); }
         .section-num { font-family:'Bebas Neue',sans-serif; font-size:32px; color:var(--accent); line-height:1; min-width:36px; }
         .section-title { font-size:20px; font-weight:700; color:var(--text); }
         .section-emoji { font-size:22px; }
-        .steps { display:flex; flex-direction:column; gap:16px; }
+
+        /* STEPS */
+        .steps { display:flex; flex-direction:column; gap:14px; }
         .step { display:flex; gap:16px; align-items:flex-start; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:16px 18px; transition:border-color 0.2s; }
         .step:hover { border-color:var(--accent); }
         .step-icon { font-size:22px; min-width:36px; text-align:center; padding-top:2px; }
         .step-body { flex:1; }
-        .step-title { font-weight:700; font-size:15px; color:var(--text); margin-bottom:4px; }
-        .step-desc { font-size:14px; color:var(--text2); line-height:1.5; }
+        .step-title { font-weight:700; font-size:15px; color:var(--text); margin-bottom:5px; }
+        .step-desc { font-size:14px; color:var(--text2); line-height:1.6; }
         .step-desc b { color:var(--text); font-weight:600; }
         .step-desc code { background:var(--bg3); border:1px solid var(--border); border-radius:4px; padding:1px 6px; font-size:12px; color:var(--accent); font-family:monospace; }
         .step-num { font-family:'Bebas Neue',sans-serif; font-size:18px; background:var(--accent); color:white; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
-        .tip { background:#1a2e1a; border:1px solid #2d5a2d; border-left:3px solid var(--green); border-radius:8px; padding:12px 16px; font-size:13px; color:#a8e6a8; margin-top:12px; }
+
+        /* ALERTS */
+        .tip { background:#1a2e1a; border:1px solid #2d5a2d; border-left:3px solid var(--green); border-radius:8px; padding:12px 16px; font-size:13px; color:#a8e6a8; margin-top:14px; }
         .tip strong { color:var(--green); }
-        .warn { background:#2a2010; border:1px solid #4a3a10; border-left:3px solid var(--yellow); border-radius:8px; padding:12px 16px; font-size:13px; color:#f0d080; margin-top:12px; }
+        .warn { background:#2a2010; border:1px solid #4a3a10; border-left:3px solid var(--yellow); border-radius:8px; padding:12px 16px; font-size:13px; color:#f0d080; margin-top:14px; }
         .warn strong { color:var(--yellow); }
-        .cat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; margin-top:8px; }
-        .cat-item { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:12px 14px; display:flex; align-items:center; gap:10px; }
-        .cat-emoji { font-size:22px; }
-        .cat-info { font-size:13px; }
-        .cat-name { font-weight:700; color:var(--text); }
+        .new-badge { display:inline-block; background:#1a2e1a; border:1px solid var(--green); border-radius:10px; padding:1px 8px; font-size:10px; color:var(--green); font-weight:700; letter-spacing:1px; margin-left:8px; vertical-align:middle; }
+
+        /* GRIDS */
+        .cat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; margin-top:10px; }
+        .cat-item { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:12px 14px; display:flex; align-items:center; gap:10px; transition:border-color 0.2s; }
+        .cat-item:hover { border-color:var(--accent); }
+        .cat-emoji { font-size:24px; }
+        .cat-name { font-weight:700; color:var(--text); font-size:14px; }
         .cat-desc { color:var(--text2); font-size:12px; }
-        .contact-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; margin-top:8px; }
-        .contact-item { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:12px 14px; font-size:13px; }
-        .contact-name { font-weight:700; color:var(--text); margin-bottom:4px; }
-        .contact-desc { color:var(--text2); font-size:12px; }
-        .contact-example { color:var(--accent); font-size:11px; margin-top:4px; font-family:monospace; }
-        .faq-item { background:var(--bg2); border:1px solid var(--border); border-radius:10px; margin-bottom:10px; overflow:hidden; }
-        .faq-q { padding:14px 18px; font-weight:700; font-size:14px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; user-select:none; transition:background 0.2s; }
+
+        .contact-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; margin-top:10px; }
+        .contact-item { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:14px; font-size:13px; transition:border-color 0.2s; }
+        .contact-item:hover { border-color:var(--accent); }
+        .contact-name { font-weight:700; color:var(--text); margin-bottom:5px; font-size:14px; }
+        .contact-desc { color:var(--text2); font-size:13px; line-height:1.5; }
+        .contact-example { color:var(--green); font-size:11px; margin-top:6px; font-weight:700; }
+
+        /* FAQ */
+        .faq-item { background:var(--bg2); border:1px solid var(--border); border-radius:10px; margin-bottom:10px; overflow:hidden; transition:border-color 0.2s; }
+        .faq-item:hover { border-color:var(--border); }
+        .faq-q { padding:14px 18px; font-weight:700; font-size:14px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; user-select:none; transition:background 0.2s; gap:12px; }
         .faq-q:hover { background:var(--bg3); }
-        .faq-q::after { content:'﹢'; font-size:18px; color:var(--accent); }
+        .faq-q::after { content:'﹢'; font-size:20px; color:var(--accent); flex-shrink:0; }
         .faq-q.open::after { content:'﹣'; }
-        .faq-a { display:none; padding:0 18px 14px; font-size:13px; color:var(--text2); line-height:1.6; }
+        .faq-a { display:none; padding:0 18px 16px; font-size:13px; color:var(--text2); line-height:1.7; }
         .faq-a.open { display:block; }
-        .progress-demo { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:16px; margin-top:8px; }
-        .pdemo-bar { height:12px; border-radius:6px; overflow:hidden; display:flex; background:var(--bg3); margin:8px 0; }
+        .faq-a code { background:var(--bg3); border:1px solid var(--border); border-radius:4px; padding:1px 6px; font-size:12px; color:var(--accent); font-family:monospace; }
+
+        /* PROGRESS DEMO */
+        .progress-demo { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:18px; margin-top:10px; }
+        .pdemo-bar { height:14px; border-radius:7px; overflow:hidden; display:flex; background:var(--bg3); margin:10px 0 12px; }
         .pdemo-green { background:var(--green); width:52%; }
         .pdemo-red { background:var(--red); width:29%; opacity:0.85; }
         .pdemo-yellow { background:var(--yellow); width:8%; opacity:0.9; }
-        .pdemo-stats { display:flex; gap:16px; font-size:12px; flex-wrap:wrap; }
-        .pdemo-stat { display:flex; align-items:center; gap:5px; color:var(--text2); }
-        .pdemo-dot { width:8px; height:8px; border-radius:50%; }
-        .page-footer { text-align:center; padding:32px 20px; border-top:1px solid var(--border); color:var(--text2); font-size:13px; }
+        .pdemo-stats { display:flex; gap:20px; font-size:13px; flex-wrap:wrap; }
+        .pdemo-stat { display:flex; align-items:center; gap:6px; color:var(--text2); }
+        .pdemo-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+
+        /* PUBLIC PROFILE HIGHLIGHT */
+        .highlight-box { background:linear-gradient(135deg,#0d2218,#0a1f35); border:1px solid #2d5a2d; border-radius:12px; padding:20px 22px; margin-top:14px; }
+        .highlight-box h4 { color:var(--green); font-size:15px; margin-bottom:10px; }
+        .highlight-box p { font-size:13px; color:var(--text2); line-height:1.7; }
+        .highlight-box ul { font-size:13px; color:var(--text2); margin:10px 0 0 18px; line-height:1.9; }
+        .highlight-box li b { color:var(--text); }
+
+        /* ZONA CHIPS DEMO */
+        .chips-demo { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 4px; }
+        .chip-ex { padding:4px 14px; border-radius:20px; font-size:12px; font-weight:700; border:1px solid var(--border); background:var(--bg3); color:var(--text2); }
+        .chip-ex.active { background:var(--accent); color:white; border-color:var(--accent); }
+
+        /* FOOTER */
+        .page-footer { text-align:center; padding:36px 20px; border-top:1px solid var(--border); color:var(--text2); font-size:13px; line-height:2; }
         .page-footer a { color:var(--accent); text-decoration:none; }
-        @media(max-width:600px) { .toc { padding:12px 16px; } .container { padding:28px 16px 60px; } }
+        .page-footer a:hover { text-decoration:underline; }
+
+        @media(max-width:600px) {
+            .toc { padding:10px 14px; gap:6px; }
+            .toc-link { font-size:11px; padding:4px 10px; }
+            .container { padding:28px 16px 60px; }
+            .cat-grid { grid-template-columns:1fr 1fr; }
+            .contact-grid { grid-template-columns:1fr; }
+        }
     </style>
 </head>
 <body>
+
 <div class="hero">
-    <div class="hero-title">❓ Guía de Uso</div>
-    <p class="hero-sub">Match de Figuritas — Mundial 2026</p>
+    <div class="hero-badge">⚽ MUNDIAL 2026</div>
+    <div class="hero-title">Guía de Uso</div>
+    <p class="hero-sub">Todo lo que necesitás saber para encontrar el intercambio perfecto</p>
     <a href="index.html" class="hero-back">← Volver a la app</a>
 </div>
+
 <nav class="toc">
     <a href="#s1" class="toc-link">⚽ ¿Qué es?</a>
     <a href="#s2" class="toc-link">👤 Mi Perfil</a>
-    <a href="#s3" class="toc-link">🆚 Comparar</a>
-    <a href="#s4" class="toc-link">🎮 Simulador</a>
-    <a href="#s5" class="toc-link">📲 Contactar</a>
-    <a href="#s6" class="toc-link">🏆 Herramientas</a>
-    <a href="#s7" class="toc-link">📊 Progreso</a>
-    <a href="#s8" class="toc-link">🔑 Categorías</a>
-    <a href="#s9" class="toc-link">❓ FAQ</a>
+    <a href="#s3" class="toc-link">🌐 Perfil Público</a>
+    <a href="#s4" class="toc-link">🆚 Comparar</a>
+    <a href="#s5" class="toc-link">🎮 Simulador</a>
+    <a href="#s6" class="toc-link">📲 Contactar</a>
+    <a href="#s7" class="toc-link">🏆 Herramientas</a>
+    <a href="#s8" class="toc-link">📊 Progreso</a>
+    <a href="#s9" class="toc-link">🔑 Categorías</a>
+    <a href="#s10" class="toc-link">❓ FAQ</a>
 </nav>
+
 <div class="container">
 
+<!-- S1: QUÉ ES -->
 <section class="section" id="s1">
-    <div class="section-header"><span class="section-num">01</span><span class="section-emoji">⚽</span><span class="section-title">¿Qué es esta app?</span></div>
+    <div class="section-header">
+        <span class="section-num">01</span>
+        <span class="section-emoji">⚽</span>
+        <span class="section-title">¿Qué es esta app?</span>
+    </div>
     <div class="steps">
-        <div class="step"><div class="step-icon">🎯</div><div class="step-body"><div class="step-title">Para qué sirve</div><div class="step-desc">Es un complemento de <b>Figuritas App</b> que cruza tu lista de repetidas con la de tus amigos y encuentra el mejor intercambio posible — automáticamente, en segundos.</div></div></div>
-        <div class="step"><div class="step-icon">☁️</div><div class="step-body"><div class="step-title">Cómo funciona</div><div class="step-desc">Cada usuario carga su lista en la nube. Al cruzarte con un amigo, la app calcula la intersección: <b>qué te da él y qué le das vos</b>, ordenado por categoría para el intercambio más justo.</div></div></div>
-        <div class="step"><div class="step-icon">📱</div><div class="step-body"><div class="step-title">Funciona en el celu</div><div class="step-desc">Diseñada para Android. Sin instalación — abrila desde el navegador. Podés agregarla a la pantalla de inicio con el botón <code>📱 Instalar Android</code>.</div></div></div>
+        <div class="step">
+            <div class="step-icon">🎯</div>
+            <div class="step-body">
+                <div class="step-title">Para qué sirve</div>
+                <div class="step-desc">Es un complemento gratuito de <b>Figuritas App</b> que cruza tu lista de repetidas con la de tus amigos — o con cualquier coleccionista público — y encuentra el mejor intercambio posible en segundos, automáticamente.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">☁️</div>
+            <div class="step-body">
+                <div class="step-title">Cómo funciona</div>
+                <div class="step-desc">Cada usuario carga su lista en la nube. La app calcula la intersección matemática: <b>qué te da él y qué le das vos</b>, agrupado por categoría (especiales, escudos, equipos, jugadores) para el intercambio más justo posible.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">🌐</div>
+            <div class="step-body">
+                <div class="step-title">Red de coleccionistas <span class="new-badge">NUEVO</span></div>
+                <div class="step-desc">Activando tu <b>perfil público</b>, aparecés en el ranking de todos los usuarios. Si alguien tiene figuritas que te faltan (y vos tenés las que a él le faltan), se encuentran solos — aunque no se conozcan.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">📱</div>
+            <div class="step-body">
+                <div class="step-title">Sin instalación, funciona en el celu</div>
+                <div class="step-desc">Diseñada para Android y escritorio. Abrila desde el navegador. Podés agregarla a la pantalla de inicio con el botón <code>📱 Instalar Android</code> para tenerla como app nativa.</div>
+            </div>
+        </div>
     </div>
 </section>
 
+<!-- S2: MI PERFIL -->
 <section class="section" id="s2">
-    <div class="section-header"><span class="section-num">02</span><span class="section-emoji">👤</span><span class="section-title">Configurar Mi Perfil</span></div>
-    <div class="steps">
-        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Elegí tu nombre de usuario</div><div class="step-desc">Escribí un nombre único en el campo <b>Usuario</b> (ej: <code>Luis_BARRACAS</code>). Es tu identificador en la nube — elegilo bien, es difícil cambiarlo después sin perder tus datos.</div></div></div>
-        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Completá Zona y Contacto</div><div class="step-desc"><b>Zona</b>: tu barrio o zona (ej: <code>Barracas, CABA</code>). Aparece junto a tu nombre para que otros sepan si están cerca.<br><br><b>Contacto preferido</b>: elegí la red y escribí tu dato. Permite que te contacten directo desde la app al hacer un match.</div></div></div>
-        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Exportá tu lista desde Figuritas App</div><div class="step-desc">Abrí <b>Figuritas App</b> → tocá el botón de compartir → copiá el texto completo. Ese texto incluye tus faltantes y repetidas en el formato correcto.</div></div></div>
-        <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Pegá la lista y guardá</div><div class="step-desc">Pegá el texto en el campo <b>Tus Figuritas</b> y tocá <code>☁️ Guardar en la Nube</code>. La barra de progreso de tu álbum se actualiza al instante.</div></div></div>
-        <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Agregá amigos frecuentes</div><div class="step-desc">Escribí los nombres de usuario de tus amigos en <b>Amigos Frecuentes</b>, separados por comas (ej: <code>Larry, Pilar, Guada</code>). Aparecerán como botones para comparar rápido.</div></div></div>
+    <div class="section-header">
+        <span class="section-num">02</span>
+        <span class="section-emoji">👤</span>
+        <span class="section-title">Configurar Mi Perfil</span>
     </div>
-    <div class="tip"><strong>💡 Tip:</strong> Actualizá tu lista cada vez que pegués o intercambiés figuritas para mantener los datos precisos.</div>
+    <div class="steps">
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <div class="step-title">Elegí tu nombre de usuario</div>
+                <div class="step-desc">Escribí un nombre único en el campo <b>Usuario</b> (ej: <code>Luis_BARRACAS</code>). Es tu identificador en la nube — elegilo bien, no lo cambies después o perdés tus datos guardados.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <div class="step-title">Completá Zona y Contacto</div>
+                <div class="step-desc">
+                    <b>Región:</b> elegí tu zona grande (CABA, GBA Norte, GBA Sur, etc.).<br><br>
+                    <b>Barrio / Ciudad:</b> podés poner varios separados por coma (ej: <code>Barracas, San Telmo</code>) si frecuentás varias zonas. Cada barrio aparece como chip de filtro en el ranking de otros usuarios.<br><br>
+                    <b>Contacto preferido:</b> elegí la red (WhatsApp, Telegram, Instagram, etc.) y escribí tu dato. Permite que te contacten directo desde la app.
+                </div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <div class="step-title">Exportá tu lista desde Figuritas App</div>
+                <div class="step-desc">Abrí <b>Figuritas App</b> → tocá el botón de compartir → copiá el texto completo. Ese texto incluye tus faltantes y repetidas en el formato correcto que la app entiende automáticamente.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+                <div class="step-title">Pegá la lista y guardá en la nube</div>
+                <div class="step-desc">Pegá el texto en el campo <b>Tus Figuritas</b> y tocá <code>☁️ Guardar en la Nube</code>. La barra de progreso del álbum se actualiza al instante y tus datos quedan disponibles para cualquier dispositivo.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+                <div class="step-title">Agregá amigos frecuentes</div>
+                <div class="step-desc">Escribí los nombres de usuario de tus amigos en <b>Amigos Frecuentes</b>, separados por comas (ej: <code>Larry, Pilar, Guada</code>). Aparecerán como botones para comparar rápido. También podés agregarlos desde el simulador con el botón <code>➕ Agregar a Frecuentes</code>.</div>
+            </div>
+        </div>
+    </div>
+    <div class="tip"><strong>💡 Tip:</strong> Actualizá tu lista cada vez que pegués o intercambiés figuritas. Tener la lista al día hace que los intercambios calculados sean precisos y que otros usuarios te encuentren mejor en el ranking.</div>
 </section>
 
+<!-- S3: PERFIL PÚBLICO -->
 <section class="section" id="s3">
-    <div class="section-header"><span class="section-num">03</span><span class="section-emoji">🆚</span><span class="section-title">Comparar con un amigo</span></div>
-    <div class="steps">
-        <div class="step"><div class="step-icon">🔘</div><div class="step-body"><div class="step-title">Desde los botones de amigos frecuentes</div><div class="step-desc">Tocá el botón <code>🆚 Nombre (Zona)</code> del amigo. La app busca su lista en la nube y calcula el match automáticamente.</div></div></div>
-        <div class="step"><div class="step-icon">✏️</div><div class="step-body"><div class="step-title">Buscar a alguien nuevo</div><div class="step-desc">En <b>Intercambio y Estrategia</b>, escribí el nombre de usuario en <b>Nombre a buscar</b> y tocá <code>🔍 Buscar</code>. Si existe en la nube, trae su lista automáticamente.</div></div></div>
-        <div class="step"><div class="step-icon">📋</div><div class="step-body"><div class="step-title">Pegar lista manualmente</div><div class="step-desc">Si el amigo te manda su lista por WhatsApp, pegala en el campo <b>Pegar su lista</b> y tocá <code>🔄 Comparar</code>. No necesita tener cuenta.</div></div></div>
-        <div class="step"><div class="step-icon">💾</div><div class="step-body"><div class="step-title">Guardar amigo</div><div class="step-desc">Después de buscar o comparar, guardá al amigo con el botón <code>💾 Guardar Amigo</code> para tenerlo en tu lista de frecuentes.</div></div></div>
+    <div class="section-header">
+        <span class="section-num">03</span>
+        <span class="section-emoji">🌐</span>
+        <span class="section-title">Perfil Público <span class="new-badge">NUEVO</span></span>
     </div>
+    <div class="steps">
+        <div class="step">
+            <div class="step-icon">🌐</div>
+            <div class="step-body">
+                <div class="step-title">¿Qué es el Perfil Público?</div>
+                <div class="step-desc">Al activarlo, tu usuario aparece en el <b>Ranking de Seleccionados de cualquier otro coleccionista</b> que use la app — aunque no te tenga como amigo frecuente. Si hay coincidencias, te van a ver automáticamente.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">✅</div>
+            <div class="step-body">
+                <div class="step-title">Cómo activarlo</div>
+                <div class="step-desc">En <b>Mi Perfil</b>, tildá el checkbox verde <code>🌐 Hacer mi perfil visible para todos</code> y tocá <code>☁️ Guardar en la Nube</code>. Listo — aparecés en la red.</div>
+            </div>
+        </div>
+    </div>
+    <div class="highlight-box">
+        <h4>🌐 ¿Qué ven los demás de tu perfil?</h4>
+        <ul>
+            <li><b>Nombre de usuario</b> — para encontrarte</li>
+            <li><b>Zona y región</b> — para filtrar por cercanía</li>
+            <li><b>Forma de contacto</b> — para escribirte directo</li>
+            <li><b>Stats del álbum</b> — cuántas tenés, cuántas faltan, cuántas repetidas</li>
+        </ul>
+        <p style="margin-top:12px;">Tu lista completa de figuritas <b>no se comparte</b> en el directorio — solo los números totales. La lista detallada solo se usa cuando alguien hace match activo con vos.</p>
+    </div>
+    <div class="tip"><strong>💡 Tip:</strong> Si activás el perfil público y completás tu zona, aparecerás en los chips de filtro del ranking de otros coleccionistas de tu barrio. Más fácil que te encuentren para intercambiar en persona.</div>
 </section>
 
+<!-- S4: COMPARAR -->
 <section class="section" id="s4">
-    <div class="section-header"><span class="section-num">04</span><span class="section-emoji">🎮</span><span class="section-title">El Simulador de Intercambio</span></div>
-    <p style="font-size:14px;color:var(--text2);margin-bottom:16px;">Al comparar con un amigo, se abre el simulador — la pantalla principal de la app.</p>
-    <div class="steps">
-        <div class="step"><div class="step-icon">⚖️</div><div class="step-body"><div class="step-title">Selección automática pareada</div><div class="step-desc">Al abrirse, el simulador ya selecciona el <b>intercambio más equilibrado posible</b>: especial × especial, escudo × escudo, equipo × equipo, CC × CC, jugador × jugador. Si hay desbalance, toma el mínimo de cada categoría.</div></div></div>
-        <div class="step"><div class="step-icon">✅</div><div class="step-body"><div class="step-title">Panel izquierdo — Vos Recibís</div><div class="step-desc">Figuritas del amigo que a vos te sirven. Los botones <b>verdes</b> = seleccionados. Tocá para tildar/destildar. <b>Todas / Ninguna</b> para selección masiva.</div></div></div>
-        <div class="step"><div class="step-icon">🎁</div><div class="step-body"><div class="step-title">Panel derecho — Vos Entregás</div><div class="step-desc">Tus repetidas que le sirven al amigo. Los badges rojos muestran el número de figurita. Si tenés varias copias aparece el indicador <code>×2</code> o <code>×3</code> — así sabés cuál te conviene más dar.</div></div></div>
-        <div class="step"><div class="step-icon">📋</div><div class="step-body"><div class="step-title">Copiar Oferta</div><div class="step-desc">Genera un mensaje con <b>solo las figuritas seleccionadas</b>, con desglose por categorías y tu link de búsqueda. Listo para pegar en cualquier chat.</div></div></div>
-        <div class="step"><div class="step-icon">🛒</div><div class="step-body"><div class="step-title">Guardar Cambio</div><div class="step-desc">Simula cómo quedaría tu álbum <b>después</b> del intercambio. Genera una lista proyectada para revisar y aplicar cuando el cambio se concrete.</div></div></div>
+    <div class="section-header">
+        <span class="section-num">04</span>
+        <span class="section-emoji">🆚</span>
+        <span class="section-title">Comparar con un coleccionista</span>
     </div>
-    <div class="warn"><strong>⚠️ Importante:</strong> "Guardar Cambio" no modifica tu lista real — primero muestra la proyección para que la revises y la confirmes.</div>
+    <div class="steps">
+        <div class="step">
+            <div class="step-icon">🏆</div>
+            <div class="step-body">
+                <div class="step-title">Ranking automático <span class="new-badge">NUEVO</span></div>
+                <div class="step-desc">Al cargar tu perfil, el <b>Ranking de Seleccionados se ejecuta automáticamente</b> — muestra todos los amigos frecuentes más todos los perfiles públicos con coincidencias, ordenados por cantidad de intercambios posibles mano a mano. No necesitás apretar ningún botón.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">🔘</div>
+            <div class="step-body">
+                <div class="step-title">Desde los botones de amigos frecuentes</div>
+                <div class="step-desc">Tocá el botón <code>🆚 Nombre (Zona)</code>. La app busca su lista en la nube y abre el simulador directamente. El botón muestra cuántas figuritas podés intercambiar con esa persona.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">🔍</div>
+            <div class="step-body">
+                <div class="step-title">Buscar a alguien por nombre</div>
+                <div class="step-desc">Escribí el nombre en <b>Nombre a buscar</b> — el campo sugiere automáticamente nombres de tus frecuentes y de usuarios públicos a medida que escribís. Tocá <code>🔍 Buscar</code> para traer su lista de la nube.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">📋</div>
+            <div class="step-body">
+                <div class="step-title">Pegar lista manualmente</div>
+                <div class="step-desc">Si el amigo te manda su lista por WhatsApp, pegala en el campo <b>Pegar su lista</b> y tocá <code>🔄 Comparar</code>. No necesita tener cuenta en la app.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">📍</div>
+            <div class="step-body">
+                <div class="step-title">Zona y contacto del amigo <span class="new-badge">NUEVO</span></div>
+                <div class="step-desc">Al escribir un nombre en el buscador, aparece un panel para cargar la <b>zona y contacto del amigo</b> (opcional). Si guardás al amigo, esos datos quedan asociados a su perfil en la nube.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">➕</div>
+            <div class="step-body">
+                <div class="step-title">Agregar a Frecuentes desde el simulador <span class="new-badge">NUEVO</span></div>
+                <div class="step-desc">Si comparás con alguien que no está en tu lista de frecuentes (por ejemplo, un usuario público del ranking), aparece el botón <code>➕ Agregar a Frecuentes</code> en la barra del simulador. Con un toque lo agregás y se guarda automáticamente.</div>
+            </div>
+        </div>
+    </div>
 </section>
 
+<!-- S5: SIMULADOR -->
 <section class="section" id="s5">
-    <div class="section-header"><span class="section-num">05</span><span class="section-emoji">📲</span><span class="section-title">Botón Contactar</span></div>
-    <p style="font-size:14px;color:var(--text2);margin-bottom:16px;">Funciona distinto según la red que tenga cargada el amigo en su perfil.</p>
-    <div class="contact-grid">
-        <div class="contact-item"><div class="contact-name">📱 WhatsApp</div><div class="contact-desc">Abre WhatsApp con el mensaje ya escrito. Solo tocá Enviar.</div><div class="contact-example">✅ Un solo toque</div></div>
-        <div class="contact-item"><div class="contact-name">✉️ Mail</div><div class="contact-desc">Abre el cliente de correo con asunto y cuerpo pre-completados.</div><div class="contact-example">✅ Un solo toque</div></div>
-        <div class="contact-item"><div class="contact-name">✈️ Telegram</div><div class="contact-desc">Copia el mensaje y abre el perfil del amigo. Pegá en el chat y enviá.</div><div class="contact-example">📋 Copiar → Abrir → Pegar</div></div>
-        <div class="contact-item"><div class="contact-name">📸 Instagram</div><div class="contact-desc">Copia el mensaje y abre el perfil. Pegá en el DM.</div><div class="contact-example">📋 Copiar → Abrir → Pegar</div></div>
-        <div class="contact-item"><div class="contact-name">👤 Facebook</div><div class="contact-desc">Copia el mensaje y abre el perfil. Pegá en Messenger.</div><div class="contact-example">📋 Copiar → Abrir → Pegar</div></div>
+    <div class="section-header">
+        <span class="section-num">05</span>
+        <span class="section-emoji">🎮</span>
+        <span class="section-title">El Simulador de Intercambio</span>
     </div>
-    <div class="tip"><strong>💡 Tip para Telegram/IG/FB:</strong> Cuando aparezca el aviso "📋 ¡Mensaje copiado!", el texto ya está en tu portapapeles. En la app, entrá al chat del amigo y mantené presionado para pegar.</div>
-</section>
-
-<section class="section" id="s6">
-    <div class="section-header"><span class="section-num">06</span><span class="section-emoji">🏆</span><span class="section-title">Herramientas Grupales</span></div>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:18px;">Al comparar con cualquier coleccionista, se abre el simulador — la pantalla principal de la app.</p>
     <div class="steps">
-        <div class="step"><div class="step-icon">⚡</div><div class="step-body"><div class="step-title">Ranking de Seleccionados</div><div class="step-desc">Tocá <code>⚡ Ranking</code> para ver todos tus amigos ordenados por cantidad de intercambios posibles mano a mano. El mejor candidato aparece primero.<br><br>Filtrá por <b>zona</b> con los chips que aparecen arriba del ranking — se generan automáticamente según las zonas cargadas por tus amigos.</div></div></div>
-        <div class="step"><div class="step-icon">🌐</div><div class="step-body"><div class="step-title">Cruces entre amigos</div><div class="step-desc">Tocá <code>🌐 Cruces</code> para ver qué intercambios existen <b>entre tus amigos</b> (no con vos). Útil para organizar cambios en grupo: "Larry le puede dar a Pilar exactamente lo que a ella le falta".</div></div></div>
-        <div class="step"><div class="step-icon">🗺️</div><div class="step-body"><div class="step-title">Completar el Álbum</div><div class="step-desc">Calcula la <b>ruta óptima</b> de intercambios entre todos tus amigos para conseguir la mayor cantidad de figuritas faltantes. Te guía paso a paso: con quién cambiar primero, segundo, etc.</div></div></div>
-        <div class="step"><div class="step-icon">🔗</div><div class="step-body"><div class="step-title">Links para compartir</div><div class="step-desc"><b>Link Público</b>: compartilo en grupos de figuritas para que otros puedan cruzar contigo sin conocer tu usuario.<br><br><b>Link Privado</b>: carga tu perfil directamente. Útil para abrir la app en otro dispositivo con tus datos ya cargados.</div></div></div>
+        <div class="step">
+            <div class="step-icon">⚖️</div>
+            <div class="step-body">
+                <div class="step-title">Selección automática pareada</div>
+                <div class="step-desc">Al abrirse, el simulador ya calcula el <b>intercambio más equilibrado posible</b>: primero especial × especial, luego escudo × escudo, equipo × equipo, Coca Cola × CC, y finalmente jugador × jugador. Si hay desbalance, toma el mínimo de cada categoría.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">✅</div>
+            <div class="step-body">
+                <div class="step-title">Panel izquierdo — Vos Recibís</div>
+                <div class="step-desc">Figuritas del amigo que a vos te sirven. Los botones <b>verdes</b> = seleccionados. Tocá para tildar/destildar individualmente. Los botones <b>Todas / Ninguna</b> hacen selección masiva. El contador del panel se actualiza en tiempo real.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">🎁</div>
+            <div class="step-body">
+                <div class="step-title">Panel derecho — Vos Entregás</div>
+                <div class="step-desc">Tus repetidas que le sirven al amigo. Los badges rojos muestran el número de figurita. Si tenés varias copias aparece el indicador <code>×2</code> o <code>×3</code> — así sabés cuál te conviene dar si hay opciones repetidas.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">📋</div>
+            <div class="step-body">
+                <div class="step-title">Copiar Oferta</div>
+                <div class="step-desc">Genera un mensaje con <b>solo las figuritas que seleccionaste</b> — con desglose por categorías (🌟🛡️👥🥤🏃), tu link de búsqueda y los datos de contacto. Listo para pegar en cualquier chat.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">📲</div>
+            <div class="step-body">
+                <div class="step-title">Contactar</div>
+                <div class="step-desc">Abre directamente la app de contacto del amigo (WhatsApp con mensaje pre-cargado, o Telegram/IG/FB con el mensaje ya copiado al portapapeles). Ver sección <a href="#s6" style="color:var(--accent);">Botón Contactar</a> para más detalle.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">🛒</div>
+            <div class="step-body">
+                <div class="step-title">Guardar Cambio</div>
+                <div class="step-desc">Simula cómo quedaría tu álbum <b>después</b> del intercambio. Genera una lista proyectada que podés revisar y aplicar a tu perfil cuando el cambio se concrete.</div>
+            </div>
+        </div>
+    </div>
+    <div class="warn"><strong>⚠️ Importante:</strong> "Guardar Cambio" no modifica tu lista real — primero muestra la proyección para que la revises y la confirmes manualmente.</div>
+</section>
+
+<!-- S6: CONTACTAR -->
+<section class="section" id="s6">
+    <div class="section-header">
+        <span class="section-num">06</span>
+        <span class="section-emoji">📲</span>
+        <span class="section-title">Botón Contactar</span>
+    </div>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:16px;">Funciona distinto según la red que tenga cargada el amigo en su perfil. Un solo toque.</p>
+    <div class="contact-grid">
+        <div class="contact-item">
+            <div class="contact-name">📱 WhatsApp</div>
+            <div class="contact-desc">Abre WhatsApp con el mensaje de oferta ya escrito. Solo tocá Enviar.</div>
+            <div class="contact-example">✅ Un solo toque — mensaje pre-cargado</div>
+        </div>
+        <div class="contact-item">
+            <div class="contact-name">✉️ Mail</div>
+            <div class="contact-desc">Abre el cliente de correo con asunto y cuerpo pre-completados.</div>
+            <div class="contact-example">✅ Un solo toque — mensaje pre-cargado</div>
+        </div>
+        <div class="contact-item">
+            <div class="contact-name">✈️ Telegram</div>
+            <div class="contact-desc">Copia el mensaje automáticamente y abre el perfil del amigo. Pegá y enviá.</div>
+            <div class="contact-example">📋 Mensaje copiado → abre Telegram → pegá</div>
+        </div>
+        <div class="contact-item">
+            <div class="contact-name">📸 Instagram</div>
+            <div class="contact-desc">Copia el mensaje y abre el perfil del amigo en Instagram. Pegá en el DM.</div>
+            <div class="contact-example">📋 Mensaje copiado → abre IG → pegá</div>
+        </div>
+        <div class="contact-item">
+            <div class="contact-name">👤 Facebook</div>
+            <div class="contact-desc">Copia el mensaje y abre el perfil del amigo en Facebook. Pegá en Messenger.</div>
+            <div class="contact-example">📋 Mensaje copiado → abre FB → pegá</div>
+        </div>
+    </div>
+    <div class="tip"><strong>💡 Para Telegram / IG / FB:</strong> Cuando aparece el aviso <b>"📋 ¡Mensaje copiado!"</b>, el texto ya está en tu portapapeles. En la app del amigo, entrá al chat, mantené presionado el campo de texto y tocá Pegar.</div>
+</section>
+
+<!-- S7: HERRAMIENTAS -->
+<section class="section" id="s7">
+    <div class="section-header">
+        <span class="section-num">07</span>
+        <span class="section-emoji">🏆</span>
+        <span class="section-title">Herramientas Grupales</span>
+    </div>
+    <div class="steps">
+        <div class="step">
+            <div class="step-icon">⚡</div>
+            <div class="step-body">
+                <div class="step-title">Ranking de Seleccionados <span class="new-badge">AUTO</span></div>
+                <div class="step-desc">
+                    Se ejecuta automáticamente al cargar tu perfil. Muestra todos tus amigos frecuentes <b>más todos los usuarios públicos</b>, ordenados por intercambios posibles mano a mano.<br><br>
+                    Los <b>amigos frecuentes</b> aparecen con borde azul y badge <code>👤 Amigo</code>. Los <b>usuarios públicos</b> con borde amarillo y badge <code>🌐 Público</code>.<br><br>
+                    <b>Filtro por zona:</b> si tus amigos o usuarios públicos tienen zona cargada, aparecen chips de filtro arriba del ranking. Si alguien cargó <code>Belgrano, Villa Urquiza</code>, genera <b>dos chips separados</b> — uno por cada barrio. Tocá uno para filtrar.
+                </div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">🌐</div>
+            <div class="step-body">
+                <div class="step-title">Cruces entre Seleccionados</div>
+                <div class="step-desc">Calculá qué intercambios existen <b>entre tus amigos</b> (sin que vos estés en el medio). Útil para organizar en grupo: "Larry le puede dar a Pilar exactamente lo que a ella le falta".</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">🗺️</div>
+            <div class="step-body">
+                <div class="step-title">Completar el Álbum</div>
+                <div class="step-desc">Calcula la <b>ruta óptima</b> de intercambios entre todos tus amigos para conseguir la mayor cantidad de figuritas faltantes. Te guía paso a paso: con quién cambiar primero, segundo, etc. Ideal para juntas de figuritas en grupo.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">🔗</div>
+            <div class="step-body">
+                <div class="step-title">Links para compartir</div>
+                <div class="step-desc">
+                    <b>Link Público:</b> compartilo en grupos de figuritas. Quien lo abre puede cruzar su lista con la tuya sin conocer tu usuario.<br><br>
+                    <b>Link Privado:</b> carga tu perfil completo directamente. Usalo para abrir la app en otro dispositivo con tus datos ya cargados. <b>No lo compartas públicamente.</b>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top:18px;">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">Ejemplo de cómo se ven los chips de zona en el ranking:</p>
+        <div class="chips-demo">
+            <span class="chip-ex active">🌐 Todas</span>
+            <span class="chip-ex">Belgrano</span>
+            <span class="chip-ex">Villa Urquiza</span>
+            <span class="chip-ex">Barracas</span>
+            <span class="chip-ex">Lanús</span>
+            <span class="chip-ex">Microcentro</span>
+            <span class="chip-ex">Norte</span>
+        </div>
+        <p style="font-size:12px;color:var(--text2);margin-top:6px;">Si un usuario cargó "Belgrano, Villa Urquiza" como zona, genera dos chips separados.</p>
     </div>
 </section>
 
-<section class="section" id="s7">
-    <div class="section-header"><span class="section-num">07</span><span class="section-emoji">📊</span><span class="section-title">Barra de Progreso del Álbum</span></div>
-    <p style="font-size:14px;color:var(--text2);margin-bottom:16px;">Visible en tu perfil (grande) y en cada panel del simulador (mini). Álbum total: 980 figuritas.</p>
+<!-- S8: PROGRESO -->
+<section class="section" id="s8">
+    <div class="section-header">
+        <span class="section-num">08</span>
+        <span class="section-emoji">📊</span>
+        <span class="section-title">Barra de Progreso del Álbum</span>
+    </div>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:16px;">Visible en tu perfil (grande) y en cada panel del simulador (mini). Álbum total: <b>980 figuritas</b>.</p>
     <div class="progress-demo">
-        <div style="font-size:13px;color:var(--text2);margin-bottom:6px;">Ejemplo — 510 de 980 figuritas</div>
-        <div class="pdemo-bar"><div class="pdemo-green"></div><div class="pdemo-red"></div><div class="pdemo-yellow"></div></div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:4px;">Ejemplo — 510 de 980 figuritas</div>
+        <div class="pdemo-bar">
+            <div class="pdemo-green"></div>
+            <div class="pdemo-red"></div>
+            <div class="pdemo-yellow"></div>
+        </div>
         <div class="pdemo-stats">
             <span class="pdemo-stat"><span class="pdemo-dot" style="background:var(--green)"></span>510 tenés (52%)</span>
             <span class="pdemo-stat"><span class="pdemo-dot" style="background:var(--red)"></span>284 faltan</span>
-            <span class="pdemo-stat"><span class="pdemo-dot" style="background:var(--yellow)"></span>76 repetidas</span>
+            <span class="pdemo-stat"><span class="pdemo-dot" style="background:var(--yellow)"></span>76 repetidas (disponibles para dar)</span>
         </div>
     </div>
     <div class="steps" style="margin-top:16px;">
-        <div class="step"><div class="step-icon">🟢</div><div class="step-body"><div class="step-title">Verde — Tenés</div><div class="step-desc">980 menos las que faltan. Incluye solo las únicas, no las repetidas.</div></div></div>
-        <div class="step"><div class="step-icon">🔴</div><div class="step-body"><div class="step-title">Rojo — Faltan</div><div class="step-desc">Las que todavía no tenés ni una copia.</div></div></div>
-        <div class="step"><div class="step-icon">🟡</div><div class="step-body"><div class="step-title">Amarillo — Repetidas</div><div class="step-desc">Las que tenés de más y podés dar. Son un bonus visual — no suman al 100%.</div></div></div>
+        <div class="step">
+            <div class="step-icon">🟢</div>
+            <div class="step-body">
+                <div class="step-title">Verde — Tenés</div>
+                <div class="step-desc">980 menos las que faltan. Solo figuritas únicas — las repetidas no suman al porcentaje de completado.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">🔴</div>
+            <div class="step-body">
+                <div class="step-title">Rojo — Faltan</div>
+                <div class="step-desc">Las que todavía no tenés ni una copia. La app las muestra en el panel "Vos Recibís" cuando hacés match.</div>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-icon">🟡</div>
+            <div class="step-body">
+                <div class="step-title">Amarillo — Repetidas</div>
+                <div class="step-desc">Las que tenés de más y podés dar. Son un bonus visual — no suman al 100%. La app las muestra en el panel "Vos Entregás" del simulador.</div>
+            </div>
+        </div>
     </div>
 </section>
 
-<section class="section" id="s8">
-    <div class="section-header"><span class="section-num">08</span><span class="section-emoji">🔑</span><span class="section-title">Categorías de figuritas</span></div>
+<!-- S9: CATEGORÍAS -->
+<section class="section" id="s9">
+    <div class="section-header">
+        <span class="section-num">09</span>
+        <span class="section-emoji">🔑</span>
+        <span class="section-title">Categorías de figuritas</span>
+    </div>
     <p style="font-size:14px;color:var(--text2);margin-bottom:14px;">La app clasifica cada figurita automáticamente para armar el intercambio más parejo:</p>
     <div class="cat-grid">
-        <div class="cat-item"><span class="cat-emoji">🌟</span><div class="cat-info"><div class="cat-name">Especiales</div><div class="cat-desc">Sigla FWC — cualquier número</div></div></div>
-        <div class="cat-item"><span class="cat-emoji">🛡️</span><div class="cat-info"><div class="cat-name">Escudos</div><div class="cat-desc">Número 1 de cada selección</div></div></div>
-        <div class="cat-item"><span class="cat-emoji">👥</span><div class="cat-info"><div class="cat-name">Equipos</div><div class="cat-desc">Número 13 de cada selección</div></div></div>
-        <div class="cat-item"><span class="cat-emoji">🥤</span><div class="cat-info"><div class="cat-name">Coca Cola</div><div class="cat-desc">Sigla CC, números 1 al 14</div></div></div>
-        <div class="cat-item"><span class="cat-emoji">🏃</span><div class="cat-info"><div class="cat-name">Jugadores</div><div class="cat-desc">Todos los demás números</div></div></div>
+        <div class="cat-item"><span class="cat-emoji">🌟</span><div><div class="cat-name">Especiales</div><div class="cat-desc">Sigla FWC — cualquier número</div></div></div>
+        <div class="cat-item"><span class="cat-emoji">🛡️</span><div><div class="cat-name">Escudos</div><div class="cat-desc">Número 1 de cada selección</div></div></div>
+        <div class="cat-item"><span class="cat-emoji">👥</span><div><div class="cat-name">Equipos</div><div class="cat-desc">Número 13 de cada selección</div></div></div>
+        <div class="cat-item"><span class="cat-emoji">🥤</span><div><div class="cat-name">Coca Cola</div><div class="cat-desc">Sigla CC — números 1 al 14</div></div></div>
+        <div class="cat-item"><span class="cat-emoji">🏃</span><div><div class="cat-name">Jugadores</div><div class="cat-desc">Todos los demás números</div></div></div>
     </div>
-    <div class="tip"><strong>💡 Lógica del simulador:</strong> selecciona 1×🌟, 1×🛡️, 1×👥, 1×🥤, luego jugadores × jugadores. Si hay desbalance (ej: vos tenés 3 especiales pero él solo 1), toma el mínimo. Podés ajustar manualmente.</div>
+    <div class="tip"><strong>💡 Lógica del simulador:</strong> empareja especiales × especiales, escudos × escudos, equipos × equipos, CC × CC, y finalmente jugadores × jugadores. Si hay desbalance (ej: vos tenés 3 especiales pero él solo 1), toma el mínimo. Podés ajustar tocando cada figurita.</div>
 </section>
 
-<section class="section" id="s9">
-    <div class="section-header"><span class="section-num">09</span><span class="section-emoji">❓</span><span class="section-title">Preguntas frecuentes</span></div>
-    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Necesito crear una cuenta?</div><div class="faq-a">No. Simplemente elegís un nombre de usuario, cargás tu lista y guardás. Ese nombre es tu "cuenta". No hay contraseña ni email.</div></div>
-    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Qué pasa si el amigo no tiene cuenta?</div><div class="faq-a">Podés pedirle que exporte su lista desde Figuritas App y te la mande. Pegala manualmente en el campo "Pegar su lista". No necesita registrarse.</div></div>
-    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Por qué desaparecieron mis amigos frecuentes?</div><div class="faq-a">Esto puede pasar si en algún momento el perfil se guardó sin incluir el campo de amigos. Para recuperarlos: escribí sus nombres nuevamente y tocá "Guardar en la Nube".</div></div>
-    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Puedo usarlo desde la computadora?</div><div class="faq-a">Sí. En PC el simulador muestra dos columnas lado a lado. En el celu se apilan verticalmente. Todo lo demás funciona igual.</div></div>
-    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Con qué formato tiene que estar la lista?</div><div class="faq-a">El que exporta Figuritas App. Ejemplo:<br><br><code style="font-size:12px;color:var(--accent);">ARG 🏳️: 3, 7, 15&nbsp;&nbsp;&nbsp;BRA 🏳️: 1, 9</code><br><br>La app limpia automáticamente el texto y extrae las siglas y números.</div></div>
-    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Mis datos están seguros?</div><div class="faq-a">Los datos se guardan en Firebase con reglas de seguridad estrictas. Solo se almacena nombre de usuario, lista de figuritas, zona, contacto y amigos frecuentes. Ningún dato personal sensible.</div></div>
-    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Cómo actualizo mi lista después de un intercambio?</div><div class="faq-a">Exportá tu lista actualizada desde Figuritas App, pegá el nuevo texto y tocá "Guardar en la Nube". Eso reemplaza la lista anterior.</div></div>
-    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Qué es el "Link Privado"?</div><div class="faq-a">Un link que carga tu perfil directamente en otro dispositivo. Útil si cambiás de celu o querés abrir la app en la PC con tus datos ya cargados. No lo compartas públicamente.</div></div>
-    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">¿Qué es el filtro por zona en el ranking?</div><div class="faq-a">Cuando hacés el Ranking de Seleccionados, aparecen chips con las zonas de tus amigos (generadas automáticamente). Al tocar una zona filtrás el ranking para ver solo los amigos de esa zona — útil si preferís intercambiar en persona con alguien cercano.</div></div>
+<!-- S10: FAQ -->
+<section class="section" id="s10">
+    <div class="section-header">
+        <span class="section-num">10</span>
+        <span class="section-emoji">❓</span>
+        <span class="section-title">Preguntas frecuentes</span>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Necesito crear una cuenta?</div>
+        <div class="faq-a">No. Simplemente elegís un nombre de usuario, cargás tu lista y guardás. Ese nombre es tu "cuenta". No hay contraseña ni email. El nombre de usuario es el único dato de acceso — elegilo bien y no lo cambies.</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Cómo activo el perfil público y para qué sirve?</div>
+        <div class="faq-a">En <b>Mi Perfil</b>, tildá el checkbox verde <code>🌐 Hacer mi perfil visible para todos</code> y guardá. A partir de ahí, cualquier usuario que use la app va a verte en su Ranking de Seleccionados si hay intercambios posibles entre ustedes — aunque nunca se hayan cruzado. Es la forma de ampliar tu red sin conocerse previamente.</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Qué datos comparte el perfil público?</div>
+        <div class="faq-a">Solo metadatos: nombre de usuario, zona/región, forma de contacto y estadísticas del álbum (cuántas tenés, cuántas faltan, cuántas repetidas). Tu lista completa de figuritas <b>no se publica</b> — se usa solo cuando alguien hace match activo con vos.</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Por qué aparecen varios chips de zona para el mismo usuario?</div>
+        <div class="faq-a">Porque si un usuario cargó su zona con varias ubicaciones separadas por coma (ej: <code>Belgrano, Villa Urquiza</code>), la app genera un chip por cada barrio. Así podés filtrar por cualquiera de los lugares donde frecuenta esa persona.</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Qué pasa si el amigo no tiene cuenta?</div>
+        <div class="faq-a">Podés pedirle que exporte su lista desde Figuritas App y te la mande por WhatsApp. Pegala manualmente en el campo "Pegar su lista" y comparás. No necesita registrarse. Si querés guardarlo para la próxima, usá el botón <code>💾 Guardar Amigo</code>.</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Por qué desaparecieron mis amigos frecuentes?</div>
+        <div class="faq-a">Puede pasar si en algún momento el perfil se guardó sin incluir ese campo (bug ya corregido). Para recuperarlos: escribí sus nombres nuevamente en el campo de amigos frecuentes y tocá "Guardar en la Nube".</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Puedo usarlo desde la computadora?</div>
+        <div class="faq-a">Sí. En PC el simulador muestra los dos paneles (Recibís / Entregás) lado a lado. En el celu se apilan verticalmente. El ranking, las herramientas grupales y todo lo demás funciona igual.</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Con qué formato tiene que estar la lista?</div>
+        <div class="faq-a">El que exporta Figuritas App:<br><br><code>ARG 🏳️: 3, 7, 15&nbsp;&nbsp;&nbsp;BRA 🏳️: 1, 9</code><br><br>La app limpia el texto automáticamente y extrae siglas y números. No necesitás formatear nada a mano.</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Mis datos están seguros?</div>
+        <div class="faq-a">Los datos se guardan en Firebase con reglas de seguridad estrictas. Solo se almacena nombre de usuario, lista de figuritas, zona, contacto y amigos frecuentes. Ningún dato personal sensible. El perfil público solo expone lo que vos elegís compartir.</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Cómo actualizo mi lista después de un intercambio?</div>
+        <div class="faq-a">Exportá tu lista actualizada desde Figuritas App, pegá el nuevo texto en <b>Tus Figuritas</b> y tocá "Guardar en la Nube". Eso reemplaza la lista anterior. Si usaste "Guardar Cambio" en el simulador, podés aplicar la proyección directamente desde ahí.</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Qué es el "Link Privado" y el "Link Público"?</div>
+        <div class="faq-a"><b>Link Privado:</b> carga tu perfil completo en cualquier dispositivo. Útil si cambiás de celu o querés abrir la app en la PC. No lo compartás públicamente.<br><br><b>Link Público:</b> compartilo en grupos. Quien lo abre puede cruzar su lista con la tuya — sin ver tu usuario ni tus datos.</div>
+    </div>
 </section>
 
 </div>
+
 <div class="page-footer">
-    <p>Match Mundial 2026 — Complemento de <a href="https://www.figuritas.app/es/descargar" target="_blank">Figuritas App</a></p>
-    <p style="margin-top:6px;">Contacto: <a href="https://t.me/luishacevedo" target="_blank">Telegram @luishacevedo</a> &nbsp;·&nbsp; <a href="index.html">← Volver a la app</a></p>
+    <p>⚽ <strong>Match de Figuritas — Mundial 2026</strong></p>
+    <p>Complemento gratuito de <a href="https://www.figuritas.app/es/descargar" target="_blank">Figuritas App</a></p>
+    <p style="margin-top:8px;">
+        Creado por <a href="https://t.me/luishacevedo" target="_blank">@luishacevedo</a> en Telegram
+        &nbsp;·&nbsp;
+        <a href="index.html">← Volver a la app</a>
+    </p>
 </div>
+
 <script>
 function toggleFaq(el) {
     el.classList.toggle('open');
     el.nextElementSibling.classList.toggle('open');
 }
+// Highlight active TOC link on scroll
+const sections = document.querySelectorAll('.section');
+const tocLinks = document.querySelectorAll('.toc-link');
+window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 90) current = s.id; });
+    tocLinks.forEach(l => { l.style.borderColor = l.getAttribute('href') === '#'+current ? 'var(--accent)' : ''; l.style.color = l.getAttribute('href') === '#'+current ? 'var(--accent)' : ''; });
+}, { passive: true });
 </script>
 </body>
 </html>
