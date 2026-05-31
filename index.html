@@ -135,7 +135,29 @@
 
 
 
-        /* FILTRO ZONA */
+        /* TOGGLE PÚBLICO */
+        .toggle-publico-wrap { display: flex; align-items: center; gap: 10px; background: #1a2e1a; border: 1px solid #2d5a2d; border-radius: 8px; padding: 10px 14px; margin-bottom: 15px; cursor: pointer; }
+        .toggle-publico-wrap input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--success); cursor: pointer; flex-shrink: 0; }
+        .toggle-publico-label { font-size: 13px; font-weight: bold; color: var(--success); line-height: 1.3; }
+        .toggle-publico-sub { font-size: 11px; color: var(--text2); font-weight: normal; display: block; margin-top: 2px; }
+
+        /* ZONA DEL AMIGO (panel derecho) */
+        .amigo-zona-panel { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: none; }
+        .zona-region-row { display: grid; grid-template-columns: 140px 1fr; gap: 8px; margin-bottom: 8px; }
+        .zona-region-row select { margin-bottom: 0; }
+        .zona-region-row input { margin-bottom: 0; }
+
+        /* BADGE AMIGO / PÚBLICO en ranking */
+        .badge-amigo { font-size: 10px; font-weight: bold; padding: 2px 7px; border-radius: 10px; background: var(--primary); color: white; margin-left: 6px; vertical-align: middle; }
+        .badge-publico { font-size: 10px; font-weight: bold; padding: 2px 7px; border-radius: 10px; background: #5c4a00; color: var(--yellow); margin-left: 6px; vertical-align: middle; }
+        .ranking-item.es-amigo { border-left-color: var(--primary); }
+        .ranking-item.es-publico { border-left-color: var(--yellow); }
+
+        /* BOTÓN AGREGAR A FRECUENTES */
+        .btn-agregar-frecuente { background: var(--success); color: #111; font-size: 12px; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; width: auto; margin: 0; }
+        .btn-agregar-frecuente:hover { filter: brightness(1.1); }
+
+                /* FILTRO ZONA */
         .zona-filtro-wrap { margin-bottom: 12px; }
         .zona-filtro-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
         .zona-chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -172,6 +194,7 @@
             .contador-stats { gap: 15px; }
             .contador-actions { min-width: unset; flex-direction: column; }
             .contacto-row { grid-template-columns: 1fr; }
+            .zona-region-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -193,7 +216,37 @@
             </div>
 
             <label>Zona:</label>
-            <input type="text" id="miZona" placeholder="Ej: Barracas, CABA">
+            <div class="zona-region-row" style="margin-bottom:8px;">
+                <select id="miRegion">
+                    <option value="">-- Región --</option>
+                    <option value="CABA">CABA</option>
+                    <option value="GBA Norte">GBA Norte</option>
+                    <option value="GBA Sur">GBA Sur</option>
+                    <option value="GBA Oeste">GBA Oeste</option>
+                    <option value="Interior">Interior</option>
+                    <option value="Exterior">Exterior</option>
+                </select>
+                <input type="text" id="miZona" placeholder="Barrio / Ciudad..." list="sugerenciasBarrio">
+            </div>
+            <datalist id="sugerenciasBarrio">
+                <option value="Barracas"><option value="Palermo"><option value="Belgrano"><option value="Caballito">
+                <option value="Villa Crespo"><option value="Almagro"><option value="Flores"><option value="San Telmo">
+                <option value="La Boca"><option value="Recoleta"><option value="Núñez"><option value="Saavedra">
+                <option value="Floresta"><option value="Villa Urquiza"><option value="Colegiales"><option value="Parque Patricios">
+                <option value="Boedo"><option value="Villa del Parque"><option value="Devoto"><option value="Mataderos">
+                <option value="San Martín"><option value="Quilmes"><option value="Lanús"><option value="Avellaneda">
+                <option value="Lomas de Zamora"><option value="Tigre"><option value="San Isidro"><option value="Vicente López">
+                <option value="Morón"><option value="La Matanza"><option value="Merlo"><option value="Moreno">
+                <option value="Rosario"><option value="Córdoba"><option value="Mendoza"><option value="Tucumán">
+                <option value="Mar del Plata"><option value="La Plata"><option value="Bahía Blanca"><option value="Salta">
+            </datalist>
+
+            <label class="toggle-publico-wrap" for="miPublico">
+                <input type="checkbox" id="miPublico">
+                <span class="toggle-publico-label">🌐 Hacer mi perfil visible para todos
+                    <span class="toggle-publico-sub">Cualquier usuario te verá en su Ranking de intercambios</span>
+                </span>
+            </label>
 
             <label>Contacto preferido:</label>
             <div class="contacto-row">
@@ -268,9 +321,38 @@
 
             <label>☁️ Nombre a buscar o guardar:</label>
             <div class="flex-row">
-                <input type="text" id="amigoUsuario" placeholder="Ej: FedeQatar">
+                <input type="text" id="amigoUsuario" placeholder="Ej: FedeQatar" list="sugerenciasAmigos" autocomplete="off">
+                <datalist id="sugerenciasAmigos"></datalist>
                 <button id="btnBuscarAmigo" class="btn-primary">🔍 Buscar</button>
             </div>
+
+            <div class="amigo-zona-panel" id="amigoZonaPanel">
+                <label style="color:var(--text2); font-size:11px; margin-bottom:6px; display:block;">📍 Zona y contacto del amigo (opcional, se guarda con su perfil):</label>
+                <div class="zona-region-row">
+                    <select id="amigoRegion">
+                        <option value="">-- Región --</option>
+                        <option value="CABA">CABA</option>
+                        <option value="GBA Norte">GBA Norte</option>
+                        <option value="GBA Sur">GBA Sur</option>
+                        <option value="GBA Oeste">GBA Oeste</option>
+                        <option value="Interior">Interior</option>
+                        <option value="Exterior">Exterior</option>
+                    </select>
+                    <input type="text" id="amigoZonaDetalle" placeholder="Barrio / Ciudad..." list="sugerenciasBarrio">
+                </div>
+                <div class="contacto-row" style="margin-bottom:0;">
+                    <select id="amigoContactoTipo">
+                        <option value="telegram">Telegram</option>
+                        <option value="whatsapp">WhatsApp</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="mail">Mail</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                    <input type="text" id="amigoContactoDato" placeholder="@usuario / número...">
+                </div>
+            </div>
+
             <label>✍️ Pegar su lista:</label>
             <textarea id="amigoLista" placeholder="Pegá la lista de tu amigo acá..."></textarea>
             <button id="btnGuardarAmigoNuevo" class="btn-success" style="padding: 8px; font-size: 13px; margin-bottom: 10px;">💾 Guardar Amigo</button>
@@ -330,6 +412,7 @@
                             <button id="btnCopiarOferta" class="btn-primary" style="flex:1; margin:0; padding: 10px 15px;">📋 Copiar Oferta</button>
                             <button id="btnContactarAmigo" class="btn-tg" style="flex:1; margin:0; padding: 10px 15px;">📲 Contactar</button>
                             <button id="btnGuardarEnCarrito" class="btn-yellow" style="flex:1; margin:0; padding: 10px 15px;">🛒 Guardar Cambio</button>
+                            <button id="btnAgregarFrecuente" class="btn-agregar-frecuente" style="display:none; flex:1; margin:0; padding: 10px 15px;">➕ Agregar a Frecuentes</button>
                             <button id="btnSaltarPasoRuta" class="btn-secondary" style="display: none; font-size: 12px; padding: 6px; margin: 0; flex:1;">⏭️ Saltar amigo</button>
                         </div>
                     </div>
@@ -403,7 +486,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getDatabase, ref, set, get, child, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAPGcn1zq1NPTrfcAZ1a1xLIjZ6IwDwMoY",
@@ -429,6 +512,7 @@
         window.carritoSimulador = [];
         let seleccionesActuales = { recibir: [], dar: [] };
         let rutaState = { activo: false, misFaltan: [], misRepetidas: [], amigos: [], pasoActual: 0 };
+        let usuariosPublicosCache = [];
 
         // =====================================
         // EVENT LISTENERS
@@ -514,6 +598,71 @@
         document.getElementById('btnContactarAmigo').addEventListener('click', contactarAmigo);
 
         // =====================================
+        // DIRECTORIO PÚBLICO Y DATALIST
+        // =====================================
+        async function cargarUsuariosPublicosEnDatalist() {
+            try {
+                const snap = await get(ref(db, 'usuarios_publicos'));
+                usuariosPublicosCache = snap.exists() ? Object.keys(snap.val()) : [];
+            } catch(e) { usuariosPublicosCache = []; }
+            actualizarDatalistAmigos();
+        }
+
+        function actualizarDatalistAmigos() {
+            let frecuentes = document.getElementById('misAmigos').value
+                .split(',').map(x => x.trim()).filter(x => x !== "");
+            let todos = [...new Set([...frecuentes, ...usuariosPublicosCache])];
+            let dl = document.getElementById('sugerenciasAmigos');
+            if (dl) dl.innerHTML = todos.map(n => `<option value="${n}">`).join('');
+        }
+
+        // Mostrar panel zona del amigo cuando hay texto en el buscador
+        document.getElementById('amigoUsuario').addEventListener('input', function() {
+            document.getElementById('amigoZonaPanel').style.display = this.value.trim() ? 'block' : 'none';
+        });
+
+        // Actualizar datalist cuando cambia la lista de frecuentes
+        document.getElementById('misAmigos').addEventListener('input', actualizarDatalistAmigos);
+
+        // Rellenar campos del amigo cuando se carga desde Firebase
+        function rellenarCamposAmigo(d) {
+            if (!d) return;
+            if (d.region) document.getElementById('amigoRegion').value = d.region;
+            if (d.zona) document.getElementById('amigoZonaDetalle').value = d.zona;
+            if (d.contacto_tipo) document.getElementById('amigoContactoTipo').value = d.contacto_tipo;
+            if (d.contacto_dato) document.getElementById('amigoContactoDato').value = d.contacto_dato;
+            document.getElementById('amigoZonaPanel').style.display = 'block';
+        }
+
+        // Agregar a Frecuentes desde el simulador
+        document.getElementById('btnAgregarFrecuente').addEventListener('click', async function() {
+            let amigo = ultimoNombreAmigo;
+            if (!amigo) return;
+            let input = document.getElementById('misAmigos');
+            let curr = input.value.split(',').map(x => x.trim()).filter(x => x !== "");
+            if (curr.includes(amigo)) { mostrarToast(`${amigo} ya está en tus frecuentes`); return; }
+            curr.push(amigo);
+            input.value = curr.join(', ');
+            renderizarBotonesAmigos();
+            actualizarDatalistAmigos();
+            let mu = document.getElementById('miUsuario').value.trim();
+            if (mu) {
+                let z = document.getElementById('miZona').value.trim();
+                let r = document.getElementById('miRegion').value;
+                let ct = document.getElementById('miContactoTipo').value;
+                let cd = document.getElementById('miContactoDato').value.trim();
+                let esPublico = document.getElementById('miPublico').checked;
+                let datos = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toLocaleString(), publico: esPublico };
+                if (z) datos.zona = z;
+                if (r) datos.region = r;
+                if (cd) { datos.contacto_tipo = ct; datos.contacto_dato = cd; }
+                try { await set(ref(db, `usuarios/${mu}`), datos); } catch(e) {}
+            }
+            mostrarToast(`✅ ¡${amigo} agregado a tus Frecuentes!`);
+            this.style.display = 'none';
+        });
+
+                // =====================================
         // CORE PARSING Y MATEMATICA
         // =====================================
         function limpiarNombreEquipo(textoRaw) {
@@ -870,6 +1019,10 @@
             document.getElementById('rankingResultados').style.display = 'none';
             document.getElementById('mercadoGlobalResultados').style.display = 'none';
             document.getElementById('infoPasoRuta').style.display = 'none';
+
+            // Mostrar "Agregar a Frecuentes" solo si no está ya en la lista
+            let _frecuentes = document.getElementById('misAmigos').value.split(',').map(x => x.trim()).filter(x => x !== "");
+            document.getElementById('btnAgregarFrecuente').style.display = _frecuentes.includes(nombre) ? 'none' : 'flex';
 
             if (window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
         }
@@ -1244,6 +1397,7 @@
                         tipo: d.contacto_tipo || "",
                         dato: d.contacto_dato || ""
                     };
+                    rellenarCamposAmigo(d);
                     ejecutarComparacion(m, d.textoOriginal, amigo, contactoAmigo, d.zona || "");
                     document.getElementById('statusAmigo').style.color = "green";
                     document.getElementById('statusAmigo').innerText = "¡Lista cargada!";
@@ -1321,9 +1475,7 @@
         }
 
         function obtenerAmigosSeleccionados() {
-            let sel = Array.from(document.querySelectorAll('.amigo-checkbox:checked')).map(cb => cb.value);
-            if (sel.length === 0) alert("Dejá al menos un amigo tildado en la lista para poder analizar.");
-            return sel;
+            return Array.from(document.querySelectorAll('.amigo-checkbox:checked')).map(cb => cb.value);
         }
 
 
@@ -1368,13 +1520,18 @@
             }
             res.forEach((r, i) => {
                 let div = document.createElement('div');
-                div.className = 'ranking-item';
+                let esAmigo = r.esAmigo !== false;
+                div.className = 'ranking-item ' + (esAmigo ? 'es-amigo' : 'es-publico');
                 div.style.opacity = r.pos === 0 ? '0.5' : '1';
                 let nombreMostrado = conZona(r.nombre, r.zona);
+                let badgeHtml = esAmigo
+                    ? '<span class="badge-amigo">👤 Amigo</span>'
+                    : '<span class="badge-publico">🌐 Público</span>';
+                let regionLabel = r.region ? `<span style="font-size:10px;color:var(--text2);margin-left:6px;">📍 ${r.region}</span>` : '';
                 div.innerHTML = `
                     <div class="ranking-header">
                         <div class="ranking-text">
-                            <div class="ranking-name">${i < 3 ? ['🥇','🥈','🥉'][i] : '🔹'} ${nombreMostrado} - 🔄 ${r.pos} mano a mano</div>
+                            <div class="ranking-name">${i < 3 ? ['🥇','🥈','🥉'][i] : '🔹'} ${nombreMostrado}${badgeHtml}${regionLabel} - 🔄 ${r.pos} mano a mano</div>
                             <div class="ranking-stats" style="color:var(--text2);"><span style="color:var(--success);">Te da <b>${r.me}</b></span> | <span style="color:var(--primary);">Le das <b>${r.le}</b></span></div>
                         </div>
                         <button class="btn-primary" style="width:auto;padding:8px 12px;font-size:12px;" onclick="cargarAmigoYComparar('${r.nombre}')">🔍 Ver Match</button>
@@ -1391,31 +1548,74 @@
                 let textoMio = document.getElementById('miLista').value.trim();
                 if (!textoMio) { alert("Pegá tu lista primero."); return; }
                 let amigos = obtenerAmigosSeleccionados();
-                if (amigos.length === 0) return;
+                let miUsuario = document.getElementById('miUsuario').value.trim();
                 let status = document.getElementById('statusAmigo');
                 status.style.color = "#005c98";
                 status.innerText = "⚡ Escaneando opciones...";
                 let misDatos = parsearTexto(textoMio);
 
-                let promesasDescarga = amigos.map(async (amigo) => {
+                // Cargar usuarios públicos y combinar con frecuentes
+                let publicosSnap = await get(ref(db, 'usuarios_publicos')).catch(() => null);
+                let publicosNombres = [];
+                if (publicosSnap && publicosSnap.exists()) {
+                    publicosNombres = Object.keys(publicosSnap.val()).filter(n => n !== miUsuario);
+                }
+                // Fallback: si usuarios_publicos está vacío, escanear usuarios/ buscando publico===true
+                if (publicosNombres.length === 0) {
+                    try {
+                        const todosSnap = await get(ref(db, 'usuarios'));
+                        if (todosSnap.exists()) {
+                            let todos = todosSnap.val();
+                            for (let nombre in todos) {
+                                if (nombre !== miUsuario && (todos[nombre].publico === true || todos[nombre].publico === 1)) {
+                                    publicosNombres.push(nombre);
+                                    // Aprovechar y escribir en usuarios_publicos para la próxima vez
+                                    let d = todos[nombre];
+                                    let stats = calcularEstadisticasAlbum(d.textoOriginal || "");
+                                    set(ref(db, `usuarios_publicos/${nombre}`), {
+                                        nombre: nombre,
+                                        zona: d.zona || "",
+                                        region: d.region || "",
+                                        contacto_tipo: d.contacto_tipo || "",
+                                        contacto_dato: d.contacto_dato || "",
+                                        tengo: stats.tengo,
+                                        faltan: stats.faltan,
+                                        repes: stats.repes,
+                                        ultimaActualizacion: d.ultimaActualizacion || ""
+                                    }).catch(() => {});
+                                }
+                            }
+                        }
+                    } catch(ef) { console.warn("Fallback público:", ef); }
+                }
+                let todosANalizar = [...new Set([...amigos, ...publicosNombres])];
+                if (todosANalizar.length === 0) { alert("No hay amigos seleccionados ni usuarios con perfil público para analizar. Agregá amigos frecuentes o esperá que alguien active su perfil público."); return; }
+
+                let promesasDescarga = todosANalizar.map(async (amigo) => {
+                    let esAmigo = amigos.includes(amigo);
                     try {
                         const snap = await get(child(ref(db), `usuarios/${amigo}`));
                         if (snap.exists()) {
                             let aTexto = snap.val().textoOriginal;
                             let aZona = snap.val().zona || "";
+                            let aRegion = snap.val().region || "";
                             let aDatos = parsearTexto(aTexto);
                             let mMe = encontrarInterseccion(misDatos.faltan, aDatos.repetidas);
                             let mLe = encontrarInterseccion(aDatos.faltan, misDatos.repetidas);
                             let cMe = contarTotal(mMe), cLe = contarTotal(mLe);
                             let pos = Math.min(cMe, cLe);
-                            if (cMe > 0 || cLe > 0) return { nombre: amigo, zona: aZona, me: cMe, le: cLe, pos: pos, txt: aTexto };
+                            if (cMe > 0 || cLe > 0) return { nombre: amigo, zona: aZona, region: aRegion, me: cMe, le: cLe, pos: pos, txt: aTexto, esAmigo };
                         }
                     } catch (e) {}
                     return null;
                 });
 
                 let res = (await Promise.all(promesasDescarga)).filter(r => r !== null);
-                res.sort((a, b) => b.pos !== a.pos ? b.pos - a.pos : b.me - a.me);
+                // Amigos primero, luego públicos; dentro de cada grupo por matches desc
+                res.sort((a, b) => {
+                    if (a.esAmigo !== b.esAmigo) return a.esAmigo ? -1 : 1;
+                    return b.pos !== a.pos ? b.pos - a.pos : b.me - a.me;
+                });
 
                 document.getElementById('resultados').style.display = 'block';
                 document.getElementById('rankingResultados').style.display = 'block';
@@ -1619,8 +1819,18 @@
                     document.getElementById('miLista').value = d.textoOriginal || "";
                     document.getElementById('misAmigos').value = d.amigos || "";
                     document.getElementById('miZona').value = d.zona || "";
+                    document.getElementById('miRegion').value = d.region || "";
                     document.getElementById('miContactoTipo').value = d.contacto_tipo || "telegram";
                     document.getElementById('miContactoDato').value = d.contacto_dato || "";
+                    // Verificar en usuarios_publicos también (por si el campo publico no se guardó)
+                    document.getElementById('miPublico').checked = !!d.publico;
+                    if (!d.publico) {
+                        // Doble check: ver si existe en el directorio público
+                        try {
+                            const pubSnap = await get(ref(db, `usuarios_publicos/${u}`));
+                            if (pubSnap.exists()) document.getElementById('miPublico').checked = true;
+                        } catch(ep) {}
+                    }
                     renderizarBotonesAmigos();
                     actualizarLinkDirecto(u);
                     actualizarBarraPerfil();
@@ -1647,20 +1857,48 @@
             if (!u || !t) { alert("Completá usuario y lista antes de guardar."); return; }
             s.style.color = "#005c98";
             s.innerText = "Guardando...";
+            let r = document.getElementById('miRegion').value;
+            let esPublico = document.getElementById('miPublico').checked;
             try {
                 let datos = {
                     textoOriginal: t,
                     amigos: a,
-                    ultimaActualizacion: new Date().toLocaleString()
+                    ultimaActualizacion: new Date().toLocaleString(),
+                    publico: esPublico === true ? true : false
                 };
                 if (z) datos.zona = z;
+                if (r) datos.region = r;
                 if (cd) { datos.contacto_tipo = ct; datos.contacto_dato = cd; }
                 await set(ref(db, `usuarios/${u}`), datos);
+
+                // Directorio público
+                let statsPublico = calcularEstadisticasAlbum(t);
+                if (esPublico) {
+                    try {
+                        await set(ref(db, `usuarios_publicos/${u}`), {
+                            nombre: u,
+                            zona: z || "",
+                            region: r || "",
+                            contacto_tipo: ct || "",
+                            contacto_dato: cd || "",
+                            tengo: statsPublico.tengo,
+                            faltan: statsPublico.faltan,
+                            repes: statsPublico.repes,
+                            ultimaActualizacion: new Date().toLocaleString()
+                        });
+                    } catch(e3) {
+                        console.warn("No se pudo guardar en directorio público:", e3.message);
+                    }
+                } else {
+                    try { await remove(ref(db, `usuarios_publicos/${u}`)); } catch(e2) {}
+                }
+
                 renderizarBotonesAmigos();
                 actualizarLinkDirecto(u);
                 actualizarBarraPerfil();
+                cargarUsuariosPublicosEnDatalist();
                 s.style.color = "green";
-                s.innerText = "¡Guardado con éxito!";
+                s.innerText = esPublico ? "¡Guardado! Tu perfil es visible para todos 🌐" : "¡Guardado con éxito!";
             } catch (e) {
                 s.style.color = "red";
                 s.innerText = "Error al guardar.";
@@ -1671,13 +1909,22 @@
             let mu = document.getElementById('miUsuario').value.trim();
             let au = document.getElementById('amigoUsuario').value.trim();
             let at = document.getElementById('amigoLista').value.trim();
+            let aRegion = document.getElementById('amigoRegion').value;
+            let aZonaDet = document.getElementById('amigoZonaDetalle').value.trim();
+            let aZona = aZonaDet || aRegion;
+            let aCT = document.getElementById('amigoContactoTipo').value;
+            let aCD = document.getElementById('amigoContactoDato').value.trim();
             let s = document.getElementById('statusAmigo');
             if (!mu) { alert("Cargá tu usuario a la izquierda."); return; }
             if (!au || !at) return;
             s.style.color = "#005c98";
             s.innerText = "Guardando...";
             try {
-                await set(ref(db, `usuarios/${au}`), { textoOriginal: at, amigos: "", ultimaActualizacion: new Date().toLocaleString() });
+                let datosAmigo = { textoOriginal: at, amigos: "", ultimaActualizacion: new Date().toLocaleString() };
+                if (aZona) datosAmigo.zona = aZona;
+                if (aRegion) datosAmigo.region = aRegion;
+                if (aCD) { datosAmigo.contacto_tipo = aCT; datosAmigo.contacto_dato = aCD; }
+                await set(ref(db, `usuarios/${au}`), datosAmigo);
                 let input = document.getElementById('misAmigos');
                 let curr = input.value.split(',').map(x => x.trim()).filter(x => x !== "");
                 if (!curr.includes(au)) {
@@ -1708,6 +1955,7 @@
         // INIT
         // =====================================
         window.onload = async function () {
+            cargarUsuariosPublicosEnDatalist();
             const url = new URLSearchParams(window.location.search);
             if (url.get('u')) {
                 document.getElementById('miUsuario').value = url.get('u');
