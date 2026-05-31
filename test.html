@@ -134,6 +134,15 @@
         .status { font-size: 13px; min-height: 18px; margin-top: 5px; }
 
 
+
+        /* FILTRO ZONA */
+        .zona-filtro-wrap { margin-bottom: 12px; }
+        .zona-filtro-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+        .zona-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .zona-chip { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid var(--border); background: var(--bg3); color: var(--text2); cursor: pointer; transition: all 0.2s; }
+        .zona-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .zona-chip:hover { filter: brightness(1.2); }
+
         /* BARRA DE PROGRESO */
         .progress-wrap { margin: 12px 0 4px 0; }
         .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 5px; }
@@ -297,7 +306,7 @@
 
     <!-- RESULTADOS -->
     <div id="resultados" class="resultados">
-        <div id="rankingResultados" style="display: none;"><h3>🏆 Ranking de Opciones</h3><div id="listaRanking"></div></div>
+        <div id="rankingResultados" style="display: none;"><h3>🏆 Ranking de Opciones</h3><div id="zonaFiltroWrap" class="zona-filtro-wrap" style="display:none;"><div class="zona-filtro-label">📍 Filtrar por zona:</div><div class="zona-chips" id="zonaChips"></div></div><div id="listaRanking"></div></div>
         <div id="mercadoGlobalResultados" style="display: none;"><h3>🌐 Triangulación de Grupo</h3><div id="listaMercadoGlobal"></div></div>
 
         <div id="detalleIndividual" style="display: none;">
@@ -390,7 +399,7 @@
         </div><!-- fin detalleIndividual -->
     </div><!-- fin resultados -->
 
-    <div class="footer"><p>Contacto: <a href="https://t.me/luishacevedo" target="_blank">Telegram @luishacevedo</a></p></div>
+    <div class="footer"><p>Contacto: <a href="https://t.me/luishacevedo" target="_blank">Telegram @luishacevedo</a> &nbsp;·&nbsp; <a href="ayuda.html" target="_blank">❓ Ayuda</a></p></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -414,6 +423,7 @@
         let ultimoMatchMeSirven = {};
         let ultimoMatchLeSirven = {};
         let ultimoNombreAmigo = "";
+        let ultimoZonaAmigo = "";
         let ultimoContactoAmigo = { tipo: "", dato: "" };
         window.amigosDataGlobal = [];
         window.carritoSimulador = [];
@@ -710,6 +720,11 @@
 
 
 
+
+        function conZona(nombre, zona) {
+            return zona ? `${nombre} (${zona})` : nombre;
+        }
+
         // =====================================
         // BARRAS DE PROGRESO
         // =====================================
@@ -767,7 +782,7 @@
             let wrapMia = document.getElementById('barraProgresoMiaSim');
             if (textoAmigo) {
                 let statsAmigo = calcularEstadisticasAlbum(textoAmigo);
-                document.getElementById('labelBarraAmigo').innerText = `📊 Álbum de ${nombreAmigo}`;
+                document.getElementById('labelBarraAmigo').innerText = `📊 Álbum de ${conZona(nombreAmigo, ultimoZonaAmigo)}`;
                 renderizarBarraMini(statsAmigo, 'Amigo');
                 wrapAmigo.style.display = 'block';
             } else {
@@ -831,6 +846,7 @@
             ultimoMatchMeSirven = encontrarInterseccion(mD.faltan, oD.repetidas);
             ultimoMatchLeSirven = encontrarInterseccion(oD.faltan, mD.repetidas);
             ultimoNombreAmigo = nombre;
+            ultimoZonaAmigo = snap.exists() ? (snap.val().zona || "") : "";
             ultimoContactoAmigo = contactoAmigo || { tipo: "", dato: "" };
 
             actualizarBotonContactar();
@@ -844,10 +860,10 @@
             renderizarResultadosInteractivos('leSirvenSim', ultimoMatchLeSirven, 'dar', mD.repetidas);
             seleccionarPareado();
 
-            document.getElementById('tituloMeSirvenTexto').innerText = `✅ Me sirven ${obtenerDesglose(ultimoMatchMeSirven)} de ${nombre}:`;
-            document.getElementById('tituloLeSirvenTexto').innerText = `🎁 A ${nombre} le sirven ${obtenerDesglose(ultimoMatchLeSirven)} tuyas:`;
-            document.getElementById('tituloMeSirvenSim').innerText = `✅ Vos recibís de ${nombre}:`;
-            document.getElementById('tituloLeSirvenSim').innerText = `🎁 Vos entregás a ${nombre}:`;
+            document.getElementById('tituloMeSirvenTexto').innerText = `✅ Me sirven ${obtenerDesglose(ultimoMatchMeSirven)} de ${conZona(nombre, ultimoZonaAmigo)}`;
+            document.getElementById('tituloLeSirvenTexto').innerText = `🎁 A ${conZona(nombre, ultimoZonaAmigo)} le sirven ${obtenerDesglose(ultimoMatchLeSirven)} tuyas:`;
+            document.getElementById('tituloMeSirvenSim').innerText = `✅ Vos recibís de ${conZona(nombre, ultimoZonaAmigo)}`;
+            document.getElementById('tituloLeSirvenSim').innerText = `🎁 Vos entregás a ${conZona(nombre, ultimoZonaAmigo)}`;
 
             document.getElementById('resultados').style.display = 'block';
             document.getElementById('detalleIndividual').style.display = 'block';
@@ -880,7 +896,7 @@
             let desgloseRecibir = obtenerDesglosePlano(seleccionesActuales.recibir);
             let desgloseDar = obtenerDesglosePlano(seleccionesActuales.dar);
 
-            let nombreAmigo = ultimoNombreAmigo || "tu amigo";
+            let nombreAmigo = conZona(ultimoNombreAmigo, ultimoZonaAmigo) || "tu amigo";
             let sep = esWhatsApp ? "*" : "";
             let ital = esWhatsApp ? "_" : "";
 
@@ -1115,8 +1131,8 @@
             info.style.display = 'block';
             info.innerHTML = `<b style="color:var(--success); font-size:16px;">Paso ${rutaState.pasoActual} de tu Plan:</b><br>Estás analizando a <b>${mejorAmigo.nombre}</b>. Tienen <b>${mejorCantidad}</b> cambios parejos potenciales. Ajustá las opciones abajo y confirmá.`;
 
-            document.getElementById('tituloMeSirvenSim').innerText = `✅ Vos recibís de ${mejorAmigo.nombre}:`;
-            document.getElementById('tituloLeSirvenSim').innerText = `🎁 Vos entregás a ${mejorAmigo.nombre}:`;
+            document.getElementById('tituloMeSirvenSim').innerText = `✅ Vos recibís de ${conZona(mejorAmigo.nombre, ultimoZonaAmigo)}`;
+            document.getElementById('tituloLeSirvenSim').innerText = `🎁 Vos entregás a ${conZona(mejorAmigo.nombre, ultimoZonaAmigo)}`;
 
             document.getElementById('resultados').style.display = 'block';
             document.getElementById('detalleIndividual').style.display = 'block';
@@ -1310,6 +1326,63 @@
             return sel;
         }
 
+
+        // =====================================
+        // FILTRO POR ZONA
+        // =====================================
+        let zonaFiltroActiva = "todas";
+        let rankingDataGlobal = [];
+
+        function renderizarChipsZona(datos) {
+            // datos = array de { nombre, zona, ... }
+            let zonas = [...new Set(datos.map(d => d.zona).filter(z => z && z.trim() !== ""))];
+            let wrap = document.getElementById('zonaFiltroWrap');
+            let chipsContainer = document.getElementById('zonaChips');
+            if (zonas.length === 0) { wrap.style.display = 'none'; return; }
+            wrap.style.display = 'block';
+            zonaFiltroActiva = "todas";
+            let html = `<span class="zona-chip active" data-zona="todas" onclick="filtrarPorZona('todas')">🌐 Todas</span>`;
+            zonas.forEach(z => {
+                html += `<span class="zona-chip" data-zona="${z}" onclick="filtrarPorZona('${z}')">${z}</span>`;
+            });
+            chipsContainer.innerHTML = html;
+        }
+
+        function filtrarPorZona(zona) {
+            zonaFiltroActiva = zona;
+            // Actualizar chips activos
+            document.querySelectorAll('.zona-chip').forEach(c => {
+                c.classList.toggle('active', c.dataset.zona === zona);
+            });
+            // Re-renderizar lista
+            let filtrados = zona === "todas" ? rankingDataGlobal : rankingDataGlobal.filter(r => r.zona === zona);
+            renderizarListaRanking(filtrados);
+        }
+
+        function renderizarListaRanking(res) {
+            let list = document.getElementById('listaRanking');
+            list.innerHTML = '';
+            if (res.length === 0) {
+                list.innerHTML = '<p style="color:#f0c060;background:#2a2000;padding:10px;border-radius:5px;">No hay intercambios en esta zona.</p>';
+                return;
+            }
+            res.forEach((r, i) => {
+                let div = document.createElement('div');
+                div.className = 'ranking-item';
+                div.style.opacity = r.pos === 0 ? '0.5' : '1';
+                let nombreMostrado = conZona(r.nombre, r.zona);
+                div.innerHTML = `
+                    <div class="ranking-header">
+                        <div class="ranking-text">
+                            <div class="ranking-name">${i < 3 ? ['🥇','🥈','🥉'][i] : '🔹'} ${nombreMostrado} - 🔄 ${r.pos} mano a mano</div>
+                            <div class="ranking-stats" style="color:var(--text2);"><span style="color:var(--success);">Te da <b>${r.me}</b></span> | <span style="color:var(--primary);">Le das <b>${r.le}</b></span></div>
+                        </div>
+                        <button class="btn-primary" style="width:auto;padding:8px 12px;font-size:12px;" onclick="cargarAmigoYComparar('${r.nombre}')">🔍 Ver Match</button>
+                    </div>`;
+                list.appendChild(div);
+            });
+        }
+
         // =====================================
         // OPTIMIZADORES GRUPALES
         // =====================================
@@ -1329,12 +1402,13 @@
                         const snap = await get(child(ref(db), `usuarios/${amigo}`));
                         if (snap.exists()) {
                             let aTexto = snap.val().textoOriginal;
+                            let aZona = snap.val().zona || "";
                             let aDatos = parsearTexto(aTexto);
                             let mMe = encontrarInterseccion(misDatos.faltan, aDatos.repetidas);
                             let mLe = encontrarInterseccion(aDatos.faltan, misDatos.repetidas);
                             let cMe = contarTotal(mMe), cLe = contarTotal(mLe);
                             let pos = Math.min(cMe, cLe);
-                            if (cMe > 0 || cLe > 0) return { nombre: amigo, me: cMe, le: cLe, pos: pos, txt: aTexto };
+                            if (cMe > 0 || cLe > 0) return { nombre: amigo, zona: aZona, me: cMe, le: cLe, pos: pos, txt: aTexto };
                         }
                     } catch (e) {}
                     return null;
@@ -1357,20 +1431,9 @@
                     return;
                 }
 
-                res.forEach((r, i) => {
-                    let div = document.createElement('div');
-                    div.className = 'ranking-item';
-                    div.style.opacity = r.pos === 0 ? '0.5' : '1';
-                    div.innerHTML = `
-                        <div class="ranking-header">
-                            <div class="ranking-text">
-                                <div class="ranking-name">${i < 3 ? ['🥇', '🥈', '🥉'][i] : '🔹'} ${r.nombre} - 🔄 ${r.pos} mano a mano</div>
-                                <div class="ranking-stats" style="color:var(--text2);"><span style="color:var(--success);">Te da <b>${r.me}</b></span> | <span style="color:var(--primary);">Le das <b>${r.le}</b></span></div>
-                            </div>
-                            <button class="btn-primary" style="width:auto;padding:8px 12px;font-size:12px;" onclick="cargarAmigoYComparar('${r.nombre}')">🔍 Ver Match</button>
-                        </div>`;
-                    list.appendChild(div);
-                });
+                rankingDataGlobal = res;
+                renderizarChipsZona(res);
+                renderizarListaRanking(res);
 
                 if (window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
                 status.innerText = "";
@@ -1478,9 +1541,9 @@
             let linkPublico = document.getElementById('linkCompartir').value || "https://luishacevedo.github.io/match-figuritas/";
             let texto = "";
             if (esWhatsApp) {
-                texto = `⚽ *MATCH DE FIGURITAS* ⚽\n\n✅ *A mí (${miUsuario.toUpperCase()}) me sirven de ${ultimoNombreAmigo}:*\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, true)}\n🎁 *A ${ultimoNombreAmigo} le sirven de las mías:*\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, true)}\n🔍 _Cruzá tus repetidas conmigo acá:_\n👉 ${linkPublico}`;
+                texto = `⚽ *MATCH DE FIGURITAS* ⚽\n\n✅ *A mí (${miUsuario.toUpperCase()}) me sirven de ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)}:*\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, true)}\n🎁 *A ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)} le sirven de las mías:*\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, true)}\n🔍 _Cruzá tus repetidas conmigo acá:_\n👉 ${linkPublico}`;
             } else {
-                texto = `⚽ MATCH DE FIGURITAS ⚽\n\n✅ A mí (${miUsuario.toUpperCase()}) me sirven de ${ultimoNombreAmigo}:\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, false)}\n🎁 A ${ultimoNombreAmigo} le sirven de las mías:\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, false)}\n🔍 Cruzá tus repetidas conmigo acá:\n👉 ${linkPublico}`;
+                texto = `⚽ MATCH DE FIGURITAS ⚽\n\n✅ A mí (${miUsuario.toUpperCase()}) me sirven de ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)}:\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, false)}\n🎁 A ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)} le sirven de las mías:\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, false)}\n🔍 Cruzá tus repetidas conmigo acá:\n👉 ${linkPublico}`;
             }
             return texto;
         }
