@@ -1486,8 +1486,16 @@
         let rankingDataGlobal = [];
 
         function renderizarChipsZona(datos) {
-            // datos = array de { nombre, zona, ... }
-            let zonas = [...new Set(datos.map(d => d.zona).filter(z => z && z.trim() !== ""))];
+            // Separar zonas compuestas por coma en chips individuales
+            let partes = new Set();
+            datos.forEach(d => {
+                if (!d.zona || d.zona.trim() === "") return;
+                d.zona.split(',').forEach(p => {
+                    let t = p.trim();
+                    if (t) partes.add(t);
+                });
+            });
+            let zonas = [...partes].sort();
             let wrap = document.getElementById('zonaFiltroWrap');
             let chipsContainer = document.getElementById('zonaChips');
             if (zonas.length === 0) { wrap.style.display = 'none'; return; }
@@ -1495,19 +1503,25 @@
             zonaFiltroActiva = "todas";
             let html = `<span class="zona-chip active" data-zona="todas" onclick="filtrarPorZona('todas')">🌐 Todas</span>`;
             zonas.forEach(z => {
-                html += `<span class="zona-chip" data-zona="${z}" onclick="filtrarPorZona('${z}')">${z}</span>`;
+                // Escapar comillas simples para el onclick
+                let zSafe = z.replace(/'/g, "\'");
+                html += `<span class="zona-chip" data-zona="${z}" onclick="filtrarPorZona('${zSafe}')">${z}</span>`;
             });
             chipsContainer.innerHTML = html;
         }
 
         window.filtrarPorZona = function filtrarPorZona(zona) {
             zonaFiltroActiva = zona;
-            // Actualizar chips activos
             document.querySelectorAll('.zona-chip').forEach(c => {
                 c.classList.toggle('active', c.dataset.zona === zona);
             });
-            // Re-renderizar lista
-            let filtrados = zona === "todas" ? rankingDataGlobal : rankingDataGlobal.filter(r => r.zona === zona);
+            // Filtrar por coincidencia parcial: si zona del usuario contiene el chip seleccionado
+            let filtrados = zona === "todas"
+                ? rankingDataGlobal
+                : rankingDataGlobal.filter(r => {
+                    if (!r.zona) return false;
+                    return r.zona.split(',').map(p => p.trim()).includes(zona);
+                });
             renderizarListaRanking(filtrados);
         }
 
@@ -1589,7 +1603,14 @@
                     } catch(ef) { console.warn("Fallback público:", ef); }
                 }
                 let todosANalizar = [...new Set([...amigos, ...publicosNombres])];
-                if (todosANalizar.length === 0) { alert("No hay amigos seleccionados ni usuarios con perfil público para analizar. Agregá amigos frecuentes o esperá que alguien active su perfil público."); return; }
+                if (todosANalizar.length === 0) {
+                    document.getElementById('resultados').style.display = 'block';
+                    document.getElementById('rankingResultados').style.display = 'block';
+                    document.getElementById('detalleIndividual').style.display = 'none';
+                    document.getElementById('listaRanking').innerHTML = '<p style="color:#f0c060;background:#2a2000;padding:10px;border-radius:5px;">Aún no hay usuarios públicos con coincidencias. Guardá tu perfil con lista y activá "Hacer mi perfil visible para todos" ⬆️</p>';
+                    status.innerText = "";
+                    return;
+                }
 
                 let promesasDescarga = todosANalizar.map(async (amigo) => {
                     let esAmigo = amigos.includes(amigo);
@@ -1633,6 +1654,11 @@
 
                 rankingDataGlobal = res;
                 renderizarChipsZona(res);
+                document.getElementById('resultados').style.display = 'block';
+                document.getElementById('rankingResultados').style.display = 'block';
+                document.getElementById('detalleIndividual').style.display = 'none';
+                document.getElementById('mercadoGlobalResultados').style.display = 'none';
+                document.getElementById('infoPasoRuta').style.display = 'none';
                 renderizarListaRanking(res);
 
                 if (window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
@@ -1836,6 +1862,8 @@
                     actualizarBarraPerfil();
                     s.style.color = "green";
                     s.innerText = "¡Perfil cargado!";
+                    // Auto-ejecutar ranking al cargar perfil
+                    escanearMisCambios();
                 } else {
                     s.style.color = "red";
                     s.innerText = "No se encontró el perfil.";
