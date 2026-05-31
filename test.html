@@ -840,13 +840,13 @@
             actualizarContadoresSeleccion();
         }
 
-        function ejecutarComparacion(mio, otro, nombre, contactoAmigo) {
+        function ejecutarComparacion(mio, otro, nombre, contactoAmigo, zonaAmigo) {
             let mD = parsearTexto(mio), oD = parsearTexto(otro);
             actualizarBarrasSimulador(mio, otro, nombre);
             ultimoMatchMeSirven = encontrarInterseccion(mD.faltan, oD.repetidas);
             ultimoMatchLeSirven = encontrarInterseccion(oD.faltan, mD.repetidas);
             ultimoNombreAmigo = nombre;
-            ultimoZonaAmigo = snap.exists() ? (snap.val().zona || "") : "";
+            ultimoZonaAmigo = zonaAmigo || "";
             ultimoContactoAmigo = contactoAmigo || { tipo: "", dato: "" };
 
             actualizarBotonContactar();
@@ -1244,7 +1244,7 @@
                         tipo: d.contacto_tipo || "",
                         dato: d.contacto_dato || ""
                     };
-                    ejecutarComparacion(m, d.textoOriginal, amigo, contactoAmigo);
+                    ejecutarComparacion(m, d.textoOriginal, amigo, contactoAmigo, d.zona || "");
                     document.getElementById('statusAmigo').style.color = "green";
                     document.getElementById('statusAmigo').innerText = "¡Lista cargada!";
                 } else {
@@ -1594,7 +1594,7 @@
             let textoMio = document.getElementById('miLista').value.trim();
             let textoAmigo = document.getElementById('amigoLista').value.trim();
             if (!textoMio || !textoAmigo) { alert("Faltan listas para comparar."); return; }
-            ejecutarComparacion(textoMio, textoAmigo, document.getElementById('amigoUsuario').value.trim() || "TU AMIGO", { tipo: "", dato: "" });
+            ejecutarComparacion(textoMio, textoAmigo, document.getElementById('amigoUsuario').value.trim() || "TU AMIGO", { tipo: "", dato: "" }, "");
             document.getElementById('statusAmigo').innerText = "";
         }
 
