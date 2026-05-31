@@ -842,11 +842,11 @@
 
         function ejecutarComparacion(mio, otro, nombre, contactoAmigo, zonaAmigo) {
             let mD = parsearTexto(mio), oD = parsearTexto(otro);
+            ultimoZonaAmigo = zonaAmigo || "";
             actualizarBarrasSimulador(mio, otro, nombre);
             ultimoMatchMeSirven = encontrarInterseccion(mD.faltan, oD.repetidas);
             ultimoMatchLeSirven = encontrarInterseccion(oD.faltan, mD.repetidas);
             ultimoNombreAmigo = nombre;
-            ultimoZonaAmigo = zonaAmigo || "";
             ultimoContactoAmigo = contactoAmigo || { tipo: "", dato: "" };
 
             actualizarBotonContactar();
@@ -1348,7 +1348,7 @@
             chipsContainer.innerHTML = html;
         }
 
-        function filtrarPorZona(zona) {
+        window.filtrarPorZona = function filtrarPorZona(zona) {
             zonaFiltroActiva = zona;
             // Actualizar chips activos
             document.querySelectorAll('.zona-chip').forEach(c => {
