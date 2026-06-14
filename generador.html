@@ -6,7 +6,8 @@
     <title>Generador QR - Figuritas App</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; max-width: 600px; margin: auto; }
@@ -21,7 +22,7 @@
 <body>
 
     <div class="box">
-        <h2 style="margin-top: 0; color: #005c98;">🛠️ Falsificador de QR</h2>
+        <h2 style="margin-top: 0; color: #005c98;">🛠️ Falsificador de QR (Final)</h2>
         <p style="font-size: 14px; color: #6c757d; margin-bottom: 20px;">Pegá una lista de WhatsApp y generá un QR clon exacto de la app original.</p>
         
         <textarea id="inputText" placeholder="Pegá tu lista de 'Me faltan' y 'Repetidas' acá..."></textarea>
@@ -45,13 +46,10 @@
         ];
 
         document.getElementById('btnGenerar').addEventListener('click', () => {
+            let texto = document.getElementById('inputText').value.trim();
+            if(!texto) { alert("Pegá una lista primero."); return; }
+            
             try {
-                let texto = document.getElementById('inputText').value.trim();
-                if(!texto) { 
-                    alert("Por favor, pegá una lista en la caja de texto primero."); 
-                    return; 
-                }
-                
                 // 1. Extraemos los datos del texto
                 let datos = parsearTexto(texto);
                 
@@ -59,43 +57,33 @@
                 let faltanBytes = crearMapaDeBits(datos.faltan);
                 let repesBytes = crearMapaDeBits(datos.repetidas);
                 
-                // 3. Comprimimos con GZIP
+                // 3. Comprimimos con GZIP (Limpiamos cabeceras nativas para evitar ruido)
                 let gzipFaltan = pako.gzip(faltanBytes);
                 let gzipRepes = pako.gzip(repesBytes);
                 
-                // 4. Limpiamos la basura de la hora (Bytes 4 al 8) en la cabecera
-                for(let i=4; i<=8; i++) {
-                    gzipFaltan[i] = 0;
-                    gzipRepes[i] = 0;
-                }
-                
-                // 5. Convertimos a Base64
+                // 4. Convertimos a Base64
                 let b64Faltan = uint8ToBase64(gzipFaltan);
                 let b64Repes = uint8ToBase64(gzipRepes);
                 
-                // 6. Añadimos el ;19 al final para indicar el álbum Usa Mex Can 26
+                // ==========================================
+                // LA SOLUCIÓN MAESTRA: AÑADIR EL ;19 AL FINAL
+                // ==========================================
                 let payloadFinal = `λ~${b64Faltan};${b64Repes};19`;
                 
-                // 7. Dibujamos el QR usando la librería segura
-                QRCode.toDataURL(payloadFinal, {
-                    width: 300,
-                    margin: 2,
-                    errorCorrectionLevel: 'L'
-                }, function (err, url) {
-                    if (err) {
-                        alert("Error al dibujar el QR: " + err);
-                        console.error(err);
-                        return;
-                    }
-                    // Mostramos la imagen final en pantalla
-                    document.getElementById('qrcode').innerHTML = `<img src="${url}">`; 
-                    document.getElementById('qrContainer').style.display = 'flex';
-                });
+                // Forzamos codificación UTF-8 para que no se rompa la λ
+                let utf8Payload = unescape(encodeURIComponent(payloadFinal));
+                
+                // Dibujamos el QR
+                let qr = qrcode(0, 'M'); 
+                qr.addData(utf8Payload);
+                qr.make();
+                
+                document.getElementById('qrcode').innerHTML = qr.createImgTag(4, 0); 
+                document.getElementById('qrContainer').style.display = 'flex';
                 
             } catch (error) {
-                // Si algo se rompe, ahora te va a saltar un cartel avisando por qué
-                console.error("Error fatal:", error);
-                alert("Ocurrió un error procesando los datos: " + error.message);
+                console.error("Error al generar el QR:", error);
+                alert("Hubo un problema al procesar la lista.");
             }
         });
 
@@ -109,6 +97,7 @@
                 
                 dict[eq].forEach(num => {
                     let stickerIdx = (eq === "FWC") ? num : num - 1;
+                    
                     let globalBit = teamIdx * 20 + stickerIdx;
                     let byteIdx = Math.floor(globalBit / 8);
                     let bitOffset = globalBit % 8;
@@ -153,7 +142,7 @@
             return d;
         }
 
-        // Convierte Uint8Array a Base64 de forma segura
+        // Convierte Uint8Array a Base64
         function uint8ToBase64(u8Arr) {
             let bin = '';
             for (let i = 0; i < u8Arr.length; i++) {
