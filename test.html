@@ -495,7 +495,6 @@
             <h3 style="color:#e9ecef; margin:0 0 14px 0; font-size:17px;">📷 Apuntá la cámara al QR</h3>
             <div style="position:relative; border-radius:10px; overflow:hidden; background:#000; min-height:240px; display:flex; align-items:center; justify-content:center;">
                 <video id="qrVideo" style="width:100%; border-radius:10px; display:block;" playsinline autoplay muted></video>
-                <!-- Marco de guía -->
                 <div style="position:absolute; inset:0; pointer-events:none; display:flex; align-items:center; justify-content:center;">
                     <div style="width:200px; height:200px; border:3px solid #4a9eda; border-radius:10px; box-shadow:0 0 0 9999px rgba(0,0,0,0.35);"></div>
                 </div>
@@ -2021,137 +2020,215 @@
         }
 
         // =====================================
-        // =====================================
-        // LECTOR QR — cámara + archivo + paste
-        // =====================================
+        // ================================================
+        // LECTOR QR CON DECODE REAL DE FIGURITAS APP
+        // ================================================
 
-        // Carga jsQR bajo demanda (solo cuando se usa por primera vez)
-        function cargarJsQR(callback) {
-            if (window.jsQR) { callback(); return; }
-            let s = document.createElement('script');
-            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js';
-            s.onload = callback;
-            s.onerror = () => mostrarToast("❌ No se pudo cargar el lector de QR. Chequeá tu conexión.");
-            document.head.appendChild(s);
+        // Orden exacto de los 50 equipos en la base de datos de la app
+        const QR_TEAMS = [
+            "FWC","MEX","RSA","KOR","CZE","CAN","BIH","QAT","SUI","BRA",
+            "MAR","HAI","SCO","USA","PAR","AUS","TUR","GER","CUW","CIV",
+            "ECU","NED","JPN","SWE","TUN","BEL","EGY","IRN","NZL","ESP",
+            "CPV","KSA","URU","FRA","SEN","IRQ","NOR","ARG","ALG","AUT",
+            "JOR","POR","COD","UZB","COL","ENG","CRO","GHA","PAN","CC"
+        ];
+
+        // Carga jsQR + pako bajo demanda (solo la primera vez)
+        let _libsQRlistas = false;
+        function cargarLibsQR(callback) {
+            if (_libsQRlistas) { callback(); return; }
+            let pendiente = 2;
+            function check() { if (--pendiente === 0) { _libsQRlistas = true; callback(); } }
+
+            let s1 = document.createElement('script');
+            s1.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+            s1.onload = check;
+            s1.onerror = () => mostrarToast("❌ No se pudo cargar el lector QR. Chequeá tu conexión.");
+
+            let s2 = document.createElement('script');
+            s2.src = 'https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js';
+            s2.onload = check;
+            s2.onerror = () => mostrarToast("❌ No se pudo cargar el decodificador. Chequeá tu conexión.");
+
+            document.head.appendChild(s1);
+            document.head.appendChild(s2);
         }
 
-        // Rellena el textarea con el texto del QR y muestra toast
-        function procesarTextoQR(texto) {
+        // Transforma los bytes del QR al diccionario {equipo: [nums]}
+        function qrBytesADict(byteArray) {
+            let dict = {};
+            for (let i = 0; i < byteArray.length; i++) {
+                let byte = byteArray[i];
+                for (let bit = 0; bit < 8; bit++) {
+                    if ((byte & (1 << bit)) !== 0) {
+                        let globalBit = i * 8 + bit;
+                        let teamIdx   = Math.floor(globalBit / 20);
+                        let stickerIdx = globalBit % 20;
+                        if (teamIdx < QR_TEAMS.length) {
+                            let eq  = QR_TEAMS[teamIdx];
+                            let num = (eq === "FWC") ? stickerIdx : stickerIdx + 1;
+                            if (!dict[eq]) dict[eq] = [];
+                            dict[eq].push(num);
+                        }
+                    }
+                }
+            }
+            return dict;
+        }
+
+        // Descomprime un chunk base64+gzip del QR
+        function qrChunkABytes(chunk) {
+            let b64 = chunk.replace(/[^A-Za-z0-9+\/=]/g, '');
+            let bin = atob(b64);
+            let arr = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+            return pako.ungzip(arr);
+        }
+
+        // Decodifica el payload crudo del QR y arma el texto compatible con parsearTexto()
+        function decodificarPayloadQR(rawData) {
+            try {
+                let chunks = rawData.split(';');
+                if (chunks.length < 2) throw new Error("Formato de QR no reconocido.");
+
+                let dictFaltan = qrBytesADict(qrChunkABytes(chunks[0]));
+                let dictRepes  = qrBytesADict(qrChunkABytes(chunks[1]));
+
+                let texto = "Figuritas App - Lista\nUsa Méx Can 26\n\nMe faltan\n";
+                for (let eq in dictFaltan) {
+                    texto += `${eq}: ${dictFaltan[eq].join(', ')}\n`;
+                }
+                texto += "\nRepetidas\n";
+                for (let eq in dictRepes) {
+                    texto += `${eq}: ${dictRepes[eq].join(', ')}\n`;
+                }
+                return texto;
+            } catch (e) {
+                console.error("decodificarPayloadQR:", e);
+                return null;
+            }
+        }
+
+        // Recibe el texto ya decodificado y lo pone en el textarea
+        function aplicarTextoDecodificado(texto) {
+            if (!texto) {
+                mostrarToast("⚠️ No se pudo decodificar el QR. ¿Es un QR de Figuritas App?");
+                return;
+            }
             let ta = document.getElementById('amigoLista');
             ta.value = texto;
             ta.style.borderColor = '#51cf66';
             setTimeout(() => ta.style.borderColor = '', 2500);
-            mostrarToast("✅ ¡QR leído con éxito! Revisá la lista y compará.");
+            mostrarToast("✅ ¡QR leído y decodificado! Revisá la lista y compará.");
         }
 
-        // Decodifica una imagen (dataURL) y extrae el QR
-        function decodificarImagenQR(dataURL) {
+        // Dado un dataURL de imagen, extrae el QR y lo decodifica
+        function procesarImagenComoQR(dataURL) {
             let img = new Image();
             img.onload = function () {
-                let cv = document.createElement('canvas');
-                cv.width = img.width;
+                let cv  = document.createElement('canvas');
+                cv.width  = img.width;
                 cv.height = img.height;
                 let ctx = cv.getContext('2d');
                 ctx.drawImage(img, 0, 0);
-                let imageData = ctx.getImageData(0, 0, cv.width, cv.height);
-                let code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
-                if (code) {
-                    procesarTextoQR(code.data);
-                } else {
+                let imgData = ctx.getImageData(0, 0, cv.width, cv.height);
+                let code = jsQR(imgData.data, imgData.width, imgData.height);
+                if (!code) {
                     mostrarToast("❌ No se detectó ningún QR. Intentá con una imagen más nítida.");
+                    return;
                 }
+                aplicarTextoDecodificado(decodificarPayloadQR(code.data));
             };
             img.src = dataURL;
         }
 
         // --- BOTÓN 1: Cámara en vivo ---
         document.getElementById('btnEscanearQR').addEventListener('click', function () {
-            cargarJsQR(() => {
+            cargarLibsQR(() => {
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    mostrarToast("❌ Tu navegador no soporta acceso a la cámara. Usá la opción de subir imagen.");
+                    mostrarToast("❌ Tu navegador no soporta cámara. Usá la opción de subir imagen.");
                     return;
                 }
-                let modal   = document.getElementById('modalQR');
-                let video   = document.getElementById('qrVideo');
-                let canvas  = document.getElementById('qrCanvas');
-                let status  = document.getElementById('statusQR');
-                let stream  = null;
-                let rafId   = null;
+                let modal  = document.getElementById('modalQR');
+                let video  = document.getElementById('qrVideo');
+                let canvas = document.getElementById('qrCanvas');
+                let status = document.getElementById('statusQR');
+                let stream = null, rafId = null;
+
                 modal.style.display = 'flex';
-                status.textContent  = '🔍 Buscando QR...';
-                status.style.color  = '#adb5bd';
+                status.textContent = '🔍 Buscando QR...';
+                status.style.color = '#adb5bd';
 
-                navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } })
-                    .then(s => {
-                        stream = s;
-                        video.srcObject = stream;
-                        video.play();
+                navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+                }).then(s => {
+                    stream = s;
+                    video.srcObject = stream;
+                    video.play();
 
-                        function tick() {
-                            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                                canvas.width  = video.videoWidth;
-                                canvas.height = video.videoHeight;
-                                let ctx  = canvas.getContext('2d');
-                                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                                let img  = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                                let code = jsQR(img.data, img.width, img.height, { inversionAttempts: "dontInvert" });
-                                if (code) {
-                                    cerrarCamara();
-                                    procesarTextoQR(code.data);
-                                    return;
-                                }
+                    function tick() {
+                        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                            canvas.width  = video.videoWidth;
+                            canvas.height = video.videoHeight;
+                            let ctx  = canvas.getContext('2d');
+                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            let code = jsQR(ctx.getImageData(0, 0, canvas.width, canvas.height).data, canvas.width, canvas.height);
+                            if (code) {
+                                cerrarCamara();
+                                aplicarTextoDecodificado(decodificarPayloadQR(code.data));
+                                return;
                             }
-                            rafId = requestAnimationFrame(tick);
                         }
                         rafId = requestAnimationFrame(tick);
-                    })
-                    .catch(() => {
-                        status.textContent = "❌ No se pudo acceder a la cámara. Usá la opción de subir imagen.";
-                        status.style.color = '#ff6b6b';
-                    });
+                    }
+                    rafId = requestAnimationFrame(tick);
+                }).catch(() => {
+                    status.textContent = "❌ No se pudo acceder a la cámara. Usá la opción de subir imagen.";
+                    status.style.color = '#ff6b6b';
+                });
 
                 function cerrarCamara() {
-                    if (rafId)   cancelAnimationFrame(rafId);
-                    if (stream)  stream.getTracks().forEach(t => t.stop());
-                    video.srcObject    = null;
+                    if (rafId)  cancelAnimationFrame(rafId);
+                    if (stream) stream.getTracks().forEach(t => t.stop());
+                    video.srcObject = null;
                     modal.style.display = 'none';
                 }
                 document.getElementById('btnCerrarQR').onclick = cerrarCamara;
-                modal.addEventListener('click', function handler(e) {
-                    if (e.target === modal) { cerrarCamara(); modal.removeEventListener('click', handler); }
+                modal.addEventListener('click', function h(e) {
+                    if (e.target === modal) { cerrarCamara(); modal.removeEventListener('click', h); }
                 });
             });
         });
 
         // --- BOTÓN 2: Subir archivo imagen ---
         document.getElementById('btnSubirQR').addEventListener('click', function () {
-            cargarJsQR(() => document.getElementById('inputArchivoQR').click());
+            cargarLibsQR(() => document.getElementById('inputArchivoQR').click());
         });
 
         document.getElementById('inputArchivoQR').addEventListener('change', function (e) {
             let file = e.target.files[0];
             if (!file) return;
             let reader = new FileReader();
-            reader.onload = ev => decodificarImagenQR(ev.target.result);
+            reader.onload = ev => procesarImagenComoQR(ev.target.result);
             reader.readAsDataURL(file);
-            e.target.value = ''; // permite volver a subir el mismo archivo
+            e.target.value = '';
         });
 
-        // --- PEGAR imagen del portapapeles (Ctrl+V en el textarea) ---
+        // --- PEGAR imagen del portapapeles (Ctrl+V sobre el textarea) ---
         document.getElementById('amigoLista').addEventListener('paste', function (e) {
             let items = (e.clipboardData || window.clipboardData).items;
             for (let item of items) {
                 if (item.type.startsWith('image/')) {
-                    e.preventDefault(); // no pegar basura en el textarea
-                    cargarJsQR(() => {
+                    e.preventDefault();
+                    cargarLibsQR(() => {
                         let reader = new FileReader();
-                        reader.onload = ev => decodificarImagenQR(ev.target.result);
+                        reader.onload = ev => procesarImagenComoQR(ev.target.result);
                         reader.readAsDataURL(item.getAsFile());
                     });
                     return;
                 }
             }
-            // Si es texto plano, el paste normal sigue funcionando
+            // Si es texto plano, el paste normal sigue sin tocar
         });
 
         // INIT
