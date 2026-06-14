@@ -6,7 +6,8 @@
     <title>Generador QR - Figuritas App</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; max-width: 600px; margin: auto; }
@@ -15,7 +16,7 @@
         button { background: #005c98; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; width: 100%; transition: 0.2s;}
         button:hover { filter: brightness(1.1); }
         #qrContainer { margin-top: 25px; display: flex; justify-content: center; padding: 20px; background: white; border-radius: 8px; border: 2px dashed #ced4da; display: none; flex-direction: column; align-items: center;}
-        #qrcode img { margin: auto; }
+        #qrcode img { margin: auto; border: 4px solid white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     </style>
 </head>
 <body>
@@ -30,7 +31,7 @@
 
         <div id="qrContainer">
             <h3 style="margin-top:0; color:#28a745;">¡QR Listo!</h3>
-            <p style="font-size:12px; color:#666;">Abrí la 'Figuritas App' original en tu celular y escaneá esta pantalla.</p>
+            <p style="font-size:12px; color:#666; margin-bottom: 15px;">Abrí la 'Figuritas App' original en tu celular y escaneá esta pantalla.</p>
             <div id="qrcode"></div>
         </div>
     </div>
@@ -66,16 +67,24 @@
             // 5. Unimos todo con el formato de la App
             let payloadFinal = `λ~${b64Faltan};${b64Repes}`;
             
-            // 6. Dibujamos el QR
-            document.getElementById('qrContainer').style.display = 'flex';
-            document.getElementById('qrcode').innerHTML = '';
-            new QRCode(document.getElementById('qrcode'), {
-                text: payloadFinal,
-                width: 250,
-                height: 250,
-                colorDark : "#000000",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.L // Nivel bajo porque el texto es largo
+            // 6. Dibujamos el QR con la NUEVA LIBRERÍA
+            document.getElementById('qrcode').innerHTML = ''; // Limpiamos si había uno previo
+            
+            QRCode.toDataURL(payloadFinal, { 
+                width: 300, 
+                margin: 2, 
+                color: { dark: '#000000', light: '#ffffff' },
+                errorCorrectionLevel: 'L' // Importante para que soporte textos larguísimos
+            }, function (err, url) {
+                if (err) { 
+                    alert("Error al generar el QR."); 
+                    console.error(err); 
+                    return; 
+                }
+                
+                // Mostramos la imagen
+                document.getElementById('qrcode').innerHTML = `<img src="${url}" alt="Código QR">`;
+                document.getElementById('qrContainer').style.display = 'flex';
             });
         });
 
@@ -103,7 +112,7 @@
             return byteArray;
         }
 
-        // Parsea el texto (reutilizamos la logica de la webapp)
+        // Parsea el texto
         function limpiarNombreEquipo(textoRaw) {
             let limpio = textoRaw.replace(/[^A-Za-z]/g, '').toUpperCase();
             for (let sigla of TEAMS) if (limpio.includes(sigla)) return sigla; 
