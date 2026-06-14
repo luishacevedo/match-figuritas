@@ -22,7 +22,7 @@
 <body>
 
     <div class="box">
-        <h2 style="margin-top: 0; color: #005c98;">🛠️ Falsificador de QR</h2>
+        <h2 style="margin-top: 0; color: #005c98;">🛠️ Falsificador de QR (Final)</h2>
         <p style="font-size: 14px; color: #6c757d; margin-bottom: 20px;">Pegá una lista de WhatsApp y generá un QR clon exacto de la app original.</p>
         
         <textarea id="inputText" placeholder="Pegá tu lista de 'Me faltan' y 'Repetidas' acá..."></textarea>
@@ -57,9 +57,29 @@
                 let faltanBytes = crearMapaDeBits(datos.faltan);
                 let repesBytes = crearMapaDeBits(datos.repetidas);
                 
-                // 3. Comprimimos con GZIP (Sin hacks que corrompan el archivo)
+                // 3. Comprimimos con GZIP
                 let gzipFaltan = pako.gzip(faltanBytes);
                 let gzipRepes = pako.gzip(repesBytes);
+                
+                // ==========================================
+                // EL HACK DEFINITIVO: BORRAR LA HORA
+                // ==========================================
+                // La app original chequea que el Base64 arranque con H4sIAAAAAAAAEy
+                // Para lograr eso, tenemos que borrar la fecha de creación del GZIP
+                // e inyectarle el número 19 (el ID de Usa Mex Can 26)
+                function inyectarFirmaExacta(gzip) {
+                    gzip[4] = 0; // Borrar Timestamp
+                    gzip[5] = 0;
+                    gzip[6] = 0;
+                    gzip[7] = 0;
+                    gzip[8] = 0; // Borrar Extra Flags
+                    gzip[9] = 19; // Clavar el ID del Álbum
+                    return gzip;
+                }
+
+                gzipFaltan = inyectarFirmaExacta(gzipFaltan);
+                gzipRepes = inyectarFirmaExacta(gzipRepes);
+                // ==========================================
                 
                 // 4. Convertimos a Base64
                 let b64Faltan = uint8ToBase64(gzipFaltan);
@@ -140,7 +160,7 @@
             return d;
         }
 
-        // Convierte Uint8Array a Base64 sin romper nada
+        // Convierte Uint8Array a Base64
         function uint8ToBase64(u8Arr) {
             let bin = '';
             for (let i = 0; i < u8Arr.length; i++) {
