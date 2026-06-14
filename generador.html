@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador QR - Figuritas App</title>
     
+    <!-- Librería pako para comprimir a GZIP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <!-- LIBRERÍA INFALIBLE: qrcode-generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; max-width: 600px; margin: auto; }
@@ -49,63 +51,54 @@
             let texto = document.getElementById('inputText').value.trim();
             if(!texto) { alert("Pegá una lista primero."); return; }
             
-            // 1. Extraemos los datos del texto
-            let datos = parsearTexto(texto);
-            
-            // 2. Armamos las matrices binarias (125 bytes c/u)
-            let faltanBytes = crearMapaDeBits(datos.faltan);
-            let repesBytes = crearMapaDeBits(datos.repetidas);
-            
-            // 3. Comprimimos con GZIP
-            let gzipFaltan = pako.gzip(faltanBytes);
-            let gzipRepes = pako.gzip(repesBytes);
-            
-            // 4. Convertimos a Base64
-            let b64Faltan = uint8ToBase64(gzipFaltan);
-            let b64Repes = uint8ToBase64(gzipRepes);
-            
-            // 5. Unimos todo con el formato de la App
-            let payloadFinal = `λ~${b64Faltan};${b64Repes}`;
-            
-            // 6. Dibujamos el QR con la NUEVA LIBRERÍA
-            document.getElementById('qrcode').innerHTML = ''; // Limpiamos si había uno previo
-            
-            QRCode.toDataURL(payloadFinal, { 
-                width: 300, 
-                margin: 2, 
-                color: { dark: '#000000', light: '#ffffff' },
-                errorCorrectionLevel: 'L' // Importante para que soporte textos larguísimos
-            }, function (err, url) {
-                if (err) { 
-                    alert("Error al generar el QR."); 
-                    console.error(err); 
-                    return; 
-                }
+            try {
+                // 1. Extraemos los datos del texto
+                let datos = parsearTexto(texto);
                 
-                // Mostramos la imagen
-                document.getElementById('qrcode').innerHTML = `<img src="${url}" alt="Código QR">`;
+                // 2. Armamos las matrices binarias (125 bytes c/u)
+                let faltanBytes = crearMapaDeBits(datos.faltan);
+                let repesBytes = crearMapaDeBits(datos.repetidas);
+                
+                // 3. Comprimimos con GZIP
+                let gzipFaltan = pako.gzip(faltanBytes);
+                let gzipRepes = pako.gzip(repesBytes);
+                
+                // 4. Convertimos a Base64
+                let b64Faltan = uint8ToBase64(gzipFaltan);
+                let b64Repes = uint8ToBase64(gzipRepes);
+                
+                // 5. Unimos todo con el formato de la App
+                let payloadFinal = `λ~${b64Faltan};${b64Repes}`;
+                
+                // 6. Dibujamos el QR con la librería ultra-estable
+                let qr = qrcode(0, 'L'); // 0 significa auto-detectar tamaño, 'L' es baja corrección (ideal para mucho texto)
+                qr.addData(payloadFinal);
+                qr.make();
+                
+                document.getElementById('qrcode').innerHTML = qr.createImgTag(4, 0); // 4px de tamaño por celda, 0px de margen
                 document.getElementById('qrContainer').style.display = 'flex';
-            });
+                
+            } catch (error) {
+                console.error("Error al generar el QR:", error);
+                alert("Hubo un problema al procesar la lista.");
+            }
         });
 
         // Convierte el diccionario de equipos en los 125 bytes crudos
         function crearMapaDeBits(dict) {
-            let byteArray = new Uint8Array(125); // 125 bytes de ceros
+            let byteArray = new Uint8Array(125); 
             
             for (let eq in dict) {
                 let teamIdx = TEAMS.indexOf(eq);
-                if (teamIdx === -1) continue; // Si no encuentra el equipo, lo ignora
+                if (teamIdx === -1) continue; 
                 
                 dict[eq].forEach(num => {
-                    // La regla de oro: FWC arranca en 0, los demas en 1
                     let stickerIdx = (eq === "FWC") ? num : num - 1;
                     
-                    // Calculamos qué bit específico prender
                     let globalBit = teamIdx * 20 + stickerIdx;
                     let byteIdx = Math.floor(globalBit / 8);
                     let bitOffset = globalBit % 8;
                     
-                    // Prendemos el interruptor (1) usando un operador OR
                     byteArray[byteIdx] |= (1 << bitOffset);
                 });
             }
