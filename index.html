@@ -713,13 +713,30 @@
                 else if (lm.includes('repetidas') || lm.includes('swaps')) seccion = 'repetidas';
                 else if (seccion && l.includes(':')) {
                     let eq = limpiarNombreEquipo(l.split(':')[0]);
-                    let nums = l.split(':')[1].replace(/\(x\d+\)/g, '').split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+                    // Todo lo que viene después del primer ':'
+                    let parteNums = l.split(':').slice(1).join(':');
+                    let nums = [];
+                    // Cada token separado por coma puede ser: "5", "5 (×3)", "5 (x3)", "5(x2)"
+                    parteNums.split(',').forEach(token => {
+                        token = token.trim();
+                        let numMatch = token.match(/^(\d+)/);
+                        if (!numMatch) return;
+                        let num = parseInt(numMatch[1]);
+                        if (isNaN(num)) return;
+                        // Soporta: (×3) con símbolo Unicode, (x3) con letra latina, (X3) mayúscula
+                        let multMatch = token.match(/\([×xX]\s*(\d+)\)/);
+                        let cantidad = multMatch ? parseInt(multMatch[1]) : 1;
+                        for (let i = 0; i < cantidad; i++) nums.push(num);
+                    });
                     if (!datos[seccion][eq]) datos[seccion][eq] = [];
                     datos[seccion][eq].push(...nums);
                 }
             });
             for (let s in datos) {
                 for (let e in datos[s]) {
+                    // faltan: deduplicar (cada número se necesita una sola vez)
+                    // repetidas: conservar duplicados (representan copias reales)
+                    if (s === 'faltan') datos[s][e] = [...new Set(datos[s][e])];
                     datos[s][e].sort((a, b) => a - b);
                 }
             }
