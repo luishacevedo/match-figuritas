@@ -22,7 +22,7 @@
 <body>
 
     <div class="box">
-        <h2 style="margin-top: 0; color: #005c98;">🛠️ Falsificador de QR (Perfecto)</h2>
+        <h2 style="margin-top: 0; color: #005c98;">🛠️ Falsificador de QR</h2>
         <p style="font-size: 14px; color: #6c757d; margin-bottom: 20px;">Pegá una lista de WhatsApp y generá un QR clon exacto de la app original.</p>
         
         <textarea id="inputText" placeholder="Pegá tu lista de 'Me faltan' y 'Repetidas' acá..."></textarea>
@@ -57,22 +57,9 @@
                 let faltanBytes = crearMapaDeBits(datos.faltan);
                 let repesBytes = crearMapaDeBits(datos.repetidas);
                 
-                // 3. Comprimimos con GZIP
+                // 3. Comprimimos con GZIP (Sin hacks que corrompan el archivo)
                 let gzipFaltan = pako.gzip(faltanBytes);
                 let gzipRepes = pako.gzip(repesBytes);
-                
-                // ==========================================
-                // HACK MÁGICO: FALSIFICAR FIRMA Y ÁLBUM
-                // ==========================================
-                // Modificamos el byte 9 de la cabecera GZIP (OS) para engañar a la app
-                // y decirle que somos el álbum 19 ("Usa Méx Can 26")
-                gzipFaltan[9] = 19; 
-                gzipRepes[9] = 19; 
-                
-                // Limpiamos el byte 8 (Extra Flags) para igualar la huella al 100%
-                gzipFaltan[8] = 0;
-                gzipRepes[8] = 0;
-                // ==========================================
                 
                 // 4. Convertimos a Base64
                 let b64Faltan = uint8ToBase64(gzipFaltan);
