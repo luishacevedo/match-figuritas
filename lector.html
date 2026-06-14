@@ -56,21 +56,17 @@
         
         <input type="file" id="fileInput" accept="image/*">
         
-        <textarea id="output" placeholder="Acá aparecerá la lista de figuritas decodificada..." readonly></textarea>
+        <textarea id="output" placeholder="Acá aparecerá la lista decodificada..." readonly></textarea>
     </div>
 
     <script>
         const fileInput = document.getElementById('fileInput');
         const output = document.getElementById('output');
 
-        // 1. Evento para cuando se sube el archivo usando el botón
         fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                procesarImagen(e.target.files[0]);
-            }
+            if (e.target.files.length > 0) procesarImagen(e.target.files[0]);
         });
 
-        // 2. Evento para escuchar cuando el usuario presiona Ctrl+V (Pegar)
         window.addEventListener('paste', (e) => {
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
             for (let i = 0; i < items.length; i++) {
@@ -81,7 +77,6 @@
             }
         });
 
-        // 3. Convertir la imagen a un Canvas y extraer el QR
         function procesarImagen(file) {
             output.value = "⏳ Escaneando imagen...";
             const reader = new FileReader();
@@ -96,15 +91,13 @@
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
                     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    
-                    // jsQR hace la magia de encontrar el cuadrado y leer sus datos
                     const code = jsQR(imageData.data, imageData.width, imageData.height);
                     
                     if (code && code.data) {
-                        output.value = "🔄 QR Detectado. Descomprimiendo archivos múltiples...";
+                        output.value = "🔄 QR Detectado. Descomprimiendo archivos...";
                         decodificarCarga(code.data);
                     } else {
-                        output.value = "❌ No se pudo encontrar o leer un código QR en la imagen enviada. Asegurate de que se vea nítido.";
+                        output.value = "❌ No se pudo leer un código QR en la imagen.";
                     }
                 };
                 img.src = e.target.result;
@@ -112,41 +105,36 @@
             reader.readAsDataURL(file);
         }
 
-        // 4. Limpiar, decodificar de Base64 y descomprimir el GZIP múltiple
         function decodificarCarga(rawData) {
             try {
-                let cleanData = rawData;
-                
-                // Remueve la firma "λ~" inicial si existe
-                if (cleanData.startsWith('λ~')) {
-                    cleanData = cleanData.substring(2);
-                }
-
-                // Separa la cadena por el punto y coma (cada elemento es un archivo GZIP distinto)
-                const chunks = cleanData.split(';');
+                // Separa la cadena por el punto y coma (cada uno es un archivo GZIP)
+                const chunks = rawData.split(';');
                 let textoFinal = "";
 
-                // Procesa cada archivo comprimido de forma independiente
                 chunks.forEach((chunk, index) => {
-                    if (!chunk.trim()) return; // Ignora pedazos vacíos
+                    // LIMPIEZA EXTREMA: Conserva solo los caracteres válidos de Base64.
+                    // Esto destruye el λ, la ~, saltos de línea y caracteres invisibles.
+                    const b64Limpio = chunk.replace(/[^A-Za-z0-9+\/=]/g, '');
                     
-                    // Decodifica el Base64 a una cadena binaria
-                    const binaryString = atob(chunk);
+                    // Si el pedazo quedó vacío tras la limpieza, lo ignoramos
+                    if (!b64Limpio) return;
                     
-                    // Lo convierte al formato Uint8Array (Requerido por Pako)
+                    // 1. Decodifica el Base64 limpio a binario
+                    const binaryString = atob(b64Limpio);
+                    
+                    // 2. Lo convierte al formato Uint8Array que necesita Pako
                     const charArray = new Uint8Array(binaryString.length);
                     for (let i = 0; i < binaryString.length; i++) {
                         charArray[i] = binaryString.charCodeAt(i);
                     }
 
-                    // Descomprime
+                    // 3. Descomprime el GZIP a Texto
                     const textoDescomprimido = pako.ungzip(charArray, { to: 'string' });
                     
-                    // Lo va sumando al resultado final
-                    textoFinal += textoDescomprimido + "\n";
+                    // 4. Lo sumamos al resultado de la pantalla
+                    textoFinal += textoDescomprimido + "\n\n";
                 });
                 
-                // Muestra la lista final unificada
                 output.value = textoFinal.trim();
                 
             } catch (error) {
