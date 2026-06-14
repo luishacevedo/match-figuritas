@@ -6,8 +6,6 @@
     <title>Generador QR - Figuritas App</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; max-width: 600px; margin: auto; }
@@ -16,14 +14,14 @@
         button { background: #005c98; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; width: 100%; transition: 0.2s;}
         button:hover { filter: brightness(1.1); }
         #qrContainer { margin-top: 25px; display: flex; justify-content: center; padding: 20px; background: white; border-radius: 8px; border: 2px dashed #ced4da; display: none; flex-direction: column; align-items: center;}
-        #qrcode img { margin: auto; border: 4px solid white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        #qrcode img { margin: auto; border: 4px solid white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 250px; height: 250px; }
     </style>
 </head>
 <body>
 
     <div class="box">
-        <h2 style="margin-top: 0; color: #005c98;">🛠️ Falsificador de QR (Definitivo)</h2>
-        <p style="font-size: 14px; color: #6c757d; margin-bottom: 20px;">Pegá una lista de WhatsApp y generá un QR clon exacto de la app original.</p>
+        <h2 style="margin-top: 0; color: #005c98;">🛠️ Falsificador de QR (Perfecto)</h2>
+        <p style="font-size: 14px; color: #6c757d; margin-bottom: 20px;">Pegá una lista de WhatsApp y generá un QR nativo que la app original puede leer.</p>
         
         <textarea id="inputText" placeholder="Pegá tu lista de 'Me faltan' y 'Repetidas' acá..."></textarea>
         
@@ -50,70 +48,60 @@
             if(!texto) { alert("Pegá una lista primero."); return; }
             
             try {
-                // 1. Extraemos los datos del texto
                 let datos = parsearTexto(texto);
                 
-                // 2. Armamos las matrices binarias de 125 bytes
                 let faltanBytes = crearMapaDeBits(datos.faltan);
                 let repesBytes = crearMapaDeBits(datos.repetidas);
                 
-                // 3. Comprimimos con GZIP
                 let gzipFaltan = pako.gzip(faltanBytes);
                 let gzipRepes = pako.gzip(repesBytes);
                 
-                // 4. Limpiamos la hora del GZIP (para que la huella sea idéntica siempre)
-                for(let i=4; i<8; i++) {
-                    gzipFaltan[i] = 0;
-                    gzipRepes[i] = 0;
+                // INYECCIÓN DE FIRMA EXACTA (Álbum 19: Usa Mex Can)
+                function inyectarFirmaExacta(gzip) {
+                    gzip[4] = 0; gzip[5] = 0; gzip[6] = 0; gzip[7] = 0; // Borra la fecha
+                    gzip[8] = 0; // Borra banderas extra
+                    gzip[9] = 19; // Clava el ID del Álbum
+                    return gzip;
                 }
+
+                gzipFaltan = inyectarFirmaExacta(gzipFaltan);
+                gzipRepes = inyectarFirmaExacta(gzipRepes);
                 
-                // 5. Convertimos a Base64
                 let b64Faltan = uint8ToBase64(gzipFaltan);
                 let b64Repes = uint8ToBase64(gzipRepes);
                 
-                // 6. LA MAGIA: Unimos todo y le clavamos el ;19 del álbum
-                let payloadFinal = `λ~${b64Faltan};${b64Repes};19`;
+                // El payload idéntico al de la App original
+                let payloadFinal = `λ~${b64Faltan};${b64Repes}`;
                 
-                // 7. Forzamos codificación UTF-8 para que la "λ" no se rompa en el celular
-                let utf8Payload = unescape(encodeURIComponent(payloadFinal));
+                // USAMOS UNA API EXTERNA PARA GENERAR EL QR EN UTF-8 PURO
+                let urlQR = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&charset-source=UTF-8&data=" + encodeURIComponent(payloadFinal);
                 
-                // 8. Dibujamos el QR usando la librería infalible
-                // '0' ajusta el tamaño automático, 'L' es baja corrección para soportar más datos
-                let qr = qrcode(0, 'L'); 
-                qr.addData(utf8Payload);
-                qr.make();
-                
-                document.getElementById('qrcode').innerHTML = qr.createImgTag(4, 0); 
+                document.getElementById('qrcode').innerHTML = `<img src="${urlQR}" alt="QR Generado">`;
                 document.getElementById('qrContainer').style.display = 'flex';
                 
             } catch (error) {
-                console.error("Error al generar el QR:", error);
-                alert("Hubo un problema al procesar la lista. " + error.message);
+                console.error(error);
+                alert("Hubo un problema al procesar la lista.");
             }
         });
 
-        // Convierte el diccionario en bytes
         function crearMapaDeBits(dict) {
             let byteArray = new Uint8Array(125); 
-            
             for (let eq in dict) {
                 let teamIdx = TEAMS.indexOf(eq);
                 if (teamIdx === -1) continue; 
                 
                 dict[eq].forEach(num => {
                     let stickerIdx = (eq === "FWC") ? num : num - 1;
-                    
                     let globalBit = teamIdx * 20 + stickerIdx;
                     let byteIdx = Math.floor(globalBit / 8);
                     let bitOffset = globalBit % 8;
-                    
                     byteArray[byteIdx] |= (1 << bitOffset);
                 });
             }
             return byteArray;
         }
 
-        // Parsea el texto
         function limpiarNombreEquipo(textoRaw) {
             let limpio = textoRaw.replace(/[^A-Za-z]/g, '').toUpperCase();
             for (let sigla of TEAMS) if (limpio.includes(sigla)) return sigla; 
@@ -127,12 +115,9 @@
             texto.split('\n').forEach(linea => {
                 let l = linea.trim().toLowerCase(); 
                 if(!l) return; 
-                
-                if(l.includes('faltan') || l.includes('need')) {
-                    seccion = 'faltan';
-                } else if(l.includes('repetidas') || l.includes('swaps')) {
-                    seccion = 'repetidas';
-                } else if(linea.includes(':')) {
+                if(l.includes('faltan') || l.includes('need')) seccion = 'faltan';
+                else if(l.includes('repetidas') || l.includes('swaps')) seccion = 'repetidas';
+                else if(linea.includes(':')) {
                     let partes = linea.split(':');
                     let eq = limpiarNombreEquipo(partes[0]);
                     if (!eq) return; 
@@ -147,7 +132,6 @@
             return d;
         }
 
-        // Convierte Uint8Array a Base64
         function uint8ToBase64(u8Arr) {
             let bin = '';
             for (let i = 0; i < u8Arr.length; i++) {
