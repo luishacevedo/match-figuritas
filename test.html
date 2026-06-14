@@ -354,7 +354,12 @@
             </div>
 
             <label>✍️ Pegar su lista:</label>
-            <textarea id="amigoLista" placeholder="Pegá la lista de tu amigo acá..."></textarea>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+                <button id="btnEscanearQR" class="btn-primary" style="padding:8px; font-size:13px; margin:0;">📷 Escanear QR</button>
+                <button id="btnSubirQR" class="btn-secondary" style="padding:8px; font-size:13px; margin:0;">🖼️ Subir / Pegar imagen</button>
+            </div>
+            <input type="file" id="inputArchivoQR" accept="image/*" style="display:none;">
+            <textarea id="amigoLista" placeholder="Pegá la lista de tu amigo acá, o usá los botones de arriba para leer su QR..."></textarea>
             <button id="btnGuardarAmigoNuevo" class="btn-success" style="padding: 8px; font-size: 13px; margin-bottom: 10px;">💾 Guardar Amigo</button>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <button id="btnCompararLocal" class="btn-primary">⚖️ Comparar</button>
@@ -483,6 +488,23 @@
     </div><!-- fin resultados -->
 
     <div class="footer"><p>Contacto: <a href="https://t.me/luishacevedo" target="_blank">Telegram @luishacevedo</a> &nbsp;·&nbsp; <a href="ayuda.html" target="_blank">❓ Ayuda</a></p></div>
+
+    <!-- MODAL CÁMARA QR -->
+    <div id="modalQR" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.93); z-index:9999; flex-direction:column; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+        <div style="background:#1e1e1e; border:1px solid #383838; border-radius:14px; padding:20px; max-width:420px; width:100%; text-align:center;">
+            <h3 style="color:#e9ecef; margin:0 0 14px 0; font-size:17px;">📷 Apuntá la cámara al QR</h3>
+            <div style="position:relative; border-radius:10px; overflow:hidden; background:#000; min-height:240px; display:flex; align-items:center; justify-content:center;">
+                <video id="qrVideo" style="width:100%; border-radius:10px; display:block;" playsinline autoplay muted></video>
+                <!-- Marco de guía -->
+                <div style="position:absolute; inset:0; pointer-events:none; display:flex; align-items:center; justify-content:center;">
+                    <div style="width:200px; height:200px; border:3px solid #4a9eda; border-radius:10px; box-shadow:0 0 0 9999px rgba(0,0,0,0.35);"></div>
+                </div>
+            </div>
+            <canvas id="qrCanvas" style="display:none;"></canvas>
+            <p id="statusQR" style="color:#adb5bd; font-size:13px; margin:12px 0 6px 0;">🔍 Buscando QR...</p>
+            <button id="btnCerrarQR" class="btn-danger" style="padding:9px; font-size:13px; margin-top:6px;">✖ Cancelar</button>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -1999,6 +2021,139 @@
         }
 
         // =====================================
+        // =====================================
+        // LECTOR QR — cámara + archivo + paste
+        // =====================================
+
+        // Carga jsQR bajo demanda (solo cuando se usa por primera vez)
+        function cargarJsQR(callback) {
+            if (window.jsQR) { callback(); return; }
+            let s = document.createElement('script');
+            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js';
+            s.onload = callback;
+            s.onerror = () => mostrarToast("❌ No se pudo cargar el lector de QR. Chequeá tu conexión.");
+            document.head.appendChild(s);
+        }
+
+        // Rellena el textarea con el texto del QR y muestra toast
+        function procesarTextoQR(texto) {
+            let ta = document.getElementById('amigoLista');
+            ta.value = texto;
+            ta.style.borderColor = '#51cf66';
+            setTimeout(() => ta.style.borderColor = '', 2500);
+            mostrarToast("✅ ¡QR leído con éxito! Revisá la lista y compará.");
+        }
+
+        // Decodifica una imagen (dataURL) y extrae el QR
+        function decodificarImagenQR(dataURL) {
+            let img = new Image();
+            img.onload = function () {
+                let cv = document.createElement('canvas');
+                cv.width = img.width;
+                cv.height = img.height;
+                let ctx = cv.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                let imageData = ctx.getImageData(0, 0, cv.width, cv.height);
+                let code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+                if (code) {
+                    procesarTextoQR(code.data);
+                } else {
+                    mostrarToast("❌ No se detectó ningún QR. Intentá con una imagen más nítida.");
+                }
+            };
+            img.src = dataURL;
+        }
+
+        // --- BOTÓN 1: Cámara en vivo ---
+        document.getElementById('btnEscanearQR').addEventListener('click', function () {
+            cargarJsQR(() => {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    mostrarToast("❌ Tu navegador no soporta acceso a la cámara. Usá la opción de subir imagen.");
+                    return;
+                }
+                let modal   = document.getElementById('modalQR');
+                let video   = document.getElementById('qrVideo');
+                let canvas  = document.getElementById('qrCanvas');
+                let status  = document.getElementById('statusQR');
+                let stream  = null;
+                let rafId   = null;
+                modal.style.display = 'flex';
+                status.textContent  = '🔍 Buscando QR...';
+                status.style.color  = '#adb5bd';
+
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } })
+                    .then(s => {
+                        stream = s;
+                        video.srcObject = stream;
+                        video.play();
+
+                        function tick() {
+                            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                                canvas.width  = video.videoWidth;
+                                canvas.height = video.videoHeight;
+                                let ctx  = canvas.getContext('2d');
+                                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                                let img  = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                                let code = jsQR(img.data, img.width, img.height, { inversionAttempts: "dontInvert" });
+                                if (code) {
+                                    cerrarCamara();
+                                    procesarTextoQR(code.data);
+                                    return;
+                                }
+                            }
+                            rafId = requestAnimationFrame(tick);
+                        }
+                        rafId = requestAnimationFrame(tick);
+                    })
+                    .catch(() => {
+                        status.textContent = "❌ No se pudo acceder a la cámara. Usá la opción de subir imagen.";
+                        status.style.color = '#ff6b6b';
+                    });
+
+                function cerrarCamara() {
+                    if (rafId)   cancelAnimationFrame(rafId);
+                    if (stream)  stream.getTracks().forEach(t => t.stop());
+                    video.srcObject    = null;
+                    modal.style.display = 'none';
+                }
+                document.getElementById('btnCerrarQR').onclick = cerrarCamara;
+                modal.addEventListener('click', function handler(e) {
+                    if (e.target === modal) { cerrarCamara(); modal.removeEventListener('click', handler); }
+                });
+            });
+        });
+
+        // --- BOTÓN 2: Subir archivo imagen ---
+        document.getElementById('btnSubirQR').addEventListener('click', function () {
+            cargarJsQR(() => document.getElementById('inputArchivoQR').click());
+        });
+
+        document.getElementById('inputArchivoQR').addEventListener('change', function (e) {
+            let file = e.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = ev => decodificarImagenQR(ev.target.result);
+            reader.readAsDataURL(file);
+            e.target.value = ''; // permite volver a subir el mismo archivo
+        });
+
+        // --- PEGAR imagen del portapapeles (Ctrl+V en el textarea) ---
+        document.getElementById('amigoLista').addEventListener('paste', function (e) {
+            let items = (e.clipboardData || window.clipboardData).items;
+            for (let item of items) {
+                if (item.type.startsWith('image/')) {
+                    e.preventDefault(); // no pegar basura en el textarea
+                    cargarJsQR(() => {
+                        let reader = new FileReader();
+                        reader.onload = ev => decodificarImagenQR(ev.target.result);
+                        reader.readAsDataURL(item.getAsFile());
+                    });
+                    return;
+                }
+            }
+            // Si es texto plano, el paste normal sigue funcionando
+        });
+
         // INIT
         // =====================================
         window.onload = async function () {
