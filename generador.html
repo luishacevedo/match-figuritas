@@ -20,7 +20,7 @@
 <body>
 
     <div class="box">
-        <h2 style="margin-top: 0; color: #005c98;">🛠️ Falsificador de QR (Perfecto)</h2>
+        <h2 style="margin-top: 0; color: #005c98;">🛠️ Falsificador de QR (Definitivo)</h2>
         <p style="font-size: 14px; color: #6c757d; margin-bottom: 20px;">Pegá una lista de WhatsApp y generá un QR nativo que la app original puede leer.</p>
         
         <textarea id="inputText" placeholder="Pegá tu lista de 'Me faltan' y 'Repetidas' acá..."></textarea>
@@ -56,11 +56,11 @@
                 let gzipFaltan = pako.gzip(faltanBytes);
                 let gzipRepes = pako.gzip(repesBytes);
                 
-                // INYECCIÓN DE FIRMA EXACTA (Álbum 19: Usa Mex Can)
+                // Limpiamos cabeceras para ser idénticos a la app
                 function inyectarFirmaExacta(gzip) {
                     gzip[4] = 0; gzip[5] = 0; gzip[6] = 0; gzip[7] = 0; // Borra la fecha
                     gzip[8] = 0; // Borra banderas extra
-                    gzip[9] = 19; // Clava el ID del Álbum
+                    gzip[9] = 19; // Clava el ID del Álbum en el GZIP
                     return gzip;
                 }
 
@@ -70,10 +70,12 @@
                 let b64Faltan = uint8ToBase64(gzipFaltan);
                 let b64Repes = uint8ToBase64(gzipRepes);
                 
-                // El payload idéntico al de la App original
-                let payloadFinal = `λ~${b64Faltan};${b64Repes}`;
+                // ==========================================
+                // LA CLAVE DEL ÉXITO: EL TERCER BLOQUE ";19"
+                // ==========================================
+                let payloadFinal = `λ~${b64Faltan};${b64Repes};19`;
                 
-                // USAMOS UNA API EXTERNA PARA GENERAR EL QR EN UTF-8 PURO
+                // Usamos la API externa que nos garantizó que el celular lee bien el UTF-8
                 let urlQR = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&charset-source=UTF-8&data=" + encodeURIComponent(payloadFinal);
                 
                 document.getElementById('qrcode').innerHTML = `<img src="${urlQR}" alt="QR Generado">`;
