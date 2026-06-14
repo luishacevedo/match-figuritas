@@ -8,7 +8,7 @@
     <!-- Librería pako para comprimir a GZIP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     
-    <!-- LIBRERÍA INFALIBLE: qrcode-generator -->
+    <!-- Librería qrcode-generator -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 
     <style>
@@ -70,12 +70,15 @@
                 // 5. Unimos todo con el formato de la App
                 let payloadFinal = `λ~${b64Faltan};${b64Repes}`;
                 
-                // 6. Dibujamos el QR con la librería ultra-estable
-                let qr = qrcode(0, 'L'); // 0 significa auto-detectar tamaño, 'L' es baja corrección (ideal para mucho texto)
-                qr.addData(payloadFinal);
+                // 6. TRUCO DE MAGIA: Forzar codificación UTF-8 para proteger el símbolo λ
+                let utf8Payload = unescape(encodeURIComponent(payloadFinal));
+                
+                // 7. Dibujamos el QR con un nivel de corrección medio ('M') para igualar a la App
+                let qr = qrcode(0, 'M'); 
+                qr.addData(utf8Payload);
                 qr.make();
                 
-                document.getElementById('qrcode').innerHTML = qr.createImgTag(4, 0); // 4px de tamaño por celda, 0px de margen
+                document.getElementById('qrcode').innerHTML = qr.createImgTag(4, 0); 
                 document.getElementById('qrContainer').style.display = 'flex';
                 
             } catch (error) {
@@ -109,23 +112,33 @@
         function limpiarNombreEquipo(textoRaw) {
             let limpio = textoRaw.replace(/[^A-Za-z]/g, '').toUpperCase();
             for (let sigla of TEAMS) if (limpio.includes(sigla)) return sigla; 
-            return limpio.substring(0, 3);
+            return null; // Si no es un equipo válido, lo descartamos
         }
 
         function parsearTexto(texto) {
             let d = { faltan: {}, repetidas: {} };
-            let seccion = null;
+            let seccion = 'faltan'; // Asumimos 'faltan' por defecto si el usuario olvida el título
+            
             texto.split('\n').forEach(linea => {
                 let l = linea.trim().toLowerCase(); 
                 if(!l) return; 
-                if(l.includes('faltan') || l.includes('need')) seccion = 'faltan';
-                else if(l.includes('repetidas') || l.includes('swaps')) seccion = 'repetidas';
-                else if(seccion && linea.includes(':')) {
+                
+                if(l.includes('faltan') || l.includes('need')) {
+                    seccion = 'faltan';
+                } else if(l.includes('repetidas') || l.includes('swaps')) {
+                    seccion = 'repetidas';
+                } else if(linea.includes(':')) {
                     let partes = linea.split(':');
                     let eq = limpiarNombreEquipo(partes[0]);
+                    
+                    if (!eq) return; // Saltamos si la línea no tiene un equipo válido
+                    
                     let nums = partes[1].replace(/\(x\d+\)/g, '').split(',').map(n => parseInt(n.replace(/[^\d]/g, ''))).filter(n => !isNaN(n));
-                    if(!d[seccion][eq]) d[seccion][eq] = [];
-                    d[seccion][eq].push(...nums);
+                    
+                    if(nums.length > 0) {
+                        if(!d[seccion][eq]) d[seccion][eq] = [];
+                        d[seccion][eq].push(...nums);
+                    }
                 }
             });
             return d;
