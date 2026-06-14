@@ -101,7 +101,7 @@
                     const code = jsQR(imageData.data, imageData.width, imageData.height);
                     
                     if (code && code.data) {
-                        output.value = "🔄 QR Detectado. Descomprimiendo...";
+                        output.value = "🔄 QR Detectado. Descomprimiendo archivos múltiples...";
                         decodificarCarga(code.data);
                     } else {
                         output.value = "❌ No se pudo encontrar o leer un código QR en la imagen enviada. Asegurate de que se vea nítido.";
@@ -112,30 +112,42 @@
             reader.readAsDataURL(file);
         }
 
-        // 4. Limpiar, decodificar de Base64 y descomprimir el GZIP
+        // 4. Limpiar, decodificar de Base64 y descomprimir el GZIP múltiple
         function decodificarCarga(rawData) {
             try {
-                let base64String = rawData;
+                let cleanData = rawData;
                 
-                // Remueve la firma "λ~" que le agrega la Figuritas App original
-                if (base64String.startsWith('λ~')) {
-                    base64String = base64String.substring(2);
+                // Remueve la firma "λ~" inicial si existe
+                if (cleanData.startsWith('λ~')) {
+                    cleanData = cleanData.substring(2);
                 }
 
-                // Decodifica el Base64 a una cadena binaria (Usa atob nativo de JS)
-                const binaryString = atob(base64String);
-                
-                // Lo convierte al formato Uint8Array (Requerido por el descompresor)
-                const charArray = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    charArray[i] = binaryString.charCodeAt(i);
-                }
+                // Separa la cadena por el punto y coma (cada elemento es un archivo GZIP distinto)
+                const chunks = cleanData.split(';');
+                let textoFinal = "";
 
-                // Descomprime usando la librería Pako
-                const textoDescomprimido = pako.ungzip(charArray, { to: 'string' });
+                // Procesa cada archivo comprimido de forma independiente
+                chunks.forEach((chunk, index) => {
+                    if (!chunk.trim()) return; // Ignora pedazos vacíos
+                    
+                    // Decodifica el Base64 a una cadena binaria
+                    const binaryString = atob(chunk);
+                    
+                    // Lo convierte al formato Uint8Array (Requerido por Pako)
+                    const charArray = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        charArray[i] = binaryString.charCodeAt(i);
+                    }
+
+                    // Descomprime
+                    const textoDescomprimido = pako.ungzip(charArray, { to: 'string' });
+                    
+                    // Lo va sumando al resultado final
+                    textoFinal += textoDescomprimido + "\n";
+                });
                 
-                // Muestra la lista impecable en pantalla
-                output.value = textoDescomprimido;
+                // Muestra la lista final unificada
+                output.value = textoFinal.trim();
                 
             } catch (error) {
                 console.error(error);
