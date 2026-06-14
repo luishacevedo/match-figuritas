@@ -4,59 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Decodificador QR - Figuritas</title>
-    
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #f0f2f5; 
-            padding: 20px; 
-            max-width: 600px; 
-            margin: auto; 
-        }
-        .box { 
-            background: white; 
-            padding: 25px; 
-            border-radius: 12px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
-            border: 1px solid #e9ecef;
-            text-align: center;
-        }
-        textarea { 
-            width: 100%; 
-            height: 350px; 
-            margin-top: 15px; 
-            font-family: monospace; 
-            font-size: 13px; 
-            padding: 10px; 
-            box-sizing: border-box; 
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            resize: vertical;
-        }
-        input[type="file"] { 
-            margin-top: 10px; 
-            margin-bottom: 10px;
-        }
-        .instrucciones {
-            font-size: 14px;
-            color: #6c757d;
-            margin-bottom: 20px;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; max-width: 800px; margin: auto; }
+        .box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e9ecef; text-align: center; }
+        textarea { width: 100%; height: 400px; margin-top: 15px; font-family: monospace; font-size: 13px; padding: 10px; box-sizing: border-box; border: 1px solid #ced4da; border-radius: 8px; resize: vertical; line-height: 1.5; }
+        input[type="file"] { margin-top: 10px; margin-bottom: 10px; }
+        .instrucciones { font-size: 14px; color: #6c757d; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <div class="box">
-        <h2 style="margin-top: 0; color: #005c98;">🔍 Lector y Descompresor QR</h2>
-        <p class="instrucciones">Elegí una imagen de tu PC/Celular o hacé click acá y apretá <b>Ctrl+V</b> para pegar el QR.</p>
+        <h2 style="margin-top: 0; color: #005c98;">🔍 Escáner Numérico de QR</h2>
+        <p class="instrucciones">Elegí o pegá (Ctrl+V) la imagen del QR para extraer el Byte Array.</p>
         
         <input type="file" id="fileInput" accept="image/*">
         
-        <textarea id="output" placeholder="Acá aparecerá la lista decodificada..." readonly></textarea>
+        <textarea id="output" placeholder="Acá aparecerá la matriz de números crudos..." readonly></textarea>
     </div>
 
     <script>
@@ -94,7 +61,7 @@
                     const code = jsQR(imageData.data, imageData.width, imageData.height);
                     
                     if (code && code.data) {
-                        output.value = "🔄 QR Detectado. Descomprimiendo archivos...";
+                        output.value = "🔄 QR Detectado. Extrayendo matriz de datos (Byte Array)...";
                         decodificarCarga(code.data);
                     } else {
                         output.value = "❌ No se pudo leer un código QR en la imagen.";
@@ -107,39 +74,37 @@
 
         function decodificarCarga(rawData) {
             try {
-                // Separa la cadena por el punto y coma (cada uno es un archivo GZIP)
                 const chunks = rawData.split(';');
-                let textoFinal = "";
+                let textoFinal = "📊 ANÁLISIS DE DATOS BINARIOS DEL QR:\n==========================================\n\n";
 
                 chunks.forEach((chunk, index) => {
-                    // LIMPIEZA EXTREMA: Conserva solo los caracteres válidos de Base64.
-                    // Esto destruye el λ, la ~, saltos de línea y caracteres invisibles.
                     const b64Limpio = chunk.replace(/[^A-Za-z0-9+\/=]/g, '');
-                    
-                    // Si el pedazo quedó vacío tras la limpieza, lo ignoramos
                     if (!b64Limpio) return;
                     
-                    // 1. Decodifica el Base64 limpio a binario
                     const binaryString = atob(b64Limpio);
-                    
-                    // 2. Lo convierte al formato Uint8Array que necesita Pako
                     const charArray = new Uint8Array(binaryString.length);
                     for (let i = 0; i < binaryString.length; i++) {
                         charArray[i] = binaryString.charCodeAt(i);
                     }
 
-                    // 3. Descomprime el GZIP a Texto
-                    const textoDescomprimido = pako.ungzip(charArray, { to: 'string' });
+                    // ACÁ ESTÁ LA MAGIA NUEVA:
+                    // Descomprimimos, pero NO lo convertimos a string. 
+                    // Lo dejamos como un arreglo de números crudos.
+                    const decompressedBytes = pako.ungzip(charArray);
                     
-                    // 4. Lo sumamos al resultado de la pantalla
-                    textoFinal += textoDescomprimido + "\n\n";
+                    // Convertimos a un arreglo normal de Javascript para poder imprimirlo
+                    const arrayNumeros = Array.from(decompressedBytes);
+                    
+                    textoFinal += `📂 BLOQUE ${index + 1}:\n`;
+                    textoFinal += `Tamaño: ${arrayNumeros.length} bytes\n`;
+                    textoFinal += `Números: [ ${arrayNumeros.join(', ')} ]\n\n`;
                 });
                 
                 output.value = textoFinal.trim();
                 
             } catch (error) {
                 console.error(error);
-                output.value = "⚠️ Error al descomprimir los datos.\n\nContenido crudo extraído del QR:\n" + rawData;
+                output.value = "⚠️ Error al descomprimir los datos.\n\n" + error;
             }
         }
     </script>
