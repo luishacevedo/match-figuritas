@@ -713,7 +713,18 @@
                 else if (lm.includes('repetidas') || lm.includes('swaps')) seccion = 'repetidas';
                 else if (seccion && l.includes(':')) {
                     let eq = limpiarNombreEquipo(l.split(':')[0]);
-                    let nums = l.split(':')[1].replace(/\(x\d+\)/g, '').split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+                    let parteNums = l.split(':')[1];
+                    let nums = [];
+                    parteNums.split(',').forEach(token => {
+                        let t = token.trim();
+                        let baseNum = parseInt(t);
+                        if (isNaN(baseNum)) return;
+                        // detectar cantidad de copias: (×2), (x2), (× 2)
+                        let copias = 1;
+                        let matchCopias = t.match(/\([x×]\s*(\d+)\)/);
+                        if (matchCopias) copias = parseInt(matchCopias[1]);
+                        for (let c = 0; c < copias; c++) nums.push(baseNum);
+                    });
                     if (!datos[seccion][eq]) datos[seccion][eq] = [];
                     datos[seccion][eq].push(...nums);
                 }
