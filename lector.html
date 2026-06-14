@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; max-width: 800px; margin: auto; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; max-width: 600px; margin: auto; }
         .box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e9ecef; text-align: center; }
         textarea { width: 100%; height: 400px; margin-top: 15px; font-family: monospace; font-size: 13px; padding: 10px; box-sizing: border-box; border: 1px solid #ced4da; border-radius: 8px; resize: vertical; line-height: 1.5; }
         input[type="file"] { margin-top: 10px; margin-bottom: 10px; }
@@ -18,17 +18,26 @@
 <body>
 
     <div class="box">
-        <h2 style="margin-top: 0; color: #005c98;">🔍 Escáner Numérico de QR</h2>
-        <p class="instrucciones">Elegí o pegá (Ctrl+V) la imagen del QR para extraer el Byte Array.</p>
+        <h2 style="margin-top: 0; color: #005c98;">🔍 Escáner Mágico de QR</h2>
+        <p class="instrucciones">Elegí o pegá (Ctrl+V) la imagen del QR para extraer la lista de texto.</p>
         
         <input type="file" id="fileInput" accept="image/*">
         
-        <textarea id="output" placeholder="Acá aparecerá la matriz de números crudos..." readonly></textarea>
+        <textarea id="output" placeholder="Acá aparecerá tu lista traducida..." readonly></textarea>
     </div>
 
     <script>
         const fileInput = document.getElementById('fileInput');
         const output = document.getElementById('output');
+
+        // El orden estricto de los 50 equipos en la base de datos de la app
+        const TEAMS = [
+            "FWC", "MEX", "RSA", "KOR", "CZE", "CAN", "BIH", "QAT", "SUI", "BRA", 
+            "MAR", "HAI", "SCO", "USA", "PAR", "AUS", "TUR", "GER", "CUW", "CIV", 
+            "ECU", "NED", "JPN", "SWE", "TUN", "BEL", "EGY", "IRN", "NZL", "ESP", 
+            "CPV", "KSA", "URU", "FRA", "SEN", "IRQ", "NOR", "ARG", "ALG", "AUT", 
+            "JOR", "POR", "COD", "UZB", "COL", "ENG", "CRO", "GHA", "PAN", "CC"
+        ];
 
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) procesarImagen(e.target.files[0]);
@@ -61,7 +70,7 @@
                     const code = jsQR(imageData.data, imageData.width, imageData.height);
                     
                     if (code && code.data) {
-                        output.value = "🔄 QR Detectado. Extrayendo matriz de datos (Byte Array)...";
+                        output.value = "🔄 QR Detectado. Traducción en proceso...";
                         decodificarCarga(code.data);
                     } else {
                         output.value = "❌ No se pudo leer un código QR en la imagen.";
@@ -72,35 +81,65 @@
             reader.readAsDataURL(file);
         }
 
+        // Función que transforma el array de Bytes a las Siglas y Números
+        function mapearBytesALista(byteArray) {
+            let dict = {};
+            for (let i = 0; i < byteArray.length; i++) {
+                let byte = byteArray[i];
+                for (let bit = 0; bit < 8; bit++) {
+                    // Si el bit está encendido (es 1)
+                    if ((byte & (1 << bit)) !== 0) {
+                        let globalBit = i * 8 + bit;
+                        let teamIdx = Math.floor(globalBit / 20);
+                        let stickerIdx = globalBit % 20;
+
+                        if (teamIdx < TEAMS.length) {
+                            let eq = TEAMS[teamIdx];
+                            // FWC es el único que empieza en 0. Los demás empiezan en 1.
+                            let num = (eq === "FWC") ? stickerIdx : stickerIdx + 1;
+                            
+                            if (!dict[eq]) dict[eq] = [];
+                            dict[eq].push(num);
+                        }
+                    }
+                }
+            }
+            return dict;
+        }
+
+        function limpiarABytes(chunk) {
+            const b64Limpio = chunk.replace(/[^A-Za-z0-9+\/=]/g, '');
+            const binaryString = atob(b64Limpio);
+            const charArray = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) charArray[i] = binaryString.charCodeAt(i);
+            return pako.ungzip(charArray);
+        }
+
         function decodificarCarga(rawData) {
             try {
                 const chunks = rawData.split(';');
-                let textoFinal = "📊 ANÁLISIS DE DATOS BINARIOS DEL QR:\n==========================================\n\n";
+                if (chunks.length < 2) throw new Error("Faltan datos en el QR.");
 
-                chunks.forEach((chunk, index) => {
-                    const b64Limpio = chunk.replace(/[^A-Za-z0-9+\/=]/g, '');
-                    if (!b64Limpio) return;
-                    
-                    const binaryString = atob(b64Limpio);
-                    const charArray = new Uint8Array(binaryString.length);
-                    for (let i = 0; i < binaryString.length; i++) {
-                        charArray[i] = binaryString.charCodeAt(i);
-                    }
+                // Descomprimir ambos bloques
+                let faltanBytes = limpiarABytes(chunks[0]);
+                let repesBytes = limpiarABytes(chunks[1]);
 
-                    // ACÁ ESTÁ LA MAGIA NUEVA:
-                    // Descomprimimos, pero NO lo convertimos a string. 
-                    // Lo dejamos como un arreglo de números crudos.
-                    const decompressedBytes = pako.ungzip(charArray);
-                    
-                    // Convertimos a un arreglo normal de Javascript para poder imprimirlo
-                    const arrayNumeros = Array.from(decompressedBytes);
-                    
-                    textoFinal += `📂 BLOQUE ${index + 1}:\n`;
-                    textoFinal += `Tamaño: ${arrayNumeros.length} bytes\n`;
-                    textoFinal += `Números: [ ${arrayNumeros.join(', ')} ]\n\n`;
-                });
+                // Mapear los bits a siglas
+                let dictFaltan = mapearBytesALista(faltanBytes);
+                let dictRepes = mapearBytesALista(repesBytes);
+
+                // Armar el texto final idéntico al de la App
+                let textoFinal = "Figuritas App - Lista\nUsa Méx Can 26\n\nMe faltan\n";
+                for (let eq in dictFaltan) {
+                    textoFinal += `${eq}: ${dictFaltan[eq].join(', ')}\n`;
+                }
+
+                textoFinal += "\nRepetidas\n";
+                for (let eq in dictRepes) {
+                    textoFinal += `${eq}: ${dictRepes[eq].join(', ')}\n`;
+                }
                 
-                output.value = textoFinal.trim();
+                output.value = textoFinal;
                 
             } catch (error) {
                 console.error(error);
