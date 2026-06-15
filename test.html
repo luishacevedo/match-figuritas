@@ -75,33 +75,10 @@
         .team-row { margin: 5px 0; font-size: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
 
         /* SIMULADOR - LAYOUT CSS GRID */
-        .sim-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        .sim-panel {
-            background: var(--bg3);
-            border-radius: 10px;
-            padding: 12px;
-            border: 1px solid var(--border);
-        }
-        .sim-panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        .sim-panel-title {
-            font-weight: bold;
-            font-size: 14px;
-            margin: 0;
-        }
+        .sim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .sim-panel { background: var(--bg3); border-radius: 10px; padding: 12px; border: 1px solid var(--border); }
+        .sim-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 6px; }
+        .sim-panel-title { font-weight: bold; font-size: 14px; margin: 0; }
         .sim-panel-title.recibir { color: var(--success); }
         .sim-panel-title.dar { color: var(--danger); }
         .sim-mini-controls { display: flex; gap: 5px; }
@@ -128,12 +105,9 @@
         .cart-box { background: #2a2210; border: 1px solid #4a3a10; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
         .cart-item { font-size: 13px; border-bottom: 1px solid #4a3a10; padding: 8px 0; }
 
-
         .footer { text-align: center; margin-top: 30px; color: var(--text2); font-size: 13px; padding-top: 20px; border-top: 1px solid var(--border); }
         .footer a { color: var(--primary); font-weight: bold; text-decoration: none; }
         .status { font-size: 13px; min-height: 18px; margin-top: 5px; }
-
-
 
         /* TOGGLE PÚBLICO */
         .toggle-publico-wrap { display: flex; align-items: center; gap: 10px; background: #1a2e1a; border: 1px solid #2d5a2d; border-radius: 8px; padding: 10px 14px; margin-bottom: 15px; cursor: pointer; }
@@ -157,7 +131,7 @@
         .btn-agregar-frecuente { background: var(--success); color: #111; font-size: 12px; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; width: auto; margin: 0; }
         .btn-agregar-frecuente:hover { filter: brightness(1.1); }
 
-                /* FILTRO ZONA */
+        /* FILTRO ZONA */
         .zona-filtro-wrap { margin-bottom: 12px; }
         .zona-filtro-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
         .zona-chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -187,8 +161,6 @@
             .botones-resultados { flex-direction: column; }
             .botones-resultados button { min-width: unset; }
             #botonesAmigos { grid-template-columns: 1fr; }
-
-            /* Simulador: apilado vertical en mobile */
             .sim-grid { grid-template-columns: 1fr; gap: 12px; }
             .contador-inner { flex-direction: column; gap: 12px; align-items: stretch; }
             .contador-stats { gap: 15px; }
@@ -206,7 +178,6 @@
     </div>
 
     <div class="grid">
-        <!-- PANEL IZQUIERDO: MI PERFIL -->
         <div class="box">
             <h3>👤 Mi Perfil</h3>
             <label>Usuario:</label>
@@ -287,7 +258,7 @@
             <button id="btnGuardarNube" class="btn-success">☁️ Guardar en la Nube</button>
             <div id="statusMiNube" class="status"></div>
 
-            <div style="margin-top: 20px; border-top: 1px solid #dee2e6; padding-top: 15px;">
+            <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
                 <label style="color: var(--primary); font-weight:bold;">📢 Link Público:</label>
                 <div class="flex-row">
                     <input type="text" id="linkCompartir" readonly style="background: var(--bg2); font-size: 11px; color: var(--text2);">
@@ -302,7 +273,6 @@
             </div>
         </div>
 
-        <!-- PANEL DERECHO: INTERCAMBIO -->
         <div class="box">
             <h3>🤝 Intercambio y Estrategia</h3>
 
@@ -354,12 +324,23 @@
             </div>
 
             <label>✍️ Pegar su lista:</label>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
-                <button id="btnEscanearQR" class="btn-primary" style="padding:8px; font-size:13px; margin:0;">📷 Escanear QR</button>
-                <button id="btnSubirQR" class="btn-secondary" style="padding:8px; font-size:13px; margin:0;">🖼️ Subir / Pegar imagen</button>
+            
+            <div style="background: var(--bg2); border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                <label style="font-size: 13px; font-weight: bold; color: var(--text2); display: block; margin-bottom: 5px;">🔑 Tu Gemini API Key (Solo para IA):</label>
+                <input type="password" id="geminiApiKey" placeholder="Pegá tu clave generada en Google AI Studio..." style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; box-sizing: border-box; background: var(--bg3); color: var(--text);">
+                <p style="font-size: 11px; color: var(--text2); margin: 5px 0 0 0;">Se guarda localmente. Presioná <b>Ctrl+V</b> acá para pegar fotos.</p>
             </div>
-            <input type="file" id="inputArchivoQR" accept="image/*" style="display:none;">
-            <textarea id="amigoLista" placeholder="Pegá la lista de tu amigo acá, o usá los botones de arriba para leer su QR..."></textarea>
+
+            <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+                <button id="btnEscanearQR" style="background: var(--bg3); border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; color: var(--text);">📷 Cámara QR</button>
+                <button id="btnSubirQR" style="background: var(--bg3); border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; color: var(--text);">🖼️ Subir QR</button>
+                <input type="file" id="inputArchivoQR" accept="image/*" style="display: none;">
+
+                <button onclick="verificarYSubirIA()" style="background: #1a2e22; border: 1px solid #2d5a2d; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; color: var(--success); flex-grow: 1;">✨ IA: Leer Foto</button>
+                <input type="file" id="iaFileInput" accept="image/*" style="display: none;">
+            </div>
+
+            <textarea id="amigoLista" placeholder="Pegá el texto acá, usá los botones o presioná Ctrl+V para pegar una imagen de la lista..."></textarea>
             <button id="btnGuardarAmigoNuevo" class="btn-success" style="padding: 8px; font-size: 13px; margin-bottom: 10px;">💾 Guardar Amigo</button>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <button id="btnCompararLocal" class="btn-primary">⚖️ Comparar</button>
@@ -369,7 +350,6 @@
         </div>
     </div>
 
-    <!-- CARRITO -->
     <div id="areaCarrito" class="resultados" style="border-color: var(--yellow);">
         <h3 style="color:var(--text); border-color: var(--yellow); display: flex; justify-content: space-between; align-items: center;">
             <span>🛒 Tu Simulador / Plan</span>
@@ -381,7 +361,7 @@
             <button id="btnProyectarLista" class="btn-yellow" style="margin-top: 15px;">✨ Generar mi Nueva Lista Proyectada</button>
             <button id="btnVaciarCarrito" class="btn-danger" style="margin-top: 8px; padding: 8px; font-size: 12px; width: auto;">🗑 Vaciar y reiniciar</button>
         </div>
-        <div id="areaProyeccion" style="display: none; margin-top: 20px; border-top: 1px solid #dee2e6; padding-top: 15px;">
+        <div id="areaProyeccion" style="display: none; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
             <h4 style="margin: 0 0 10px 0; color:var(--text);">Tu lista proyectada final:</h4>
             <textarea id="listaProyectada" style="height: 200px; font-size: 12px;"></textarea>
             <div style="display: flex; gap: 10px;">
@@ -391,14 +371,11 @@
         </div>
     </div>
 
-    <!-- RESULTADOS -->
     <div id="resultados" class="resultados">
         <div id="rankingResultados" style="display: none;"><h3>🏆 Ranking de Opciones</h3><div id="zonaFiltroWrap" class="zona-filtro-wrap" style="display:none;"><div class="zona-filtro-label">📍 Filtrar por zona:</div><div class="zona-chips" id="zonaChips"></div></div><div id="listaRanking"></div></div>
         <div id="mercadoGlobalResultados" style="display: none;"><h3>🌐 Triangulación de Grupo</h3><div id="listaMercadoGlobal"></div></div>
 
         <div id="detalleIndividual" style="display: none;">
-            <!-- SIMULADOR DIRECTO (sin pestañas) -->
-            <!-- IDs ocultos para compatibilidad con funciones existentes -->
             <div id="vistaTexto" style="display:none;">
                 <h3 id="tituloMeSirvenTexto"></h3>
                 <div id="meSirvenTexto"></div>
@@ -410,7 +387,6 @@
             <div id="vistaSimulador">
                 <div class="step-box" id="infoPasoRuta" style="display: none; margin-bottom: 15px;"></div>
 
-                <!-- CONTADOR + BOTONES ACCIÓN -->
                 <div class="contador-simulador">
                     <div class="contador-inner">
                         <div class="contador-actions" style="flex-direction: row; gap: 8px; min-width: unset; flex: 1; flex-wrap: wrap;">
@@ -423,9 +399,7 @@
                     </div>
                 </div>
 
-                <!-- GRID DE DOS PANELES -->
                 <div class="sim-grid">
-                    <!-- PANEL RECIBIR -->
                     <div class="sim-panel">
                         <div class="sim-panel-header">
                             <span class="sim-panel-title recibir" id="tituloMeSirvenSim">✅ Vos recibís:</span>
@@ -453,7 +427,7 @@
                         </div>
                         <div id="meSirvenSim"></div>
                     </div>
-                    <!-- PANEL DAR -->
+
                     <div class="sim-panel">
                         <div class="sim-panel-header">
                             <span class="sim-panel-title dar" id="tituloLeSirvenSim">🎁 Vos entregás:</span>
@@ -483,13 +457,12 @@
                     </div>
                 </div>
 
-            </div><!-- fin vistaSimulador -->
-        </div><!-- fin detalleIndividual -->
-    </div><!-- fin resultados -->
+            </div>
+        </div>
+    </div>
 
     <div class="footer"><p>Contacto: <a href="https://t.me/luishacevedo" target="_blank">Telegram @luishacevedo</a> &nbsp;·&nbsp; <a href="ayuda.html" target="_blank">❓ Ayuda</a></p></div>
 
-    <!-- MODAL CÁMARA QR -->
     <div id="modalQR" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.93); z-index:9999; flex-direction:column; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
         <div style="background:#1e1e1e; border:1px solid #383838; border-radius:14px; padding:20px; max-width:420px; width:100%; text-align:center;">
             <h3 style="color:#e9ecef; margin:0 0 14px 0; font-size:17px;">📷 Apuntá la cámara al QR</h3>
@@ -521,9 +494,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // =====================================
-        // VARIABLES GLOBALES
-        // =====================================
         let ultimoMatchMeSirven = {};
         let ultimoMatchLeSirven = {};
         let ultimoNombreAmigo = "";
@@ -535,9 +505,6 @@
         let rutaState = { activo: false, misFaltan: [], misRepetidas: [], amigos: [], pasoActual: 0 };
         let usuariosPublicosCache = [];
 
-        // =====================================
-        // EVENT LISTENERS
-        // =====================================
         document.getElementById('btnCargarPerfil').addEventListener('click', cargarMiPerfil);
         document.getElementById('btnGuardarNube').addEventListener('click', guardarMisDatos);
         document.getElementById('btnCompararLocal').addEventListener('click', compararListasLocales);
@@ -569,7 +536,6 @@
             document.querySelectorAll('.amigo-checkbox').forEach(cb => cb.checked = false);
         });
 
-        // Controles simulador selección masiva
         document.getElementById('btnSimRecibirTodas').addEventListener('click', () => {
             document.querySelectorAll('#meSirvenSim .sticker-btn').forEach(btn => btn.classList.add('selected'));
             actualizarContadoresSeleccion();
@@ -613,14 +579,10 @@
             calcularSiguientePasoRuta();
         });
 
-        // Botones de oferta (simulador)
         document.getElementById('btnCopiarOferta').addEventListener('click', copiarOfertaSimulador);
         document.getElementById('miLista').addEventListener('input', actualizarBarraPerfil);
         document.getElementById('btnContactarAmigo').addEventListener('click', contactarAmigo);
 
-        // =====================================
-        // DIRECTORIO PÚBLICO Y DATALIST
-        // =====================================
         async function cargarUsuariosPublicosEnDatalist() {
             try {
                 const snap = await get(ref(db, 'usuarios_publicos'));
@@ -637,7 +599,6 @@
             if (dl) dl.innerHTML = todos.map(n => `<option value="${n}">`).join('');
         }
 
-        // Mostrar/ocultar y limpiar panel zona del amigo al escribir nuevo nombre
         let _amigoAnterior = '';
         document.getElementById('amigoUsuario').addEventListener('input', function() {
             let val = this.value.trim();
@@ -650,10 +611,8 @@
             _amigoAnterior = val;
         });
 
-        // Actualizar datalist cuando cambia la lista de frecuentes
         document.getElementById('misAmigos').addEventListener('input', actualizarDatalistAmigos);
 
-        // Rellenar campos del amigo cuando se carga desde Firebase
         function rellenarCamposAmigo(d) {
             if (!d) return;
             if (d.region) document.getElementById('amigoRegion').value = d.region;
@@ -663,7 +622,6 @@
             document.getElementById('amigoZonaPanel').style.display = 'block';
         }
 
-        // Agregar a Frecuentes desde el simulador
         document.getElementById('btnAgregarFrecuente').addEventListener('click', async function() {
             let amigo = ultimoNombreAmigo;
             if (!amigo) return;
@@ -691,9 +649,6 @@
             this.style.display = 'none';
         });
 
-                // =====================================
-        // CORE PARSING Y MATEMATICA
-        // =====================================
         function limpiarNombreEquipo(textoRaw) {
             let limpio = textoRaw.replace(/[^A-Za-z]/g, '').toUpperCase();
             let siglas = ["FWC","MEX","RSA","KOR","CZE","CAN","BIH","QAT","SUI","BRA","MAR","HAI","SCO","USA","PAR","AUS","TUR","GER","CUW","CIV","ECU","NED","JPN","SWE","TUN","BEL","EGY","IRN","NZL","ESP","CPV","KSA","URU","FRA","SEN","IRQ","NOR","ARG","ALG","AUT","JOR","POR","COD","UZB","COL","ENG","CRO","GHA","PAN","CC"];
@@ -713,17 +668,17 @@
                 else if (lm.includes('repetidas') || lm.includes('swaps')) seccion = 'repetidas';
                 else if (seccion && l.includes(':')) {
                     let eq = limpiarNombreEquipo(l.split(':')[0]);
-                    let parteNums = l.split(':')[1];
+                    let parteNums = l.split(':').slice(1).join(':');
                     let nums = [];
                     parteNums.split(',').forEach(token => {
-                        let t = token.trim();
-                        let baseNum = parseInt(t);
-                        if (isNaN(baseNum)) return;
-                        // detectar cantidad de copias: (×2), (x2), (× 2)
-                        let copias = 1;
-                        let matchCopias = t.match(/\([x×]\s*(\d+)\)/);
-                        if (matchCopias) copias = parseInt(matchCopias[1]);
-                        for (let c = 0; c < copias; c++) nums.push(baseNum);
+                        token = token.trim();
+                        let numMatch = token.match(/^(\d+)/);
+                        if (!numMatch) return;
+                        let num = parseInt(numMatch[1]);
+                        if (isNaN(num)) return;
+                        let multMatch = token.match(/\([×xX]\s*(\d+)\)/);
+                        let cantidad = multMatch ? parseInt(multMatch[1]) : 1;
+                        for (let i = 0; i < cantidad; i++) nums.push(num);
                     });
                     if (!datos[seccion][eq]) datos[seccion][eq] = [];
                     datos[seccion][eq].push(...nums);
@@ -731,6 +686,7 @@
             });
             for (let s in datos) {
                 for (let e in datos[s]) {
+                    if (s === 'faltan') datos[s][e] = [...new Set(datos[s][e])];
                     datos[s][e].sort((a, b) => a - b);
                 }
             }
@@ -773,7 +729,6 @@
             return dict;
         }
 
-        // Categoriza una figurita: devuelve emoji y nombre
         function categorizarFigu(eq, num) {
             if (eq === 'FWC') return { emoji: '🌟', nombre: 'Especial' };
             if (eq === 'CC') return { emoji: '🥤', nombre: 'Coca Cola' };
@@ -831,9 +786,6 @@
             return t;
         }
 
-        // =====================================
-        // RENDERIZADO VISTAS
-        // =====================================
         function renderizarResultadosTexto(divId, d) {
             let div = document.getElementById(divId);
             div.innerHTML = '';
@@ -852,31 +804,26 @@
             div.innerHTML = '';
             let hayMatches = false;
             let claseBtn = tipo === 'recibir' ? 'receive' : 'give';
-
             let agrupado = {};
             for (let e in d) {
                 agrupado[e] = {};
                 d[e].forEach(num => { agrupado[e][num] = (agrupado[e][num] || 0) + 1; });
             }
-
             for (let e in agrupado) {
                 hayMatches = true;
                 let fila = document.createElement('div');
                 fila.className = 'team-row';
                 fila.innerHTML = `<b style="min-width: 38px; display:inline-block;">${e}:</b>`;
-
                 for (let num in agrupado[e]) {
                     let totalCopiasOriginal = 1;
                     if (diccionarioOriginalDeEseTipo && diccionarioOriginalDeEseTipo[e]) {
                         totalCopiasOriginal = diccionarioOriginalDeEseTipo[e].filter(x => x == num).length;
                     }
-
                     let cantidadDeMatches = agrupado[e][num];
                     for (let i = 0; i < cantidadDeMatches; i++) {
                         let btn = document.createElement('span');
                         btn.className = `sticker-btn ${claseBtn}`;
                         btn.dataset.id = `${e} ${num}#${i}`;
-
                         let badgeHtml = "";
                         if (totalCopiasOriginal > 1 && i === 0) {
                             badgeHtml = `<span class="sticker-badge">x${totalCopiasOriginal}</span>`;
@@ -897,26 +844,18 @@
         function actualizarContadoresSeleccion() {
             let rawRecibir = Array.from(document.querySelectorAll('#meSirvenSim .sticker-btn.selected')).map(el => el.dataset.id);
             let rawDar = Array.from(document.querySelectorAll('#leSirvenSim .sticker-btn.selected')).map(el => el.dataset.id);
-
             seleccionesActuales.recibir = rawRecibir.map(id => id.split('#')[0]);
             seleccionesActuales.dar = rawDar.map(id => id.split('#')[0]);
-
             document.getElementById('countRecibir').innerText = seleccionesActuales.recibir.length;
             document.getElementById('breakdownRecibir').innerText = obtenerDesglosePlano(seleccionesActuales.recibir);
             document.getElementById('countDar').innerText = seleccionesActuales.dar.length;
             document.getElementById('breakdownDar').innerText = obtenerDesglosePlano(seleccionesActuales.dar);
         }
 
-
-
-
         function conZona(nombre, zona) {
             return zona ? `${nombre} (${zona})` : nombre;
         }
 
-        // =====================================
-        // BARRAS DE PROGRESO
-        // =====================================
         const TOTAL_ALBUM = 980;
 
         function calcularEstadisticasAlbum(textoLista) {
@@ -932,8 +871,7 @@
         function renderizarBarraGrande(stats, prefijo) {
             let pctTengo = Math.min(100, (stats.tengo / TOTAL_ALBUM) * 100);
             let pctFaltan = Math.min(100 - pctTengo, (stats.faltan / TOTAL_ALBUM) * 100);
-            // Repes como overlay visual (no suman al 100%, son bonus)
-            let pctRepes = Math.min(15, (stats.repes / TOTAL_ALBUM) * 100); // max 15% visual
+            let pctRepes = Math.min(15, (stats.repes / TOTAL_ALBUM) * 100);
             document.getElementById(`segTengo${prefijo}`).style.width = pctTengo + '%';
             document.getElementById(`segFaltan${prefijo}`).style.width = pctFaltan + '%';
             document.getElementById(`segRepes${prefijo}`).style.width = pctRepes + '%';
@@ -966,7 +904,6 @@
         }
 
         function actualizarBarrasSimulador(textoMio, textoAmigo, nombreAmigo) {
-            // Barra del amigo (panel recibir)
             let wrapAmigo = document.getElementById('barraProgresoAmigo');
             let wrapMia = document.getElementById('barraProgresoMiaSim');
             if (textoAmigo) {
@@ -974,28 +911,17 @@
                 document.getElementById('labelBarraAmigo').innerText = `📊 Álbum de ${conZona(nombreAmigo, ultimoZonaAmigo)}`;
                 renderizarBarraMini(statsAmigo, 'Amigo');
                 wrapAmigo.style.display = 'block';
-            } else {
-                wrapAmigo.style.display = 'none';
-            }
-            // Barra mía (panel dar)
+            } else { wrapAmigo.style.display = 'none'; }
             if (textoMio) {
                 let statsMia = calcularEstadisticasAlbum(textoMio);
                 renderizarBarraMini(statsMia, 'MiaSim');
                 wrapMia.style.display = 'block';
-            } else {
-                wrapMia.style.display = 'none';
-            }
+            } else { wrapMia.style.display = 'none'; }
         }
 
-        // =====================================
-        // SELECCIÓN PAREADA INTELIGENTE
-        // =====================================
         function seleccionarPareado() {
-            // Limpiar todo primero
             document.querySelectorAll('#meSirvenSim .sticker-btn').forEach(b => b.classList.remove('selected'));
             document.querySelectorAll('#leSirvenSim .sticker-btn').forEach(b => b.classList.remove('selected'));
-
-            // Obtener todos los botones por categoría
             function getBtnsPorCategoria(selector) {
                 let cats = { esp: [], esc: [], eq: [], cc: [], jug: [] };
                 document.querySelectorAll(selector + ' .sticker-btn').forEach(btn => {
@@ -1010,11 +936,8 @@
                 });
                 return cats;
             }
-
             let recibir = getBtnsPorCategoria('#meSirvenSim');
             let dar = getBtnsPorCategoria('#leSirvenSim');
-
-            // Seleccionar mínimo de cada categoría en ambos lados
             let orden = ['esp', 'esc', 'eq', 'cc', 'jug'];
             for (let cat of orden) {
                 let min = Math.min(recibir[cat].length, dar[cat].length);
@@ -1023,9 +946,6 @@
                     dar[cat][i].classList.add('selected');
                 }
             }
-
-            // Si quedaron sin seleccionar por falta de paridad en alguna categoría,
-            // no seleccionar — el usuario puede ajustar manualmente.
             actualizarContadoresSeleccion();
         }
 
@@ -1060,44 +980,30 @@
             document.getElementById('mercadoGlobalResultados').style.display = 'none';
             document.getElementById('infoPasoRuta').style.display = 'none';
 
-            // Mostrar "Agregar a Frecuentes" solo si no está ya en la lista
             let _frecuentes = document.getElementById('misAmigos').value.split(',').map(x => x.trim()).filter(x => x !== "");
             document.getElementById('btnAgregarFrecuente').style.display = _frecuentes.includes(nombre) ? 'none' : 'flex';
 
             if (window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // =====================================
-        // BOTONES OFERTA SIMULADOR
-        // =====================================
         function generarTextoOferta(esWhatsApp = false) {
             let miUsuario = (document.getElementById('miUsuario').value.trim() || "YO").toUpperCase();
             let miZona = document.getElementById('miZona').value.trim();
             let miTipo = document.getElementById('miContactoTipo').value;
             let miDato = document.getElementById('miContactoDato').value.trim();
             let linkPublico = document.getElementById('linkCompartir').value || "https://luishacevedo.github.io/match-figuritas/";
-
-            // Construir grupos para las seleccionadas
             let recibirDict = desaplanarArray(seleccionesActuales.recibir);
             let darDict = desaplanarArray(seleccionesActuales.dar);
-
             let totalRecibir = seleccionesActuales.recibir.length;
             let totalDar = seleccionesActuales.dar.length;
-
             if (totalRecibir === 0 && totalDar === 0) return null;
-
             let desgloseRecibir = obtenerDesglosePlano(seleccionesActuales.recibir);
             let desgloseDar = obtenerDesglosePlano(seleccionesActuales.dar);
-
             let nombreAmigo = conZona(ultimoNombreAmigo, ultimoZonaAmigo) || "tu amigo";
             let sep = esWhatsApp ? "*" : "";
             let ital = esWhatsApp ? "_" : "";
-
-            // Líneas de figuritas por equipo
             let lineasRecibir = formatearDiccionario(recibirDict, esWhatsApp);
             let lineasDar = formatearDiccionario(darDict, esWhatsApp);
-
-            // Identificador del usuario (nombre + zona si tiene)
             let miId = miZona ? `${miUsuario} (${miZona})` : miUsuario;
 
             let txt = `⚽ ${sep}MATCH DE FIGURITAS${sep} ⚽\n\n`;
@@ -1107,13 +1013,8 @@
             txt += `\n🎁 ${sep}A ${nombreAmigo} le sirven de las mías:${sep}\n`;
             txt += `${desgloseDar}\n`;
             txt += lineasDar.trim() ? lineasDar : "Nada seleccionado\n";
-
-            if (miDato) {
-                txt += `\n📲 ${sep}Contactame${sep}: ${generarTextoContacto(miTipo, miDato)}`;
-            }
-
+            if (miDato) txt += `\n📲 ${sep}Contactame${sep}: ${generarTextoContacto(miTipo, miDato)}`;
             txt += `\n🔍 ${ital}Cruzá tus repetidas conmigo acá:${ital}\n👉 ${linkPublico}`;
-
             return txt;
         }
 
@@ -1149,17 +1050,10 @@
             let emojis = { telegram: '✈️', whatsapp: '📱', instagram: '📸', facebook: '👤', mail: '📧', otro: '📞', '': '📲' };
             let labels = { telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram', facebook: 'Facebook', mail: 'Mail', otro: 'Contactar', '': 'Contactar' };
             let colores = { telegram: '#0088cc', whatsapp: '#25D366', instagram: '#E1306C', facebook: '#1877F2', mail: '#6c757d', otro: '#6c757d', '': '#6c757d' };
-
             btn.innerText = `${emojis[tipo] || '📲'} ${labels[tipo] || 'Contactar'}`;
             btn.style.backgroundColor = colores[tipo] || '#6c757d';
-
-            if (!dato) {
-                btn.style.opacity = "0.5";
-                btn.title = "Este usuario no tiene contacto cargado";
-            } else {
-                btn.style.opacity = "1";
-                btn.title = `Contactar a ${ultimoNombreAmigo}`;
-            }
+            if (!dato) { btn.style.opacity = "0.5"; btn.title = "Este usuario no tiene contacto cargado"; } 
+            else { btn.style.opacity = "1"; btn.title = `Contactar a ${ultimoNombreAmigo}`; }
         }
 
         function copiarOfertaSimulador() {
@@ -1179,27 +1073,18 @@
         function contactarAmigo() {
             let tipo = ultimoContactoAmigo.tipo || "";
             let dato = ultimoContactoAmigo.dato || "";
-
-            if (!dato) {
-                alert(`${ultimoNombreAmigo} no tiene datos de contacto cargados.`);
-                return;
-            }
-
+            if (!dato) { alert(`${ultimoNombreAmigo} no tiene datos de contacto cargados.`); return; }
             let txtOferta = generarTextoOferta(tipo === 'whatsapp');
             let link = generarLinkContacto(tipo, dato);
-
             if (tipo === 'whatsapp') {
-                // WhatsApp soporta pre-carga del mensaje — un solo paso
                 let wLink = `https://wa.me/${dato.replace(/\D/g, '')}`;
                 if (txtOferta) wLink += `?text=${encodeURIComponent(txtOferta)}`;
                 window.open(wLink, '_blank');
             } else if (tipo === 'mail') {
-                // Mail soporta subject+body — un solo paso
                 let asunto = `Match de Figuritas Mundial 2026 - Propuesta de intercambio`;
                 let cuerpo = txtOferta || "";
                 window.open(`mailto:${dato}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`, '_blank');
             } else if (link) {
-                // Telegram, Instagram, Facebook — dos pasos: copiar + abrir
                 let txt = txtOferta || generarTextoResultados(false);
                 navigator.clipboard.writeText(txt).then(() => {
                     mostrarToast('📋 ¡Mensaje copiado! Solo pegalo en la app y envialo.');
@@ -1227,48 +1112,33 @@
             toast._timer = setTimeout(() => { toast.style.opacity = '0'; }, 3500);
         }
 
-        // =====================================
-        // RUTA INTERACTIVA
-        // =====================================
         async function iniciarRutaInteractiva() {
             try {
                 let textoMio = document.getElementById('miLista').value.trim();
                 if (!textoMio) { alert("Primero pegá tu lista."); return; }
-
                 let amigosSeleccionados = obtenerAmigosSeleccionados();
                 if (amigosSeleccionados.length === 0) return;
-
                 document.getElementById('statusAmigo').style.color = "#005c98";
                 document.getElementById('statusAmigo').innerText = "Iniciando Plan Estratégico...";
-
                 let misDatos = parsearTexto(textoMio);
                 rutaState.misFaltan = aplanarDiccionario(misDatos.faltan);
                 rutaState.misRepetidas = aplanarDiccionario(misDatos.repetidas);
                 rutaState.amigos = [];
                 rutaState.pasoActual = 0;
                 rutaState.activo = true;
-
                 document.getElementById('badgeRuta').style.display = 'inline-block';
                 document.getElementById('btnGuardarEnCarrito').innerText = "✅ Confirmar Paso y Buscar Siguiente";
                 document.getElementById('btnSaltarPasoRuta').style.display = 'inline-block';
-
                 vaciarCarrito();
-
                 await Promise.all(amigosSeleccionados.map(async (amigo) => {
                     try {
                         const snap = await get(child(ref(db), `usuarios/${amigo}`));
                         if (snap.exists()) {
                             let d = parsearTexto(snap.val().textoOriginal);
-                            rutaState.amigos.push({
-                                nombre: amigo,
-                                faltan: aplanarDiccionario(d.faltan),
-                                repetidas: aplanarDiccionario(d.repetidas),
-                                textoOriginal: snap.val().textoOriginal
-                            });
+                            rutaState.amigos.push({ nombre: amigo, faltan: aplanarDiccionario(d.faltan), repetidas: aplanarDiccionario(d.repetidas), textoOriginal: snap.val().textoOriginal });
                         }
                     } catch (e) {}
                 }));
-
                 calcularSiguientePasoRuta();
             } catch (e) {
                 console.error(e);
@@ -1280,7 +1150,6 @@
         function calcularSiguientePasoRuta() {
             document.getElementById('statusAmigo').innerText = "";
             let mejorAmigo = null, mejorCantidad = 0, mejorMeDa = [], mejorLeDoy = [];
-
             for (let amigo of rutaState.amigos) {
                 let mePuedeDar = amigo.repetidas.filter(f => rutaState.misFaltan.includes(f));
                 let lePuedoDar = amigo.faltan.filter(f => rutaState.misRepetidas.includes(f));
@@ -1292,7 +1161,6 @@
                     mejorLeDoy = lePuedoDar;
                 }
             }
-
             if (mejorCantidad === 0) {
                 rutaState.activo = false;
                 document.getElementById('badgeRuta').style.display = 'none';
@@ -1304,40 +1172,28 @@
                 generarListaProyectada();
                 return;
             }
-
             rutaState.pasoActual++;
             ultimoNombreAmigo = mejorAmigo.nombre;
             ultimoContactoAmigo = { tipo: "", dato: "" };
             actualizarBotonContactar();
-
             let dictMeSirven = desaplanarArray(mejorMeDa);
             let dictLeSirven = desaplanarArray(mejorLeDoy);
-
             seleccionesActuales = { recibir: [], dar: [] };
-
             renderizarResultadosInteractivos('meSirvenSim', dictMeSirven, 'recibir', desaplanarArray(mejorAmigo.repetidas));
             renderizarResultadosInteractivos('leSirvenSim', dictLeSirven, 'dar', desaplanarArray(rutaState.misRepetidas));
-
             seleccionarPareado();
-
             let info = document.getElementById('infoPasoRuta');
             info.style.display = 'block';
             info.innerHTML = `<b style="color:var(--success); font-size:16px;">Paso ${rutaState.pasoActual} de tu Plan:</b><br>Estás analizando a <b>${mejorAmigo.nombre}</b>. Tienen <b>${mejorCantidad}</b> cambios parejos potenciales. Ajustá las opciones abajo y confirmá.`;
-
             document.getElementById('tituloMeSirvenSim').innerText = `✅ Vos recibís de ${conZona(mejorAmigo.nombre, ultimoZonaAmigo)}`;
             document.getElementById('tituloLeSirvenSim').innerText = `🎁 Vos entregás a ${conZona(mejorAmigo.nombre, ultimoZonaAmigo)}`;
-
             document.getElementById('resultados').style.display = 'block';
             document.getElementById('detalleIndividual').style.display = 'block';
             document.getElementById('rankingResultados').style.display = 'none';
             document.getElementById('mercadoGlobalResultados').style.display = 'none';
-
             if (window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // =====================================
-        // CARRITO SIMULADOR
-        // =====================================
         function agregarAlCarrito() {
             if (seleccionesActuales.recibir.length === 0 && seleccionesActuales.dar.length === 0) {
                 alert("No seleccionaste nada.");
@@ -1346,15 +1202,8 @@
             if (seleccionesActuales.recibir.length !== seleccionesActuales.dar.length) {
                 if (!confirm(`Estás recibiendo ${seleccionesActuales.recibir.length} y entregando ${seleccionesActuales.dar.length}. ¿Guardar igual?`)) return;
             }
-
-            window.carritoSimulador.push({
-                nombre: ultimoNombreAmigo,
-                recibo: seleccionesActuales.recibir,
-                doy: seleccionesActuales.dar
-            });
-
+            window.carritoSimulador.push({ nombre: ultimoNombreAmigo, recibo: seleccionesActuales.recibir, doy: seleccionesActuales.dar });
             actualizarVistaCarrito();
-
             if (rutaState.activo) {
                 rutaState.misFaltan = rutaState.misFaltan.filter(f => !seleccionesActuales.recibir.includes(f));
                 seleccionesActuales.dar.forEach(d => {
@@ -1421,9 +1270,6 @@
             document.getElementById('areaProyeccion').style.display = 'block';
         }
 
-        // =====================================
-        // DOM Y EVENTOS DE AMIGOS
-        // =====================================
         window.cargarAmigoYComparar = async function (amigo) {
             document.getElementById('amigoUsuario').value = amigo;
             let m = document.getElementById('miLista').value.trim();
@@ -1433,11 +1279,8 @@
                 if (snap.exists()) {
                     let d = snap.val();
                     document.getElementById('amigoLista').value = d.textoOriginal;
-                    let contactoAmigo = {
-                        tipo: d.contacto_tipo || "",
-                        dato: d.contacto_dato || ""
-                    };
-                    limpiarCamposAmigo(); // resetear antes de rellenar con el nuevo usuario
+                    let contactoAmigo = { tipo: d.contacto_tipo || "", dato: d.contacto_dato || "" };
+                    limpiarCamposAmigo();
                     rellenarCamposAmigo(d);
                     ejecutarComparacion(m, d.textoOriginal, amigo, contactoAmigo, d.zona || "");
                     document.getElementById('statusAmigo').style.color = "green";
@@ -1460,11 +1303,7 @@
                     let z = document.getElementById('miZona').value.trim();
                     let ct = document.getElementById('miContactoTipo').value;
                     let cd = document.getElementById('miContactoDato').value.trim();
-                    let datos = {
-                        textoOriginal: document.getElementById('miLista').value.trim(),
-                        amigos: input.value,
-                        ultimaActualizacion: new Date().toLocaleString()
-                    };
+                    let datos = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toLocaleString() };
                     if (z) datos.zona = z;
                     if (cd) { datos.contacto_tipo = ct; datos.contacto_dato = cd; }
                     set(ref(db, `usuarios/${u}`), datos).then(() => renderizarBotonesAmigos());
@@ -1482,7 +1321,6 @@
             let btnMercado = document.getElementById('btnMercadoGlobal');
             let btnRuta = document.getElementById('btnRutaCompletar');
             let controlesSelec = document.getElementById('controlesSeleccion');
-
             if (!amigosTexto) {
                 btnEscanear.style.display = 'none';
                 btnMercado.style.display = 'none';
@@ -1490,7 +1328,6 @@
                 controlesSelec.style.display = 'none';
                 return;
             }
-
             let amigos = amigosTexto.split(',').map(a => a.trim()).filter(a => a !== "");
             if (amigos.length > 0) {
                 btnEscanear.style.display = 'block';
@@ -1498,11 +1335,8 @@
                 if (amigos.length > 1) {
                     btnMercado.style.display = 'block';
                     controlesSelec.style.display = 'flex';
-                } else {
-                    controlesSelec.style.display = 'none';
-                }
+                } else { controlesSelec.style.display = 'none'; }
             }
-
             let html = '';
             amigos.forEach(amigo => {
                 html += `
@@ -1519,22 +1353,14 @@
             return Array.from(document.querySelectorAll('.amigo-checkbox:checked')).map(cb => cb.value);
         }
 
-
-        // =====================================
-        // FILTRO POR ZONA
-        // =====================================
         let zonaFiltroActiva = "todas";
         let rankingDataGlobal = [];
 
         function renderizarChipsZona(datos) {
-            // Separar zonas compuestas por coma en chips individuales
             let partes = new Set();
             datos.forEach(d => {
                 if (!d.zona || d.zona.trim() === "") return;
-                d.zona.split(',').forEach(p => {
-                    let t = p.trim();
-                    if (t) partes.add(t);
-                });
+                d.zona.split(',').forEach(p => { let t = p.trim(); if (t) partes.add(t); });
             });
             let zonas = [...partes].sort();
             let wrap = document.getElementById('zonaFiltroWrap');
@@ -1552,16 +1378,11 @@
 
         window.filtrarPorZona = function filtrarPorZona(zona) {
             zonaFiltroActiva = zona;
-            document.querySelectorAll('.zona-chip').forEach(c => {
-                c.classList.toggle('active', c.dataset.zona === zona);
+            document.querySelectorAll('.zona-chip').forEach(c => { c.classList.toggle('active', c.dataset.zona === zona); });
+            let filtrados = zona === "todas" ? rankingDataGlobal : rankingDataGlobal.filter(r => {
+                if (!r.zona) return false;
+                return r.zona.split(',').map(p => p.trim()).includes(zona);
             });
-            // Filtro por coincidencia parcial: el barrio elegido está dentro de la zona del usuario
-            let filtrados = zona === "todas"
-                ? rankingDataGlobal
-                : rankingDataGlobal.filter(r => {
-                    if (!r.zona) return false;
-                    return r.zona.split(',').map(p => p.trim()).includes(zona);
-                });
             renderizarListaRanking(filtrados);
         }
 
@@ -1578,9 +1399,7 @@
                 div.className = 'ranking-item ' + (esAmigo ? 'es-amigo' : 'es-publico');
                 div.style.opacity = r.pos === 0 ? '0.5' : '1';
                 let nombreMostrado = conZona(r.nombre, r.zona);
-                let badgeHtml = esAmigo
-                    ? '<span class="badge-amigo">👤 Amigo</span>'
-                    : '<span class="badge-publico">🌐 Público</span>';
+                let badgeHtml = esAmigo ? '<span class="badge-amigo">👤 Amigo</span>' : '<span class="badge-publico">🌐 Público</span>';
                 let regionLabel = r.region ? `<span style="font-size:10px;color:var(--text2);margin-left:6px;">📍 ${r.region}</span>` : '';
                 div.innerHTML = `
                     <div class="ranking-header">
@@ -1594,9 +1413,6 @@
             });
         }
 
-        // =====================================
-        // OPTIMIZADORES GRUPALES
-        // =====================================
         async function escanearMisCambios() {
             try {
                 let textoMio = document.getElementById('miLista').value.trim();
@@ -1607,14 +1423,11 @@
                 status.style.color = "#005c98";
                 status.innerText = "⚡ Escaneando opciones...";
                 let misDatos = parsearTexto(textoMio);
-
-                // Cargar usuarios públicos y combinar con frecuentes
                 let publicosSnap = await get(ref(db, 'usuarios_publicos')).catch(() => null);
                 let publicosNombres = [];
                 if (publicosSnap && publicosSnap.exists()) {
                     publicosNombres = Object.keys(publicosSnap.val()).filter(n => n !== miUsuario);
                 }
-                // Fallback: si usuarios_publicos está vacío, escanear usuarios/ buscando publico===true
                 if (publicosNombres.length === 0) {
                     try {
                         const todosSnap = await get(ref(db, 'usuarios'));
@@ -1623,19 +1436,10 @@
                             for (let nombre in todos) {
                                 if (nombre !== miUsuario && (todos[nombre].publico === true || todos[nombre].publico === 1)) {
                                     publicosNombres.push(nombre);
-                                    // Aprovechar y escribir en usuarios_publicos para la próxima vez
                                     let d = todos[nombre];
                                     let stats = calcularEstadisticasAlbum(d.textoOriginal || "");
                                     set(ref(db, `usuarios_publicos/${nombre}`), {
-                                        nombre: nombre,
-                                        zona: d.zona || "",
-                                        region: d.region || "",
-                                        contacto_tipo: d.contacto_tipo || "",
-                                        contacto_dato: d.contacto_dato || "",
-                                        tengo: stats.tengo,
-                                        faltan: stats.faltan,
-                                        repes: stats.repes,
-                                        ultimaActualizacion: d.ultimaActualizacion || ""
+                                        nombre: nombre, zona: d.zona || "", region: d.region || "", contacto_tipo: d.contacto_tipo || "", contacto_dato: d.contacto_dato || "", tengo: stats.tengo, faltan: stats.faltan, repes: stats.repes, ultimaActualizacion: d.ultimaActualizacion || ""
                                     }).catch(() => {});
                                 }
                             }
@@ -1653,7 +1457,6 @@
                     status.innerText = "";
                     return;
                 }
-
                 let promesasDescarga = todosANalizar.map(async (amigo) => {
                     let esAmigo = amigos.includes(amigo);
                     try {
@@ -1672,28 +1475,22 @@
                     } catch (e) {}
                     return null;
                 });
-
                 let res = (await Promise.all(promesasDescarga)).filter(r => r !== null);
-                // Amigos primero, luego públicos; dentro de cada grupo por matches desc
                 res.sort((a, b) => {
                     if (a.esAmigo !== b.esAmigo) return a.esAmigo ? -1 : 1;
                     return b.pos !== a.pos ? b.pos - a.pos : b.me - a.me;
                 });
-
                 document.getElementById('resultados').style.display = 'block';
                 document.getElementById('rankingResultados').style.display = 'block';
                 document.getElementById('detalleIndividual').style.display = 'none';
                 document.getElementById('mercadoGlobalResultados').style.display = 'none';
-
                 let list = document.getElementById('listaRanking');
                 list.innerHTML = '';
-
                 if (res.length === 0) {
                     list.innerHTML = '<p style="color:#f0c060;background:#2a2000;padding:10px;border-radius:5px;">No hay intercambios posibles.</p>';
                     status.innerText = "";
                     return;
                 }
-
                 rankingDataGlobal = res;
                 renderizarChipsZona(res);
                 document.getElementById('resultados').style.display = 'block';
@@ -1702,7 +1499,6 @@
                 document.getElementById('mercadoGlobalResultados').style.display = 'none';
                 document.getElementById('infoPasoRuta').style.display = 'none';
                 renderizarListaRanking(res);
-
                 if (window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
                 status.innerText = "";
             } catch (e) {
@@ -1720,7 +1516,6 @@
                 status.style.color = "#005c98";
                 status.innerText = "🌐 Analizando matriz...";
                 window.amigosDataGlobal = [];
-
                 await Promise.all(amigos.map(async (amigo) => {
                     try {
                         const snap = await get(child(ref(db), `usuarios/${amigo}`));
@@ -1729,7 +1524,6 @@
                         }
                     } catch (e) {}
                 }));
-
                 let cruces = [];
                 for (let i = 0; i < window.amigosDataGlobal.length; i++) {
                     for (let j = i + 1; j < window.amigosDataGlobal.length; j++) {
@@ -1741,21 +1535,17 @@
                     }
                 }
                 cruces.sort((a, b) => b.pos - a.pos);
-
                 document.getElementById('resultados').style.display = 'block';
                 document.getElementById('mercadoGlobalResultados').style.display = 'block';
                 document.getElementById('rankingResultados').style.display = 'none';
                 document.getElementById('detalleIndividual').style.display = 'none';
-
                 let list = document.getElementById('listaMercadoGlobal');
                 list.innerHTML = '';
-
                 if (cruces.length === 0) {
                     list.innerHTML = '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:5px;">Los amigos seleccionados no tienen intercambios entre ellos.</p>';
                     status.innerText = "";
                     return;
                 }
-
                 cruces.slice(0, 15).forEach((res) => {
                     let div = document.createElement('div');
                     div.className = 'ranking-item';
@@ -1779,7 +1569,6 @@
                         </div>`;
                     list.appendChild(div);
                 });
-
                 if (window.innerWidth <= 768) document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
                 status.innerText = "";
             } catch (e) {
@@ -1789,9 +1578,6 @@
             }
         }
 
-        // =====================================
-        // UTILIDADES VARIAS
-        // =====================================
         function formatearDiccionario(d, w) {
             let t = "", h = false;
             for (let e in d) {
@@ -1899,10 +1685,8 @@
                     document.getElementById('miRegion').value = d.region || "";
                     document.getElementById('miContactoTipo').value = d.contacto_tipo || "telegram";
                     document.getElementById('miContactoDato').value = d.contacto_dato || "";
-                    // Verificar en usuarios_publicos también (por si el campo publico no se guardó)
                     document.getElementById('miPublico').checked = !!d.publico;
                     if (!d.publico) {
-                        // Doble check: ver si existe en el directorio público
                         try {
                             const pubSnap = await get(ref(db, `usuarios_publicos/${u}`));
                             if (pubSnap.exists()) document.getElementById('miPublico').checked = true;
@@ -1913,7 +1697,6 @@
                     actualizarBarraPerfil();
                     s.style.color = "green";
                     s.innerText = "¡Perfil cargado!";
-                    // Auto-ejecutar ranking al cargar perfil
                     escanearMisCambios();
                 } else {
                     s.style.color = "red";
@@ -1939,39 +1722,22 @@
             let r = document.getElementById('miRegion').value;
             let esPublico = document.getElementById('miPublico').checked;
             try {
-                let datos = {
-                    textoOriginal: t,
-                    amigos: a,
-                    ultimaActualizacion: new Date().toLocaleString(),
-                    publico: esPublico === true ? true : false
-                };
+                let datos = { textoOriginal: t, amigos: a, ultimaActualizacion: new Date().toLocaleString(), publico: esPublico === true ? true : false };
                 if (z) datos.zona = z;
                 if (r) datos.region = r;
                 if (cd) { datos.contacto_tipo = ct; datos.contacto_dato = cd; }
                 await set(ref(db, `usuarios/${u}`), datos);
 
-                // Directorio público
                 let statsPublico = calcularEstadisticasAlbum(t);
                 if (esPublico) {
                     try {
                         await set(ref(db, `usuarios_publicos/${u}`), {
-                            nombre: u,
-                            zona: z || "",
-                            region: r || "",
-                            contacto_tipo: ct || "",
-                            contacto_dato: cd || "",
-                            tengo: statsPublico.tengo,
-                            faltan: statsPublico.faltan,
-                            repes: statsPublico.repes,
-                            ultimaActualizacion: new Date().toLocaleString()
+                            nombre: u, zona: z || "", region: r || "", contacto_tipo: ct || "", contacto_dato: cd || "", tengo: statsPublico.tengo, faltan: statsPublico.faltan, repes: statsPublico.repes, ultimaActualizacion: new Date().toLocaleString()
                         });
-                    } catch(e3) {
-                        console.warn("No se pudo guardar en directorio público:", e3.message);
-                    }
+                    } catch(e3) {}
                 } else {
                     try { await remove(ref(db, `usuarios_publicos/${u}`)); } catch(e2) {}
                 }
-
                 renderizarBotonesAmigos();
                 actualizarLinkDirecto(u);
                 actualizarBarraPerfil();
@@ -2012,11 +1778,7 @@
                     let z2 = document.getElementById('miZona').value.trim();
                     let ct2 = document.getElementById('miContactoTipo').value;
                     let cd2 = document.getElementById('miContactoDato').value.trim();
-                    let datosMios = {
-                        textoOriginal: document.getElementById('miLista').value.trim(),
-                        amigos: input.value,
-                        ultimaActualizacion: new Date().toLocaleString()
-                    };
+                    let datosMios = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toLocaleString() };
                     if (z2) datosMios.zona = z2;
                     if (cd2) { datosMios.contacto_tipo = ct2; datosMios.contacto_dato = cd2; }
                     await set(ref(db, `usuarios/${mu}`), datosMios);
@@ -2030,12 +1792,109 @@
             }
         }
 
-        // =====================================
         // ================================================
-        // LECTOR QR CON DECODE REAL DE FIGURITAS APP
+        // LECTOR QR, IA Y PORTAPAPELES (NUEVO)
         // ================================================
 
-        // Orden exacto de los 50 equipos en la base de datos de la app
+        // Lógica de IA y guardado local de Llave
+        function cargarLlaveLocal() {
+            const savedKey = localStorage.getItem('gemini_api_key');
+            if (savedKey) {
+                let el = document.getElementById('geminiApiKey');
+                if (el) el.value = savedKey;
+            }
+        }
+
+        window.verificarYSubirIA = function() {
+            const apiKey = document.getElementById('geminiApiKey').value.trim();
+            if (!apiKey) {
+                alert("⚠️ Por favor, pegá tu API Key de Gemini en el recuadro superior para usar la IA.");
+                document.getElementById('geminiApiKey').focus();
+                return;
+            }
+            localStorage.setItem('gemini_api_key', apiKey);
+            document.getElementById('iaFileInput').click();
+        };
+
+        document.getElementById('iaFileInput').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                procesarImagenConIA(e.target.files[0]);
+                e.target.value = ''; 
+            }
+        });
+
+        async function procesarImagenConIA(file) {
+            const statusDiv = document.getElementById('statusAmigo');
+            const textarea = document.getElementById('amigoLista');
+            const apiKey = document.getElementById('geminiApiKey').value.trim();
+
+            statusDiv.innerHTML = "⏳ <b>IA analizando imagen...</b> (Tarda 5 seg aprox)";
+            statusDiv.style.color = "var(--yellow)";
+
+            try {
+                const base64Image = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = error => reject(error);
+                });
+
+                let mimeType = file.type;
+                if (!mimeType || mimeType.includes('jfif')) mimeType = 'image/jpeg';
+
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+                const prompt = `
+                Sos un asistente experto en extraer datos de álbumes de figuritas. Analizá esta imagen.
+                REGLAS:
+                1. Ignorá banderas, fotos de jugadores, escudos y textos publicitarios.
+                2. Agrupá los números bajo "Me faltan" y "Repetidas".
+                3. Convertí nombres de países a siglas de 3 letras (ej: ARGENTINA = ARG, BRASIL = BRA).
+                4. Trofeos/Logos/FIFA = FWC. Coca Cola = CC.
+                5. Respondé EXCLUSIVAMENTE con siglas y números separados por comas.
+
+                Formato esperado:
+                Me faltan
+                ARG: 1, 4
+                FWC: 3
+
+                Repetidas
+                MEX: 2, 8
+                `;
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "contents": [{
+                            "parts": [
+                                {"text": prompt},
+                                { "inline_data": { "mime_type": mimeType, "data": base64Image } }
+                            ]
+                        }]
+                    })
+                });
+
+                if (!response.ok) throw new Error("Clave de Gemini inválida o límite excedido.");
+
+                const data = await response.json();
+                const textoFinal = data.candidates[0].content.parts[0].text;
+
+                textarea.value = textoFinal.trim();
+                statusDiv.innerHTML = "✅ <b>¡Lista extraída con éxito!</b>";
+                statusDiv.style.color = "var(--success)";
+
+                if (document.getElementById('miLista').value.trim() !== "") {
+                    document.getElementById('btnCompararLocal').click();
+                }
+
+            } catch (error) {
+                console.error(error);
+                statusDiv.innerHTML = "❌ <b>Error:</b> " + error.message;
+                statusDiv.style.color = "var(--danger)";
+            }
+        }
+
         const QR_TEAMS = [
             "FWC","MEX","RSA","KOR","CZE","CAN","BIH","QAT","SUI","BRA",
             "MAR","HAI","SCO","USA","PAR","AUS","TUR","GER","CUW","CIV",
@@ -2044,28 +1903,23 @@
             "JOR","POR","COD","UZB","COL","ENG","CRO","GHA","PAN","CC"
         ];
 
-        // Carga jsQR + pako bajo demanda (solo la primera vez)
         let _libsQRlistas = false;
         function cargarLibsQR(callback) {
             if (_libsQRlistas) { callback(); return; }
             let pendiente = 2;
             function check() { if (--pendiente === 0) { _libsQRlistas = true; callback(); } }
-
             let s1 = document.createElement('script');
             s1.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
             s1.onload = check;
             s1.onerror = () => mostrarToast("❌ No se pudo cargar el lector QR. Chequeá tu conexión.");
-
             let s2 = document.createElement('script');
             s2.src = 'https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js';
             s2.onload = check;
             s2.onerror = () => mostrarToast("❌ No se pudo cargar el decodificador. Chequeá tu conexión.");
-
             document.head.appendChild(s1);
             document.head.appendChild(s2);
         }
 
-        // Transforma los bytes del QR al diccionario {equipo: [nums]}
         function qrBytesADict(byteArray) {
             let dict = {};
             for (let i = 0; i < byteArray.length; i++) {
@@ -2087,7 +1941,6 @@
             return dict;
         }
 
-        // Descomprime un chunk base64+gzip del QR
         function qrChunkABytes(chunk) {
             let b64 = chunk.replace(/[^A-Za-z0-9+\/=]/g, '');
             let bin = atob(b64);
@@ -2096,23 +1949,16 @@
             return pako.ungzip(arr);
         }
 
-        // Decodifica el payload crudo del QR y arma el texto compatible con parsearTexto()
         function decodificarPayloadQR(rawData) {
             try {
                 let chunks = rawData.split(';');
                 if (chunks.length < 2) throw new Error("Formato de QR no reconocido.");
-
                 let dictFaltan = qrBytesADict(qrChunkABytes(chunks[0]));
                 let dictRepes  = qrBytesADict(qrChunkABytes(chunks[1]));
-
                 let texto = "Figuritas App - Lista\nUsa Méx Can 26\n\nMe faltan\n";
-                for (let eq in dictFaltan) {
-                    texto += `${eq}: ${dictFaltan[eq].join(', ')}\n`;
-                }
+                for (let eq in dictFaltan) { texto += `${eq}: ${dictFaltan[eq].join(', ')}\n`; }
                 texto += "\nRepetidas\n";
-                for (let eq in dictRepes) {
-                    texto += `${eq}: ${dictRepes[eq].join(', ')}\n`;
-                }
+                for (let eq in dictRepes) { texto += `${eq}: ${dictRepes[eq].join(', ')}\n`; }
                 return texto;
             } catch (e) {
                 console.error("decodificarPayloadQR:", e);
@@ -2120,12 +1966,8 @@
             }
         }
 
-        // Recibe el texto ya decodificado y lo pone en el textarea
         function aplicarTextoDecodificado(texto) {
-            if (!texto) {
-                mostrarToast("⚠️ No se pudo decodificar el QR. ¿Es un QR de Figuritas App?");
-                return;
-            }
+            if (!texto) { mostrarToast("⚠️ No se pudo decodificar el QR. ¿Es un QR de Figuritas App?"); return; }
             let ta = document.getElementById('amigoLista');
             ta.value = texto;
             ta.style.borderColor = '#51cf66';
@@ -2133,7 +1975,6 @@
             mostrarToast("✅ ¡QR leído y decodificado! Revisá la lista y compará.");
         }
 
-        // Dado un dataURL de imagen, extrae el QR y lo decodifica
         function procesarImagenComoQR(dataURL) {
             let img = new Image();
             img.onload = function () {
@@ -2153,7 +1994,6 @@
             img.src = dataURL;
         }
 
-        // --- BOTÓN 1: Cámara en vivo ---
         document.getElementById('btnEscanearQR').addEventListener('click', function () {
             cargarLibsQR(() => {
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -2176,7 +2016,6 @@
                     stream = s;
                     video.srcObject = stream;
                     video.play();
-
                     function tick() {
                         if (video.readyState === video.HAVE_ENOUGH_DATA) {
                             canvas.width  = video.videoWidth;
@@ -2211,7 +2050,6 @@
             });
         });
 
-        // --- BOTÓN 2: Subir archivo imagen ---
         document.getElementById('btnSubirQR').addEventListener('click', function () {
             cargarLibsQR(() => document.getElementById('inputArchivoQR').click());
         });
@@ -2225,26 +2063,40 @@
             e.target.value = '';
         });
 
-        // --- PEGAR imagen del portapapeles (Ctrl+V sobre el textarea) ---
+        // INTERCEPTOR DE PEGADO (CTRL+V)
         document.getElementById('amigoLista').addEventListener('paste', function (e) {
             let items = (e.clipboardData || window.clipboardData).items;
+            let imageFile = null;
             for (let item of items) {
                 if (item.type.startsWith('image/')) {
-                    e.preventDefault();
+                    imageFile = item.getAsFile();
+                    break;
+                }
+            }
+            if (imageFile) {
+                e.preventDefault();
+                if (confirm("📸 Detectamos una imagen pegada.\n\n¿Querés analizarla con IA? (Infografías / Capturas)\n\n[Aceptar] = Leer con IA\n[Cancelar] = Es un código QR oficial de la app")) {
+                    const apiKey = document.getElementById('geminiApiKey').value.trim();
+                    if (!apiKey) {
+                        alert("Necesitás pegar tu API Key arriba para usar la IA.");
+                        document.getElementById('geminiApiKey').focus();
+                        return;
+                    }
+                    localStorage.setItem('gemini_api_key', apiKey);
+                    procesarImagenConIA(imageFile);
+                } else {
                     cargarLibsQR(() => {
                         let reader = new FileReader();
                         reader.onload = ev => procesarImagenComoQR(ev.target.result);
-                        reader.readAsDataURL(item.getAsFile());
+                        reader.readAsDataURL(imageFile);
                     });
-                    return;
                 }
             }
-            // Si es texto plano, el paste normal sigue sin tocar
         });
 
         // INIT
-        // =====================================
         window.onload = async function () {
+            cargarLlaveLocal();
             cargarUsuariosPublicosEnDatalist();
             const url = new URLSearchParams(window.location.search);
             if (url.get('u')) {
