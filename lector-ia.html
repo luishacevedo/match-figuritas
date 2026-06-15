@@ -60,7 +60,7 @@
                 return;
             }
 
-            // Guardamos la llave localmente para comodidad del usuario
+            // Guardamos la llave localmente para comodidad
             localStorage.setItem('gemini_api_key', apiKey);
 
             const file = input.files[0];
@@ -70,14 +70,14 @@
                 const base64Image = await fileToBase64(file);
                 const base64Data = base64Image.split(',')[1];
                 
-                // SOLUCIÓN PARA .JFIF y tipos vacíos
+                // Parche infalible para .jfif y tipos vacíos
                 let mimeType = file.type;
                 if (!mimeType || mimeType.includes('jfif')) {
                     mimeType = 'image/jpeg';
                 }
 
-                // URL de la API usando la llave dinámica ingresada en la pantalla
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                // URL apuntando al modelo moderno (gemini-2.5-flash) para evitar el error 404
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
                 const prompt = `
                 Sos un asistente experto en extraer datos de álbumes de figuritas de fútbol. Analizá esta imagen.
@@ -121,7 +121,7 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error("Error en la API. Verificá que tu API Key sea válida y no haya sido revocada.");
+                    throw new Error("Error de conexión. Revisá tu API Key o conexión a internet.");
                 }
 
                 const data = await response.json();
