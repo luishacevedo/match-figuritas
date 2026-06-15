@@ -71,10 +71,21 @@
             try {
                 const base64Image = await fileToBase64(file);
                 const base64Data = base64Image.split(',')[1];
-                const mimeType = file.type;
+const file = input.files[0];
+statusTxt.innerText = "⏳ Convirtiendo imagen...";
 
-                // URL de la API usando la llave dinámica ingresada en la pantalla
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+try {
+    const base64Image = await fileToBase64(file);
+    const base64Data = base64Image.split(',')[1];
+    
+    // CAMBIO ACÁ: Forzamos el tipo correcto si es jfif o viene vacío
+    let mimeType = file.type;
+    if (mimeType.includes('jfif') || !mimeType) {
+        mimeType = 'image/jpeg';
+    }
+
+    // URL de la API usando la llave dinámica ingresada en la pantalla
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
                 const prompt = `
                 Sos un asistente experto en extraer datos de álbumes de figuritas de fútbol. Analizá esta imagen.
