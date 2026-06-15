@@ -20,7 +20,7 @@
 
     <div class="box">
         <h2 style="margin-top: 0; color: #005c98;">🤖 Lector Visual con IA</h2>
-        <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Subí la captura de una infografía para extraer las listas.</p>
+        <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Subí la captura de una infografía para extraer las listas limpias.</p>
         
         <label style="font-size: 13px; font-weight: bold; display: block; margin-bottom: 5px;">🔑 Tu Gemini API Key:</label>
         <input type="password" id="apiKeyInput" placeholder="Pegá tu API Key acá (se guarda solo en tu navegador)...">
@@ -33,8 +33,6 @@
         
         <textarea id="resultado" placeholder="El resultado limpio aparecerá acá..." readonly></textarea>
     </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 
     <script>
         // Al cargar la página, recuperamos la llave si ya fue guardada antes
@@ -71,21 +69,15 @@
             try {
                 const base64Image = await fileToBase64(file);
                 const base64Data = base64Image.split(',')[1];
-const file = input.files[0];
-statusTxt.innerText = "⏳ Convirtiendo imagen...";
+                
+                // SOLUCIÓN PARA .JFIF y tipos vacíos
+                let mimeType = file.type;
+                if (!mimeType || mimeType.includes('jfif')) {
+                    mimeType = 'image/jpeg';
+                }
 
-try {
-    const base64Image = await fileToBase64(file);
-    const base64Data = base64Image.split(',')[1];
-    
-    // CAMBIO ACÁ: Forzamos el tipo correcto si es jfif o viene vacío
-    let mimeType = file.type;
-    if (mimeType.includes('jfif') || !mimeType) {
-        mimeType = 'image/jpeg';
-    }
-
-    // URL de la API usando la llave dinámica ingresada en la pantalla
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                // URL de la API usando la llave dinámica ingresada en la pantalla
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
                 const prompt = `
                 Sos un asistente experto en extraer datos de álbumes de figuritas de fútbol. Analizá esta imagen.
@@ -128,7 +120,9 @@ try {
                     body: JSON.stringify(requestBody)
                 });
 
-                if (!response.ok) throw new Error("Error en la API. Verificá que tu API Key sea válida y no haya sido revocada.");
+                if (!response.ok) {
+                    throw new Error("Error en la API. Verificá que tu API Key sea válida y no haya sido revocada.");
+                }
 
                 const data = await response.json();
                 const textoFinal = data.candidates[0].content.parts[0].text;
