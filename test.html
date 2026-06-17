@@ -659,17 +659,33 @@
         function parsearTexto(texto) {
             let datos = { faltan: {}, repetidas: {} };
             if (!texto || typeof texto !== 'string') return datos;
+            
             let seccion = null;
+            let equipoActual = null;
+            const QR_TEAMS = ["FWC","MEX","RSA","KOR","CZE","CAN","BIH","QAT","SUI","BRA","MAR","HAI","SCO","USA","PAR","AUS","TUR","GER","CUW","CIV","ECU","NED","JPN","SWE","TUN","BEL","EGY","IRN","NZL","ESP","CPV","KSA","URU","FRA","SEN","IRQ","NOR","ARG","ALG","AUT","JOR","POR","COD","UZB","COL","ENG","CRO","GHA","PAN","CC"];
+
             texto.split('\n').forEach(linea => {
                 let l = linea.trim();
                 if (!l) return;
                 let lm = l.toLowerCase();
-                if (lm.includes('faltan') || lm.includes('need')) seccion = 'faltan';
-                else if (lm.includes('repetidas') || lm.includes('swaps')) seccion = 'repetidas';
-                else if (seccion && l.includes(':')) {
-                    let eq = limpiarNombreEquipo(l.split(':')[0]);
-                    let parteNums = l.split(':').slice(1).join(':');
-                    let nums = [];
+
+                // 1. Detectar cambio de sección (Faltantes o Repetidas)
+                if (lm.includes('faltan') || lm.includes('need') || lm.includes('faltantes')) {
+                    seccion = 'faltan';
+                    return;
+                } else if (lm.includes('repetidas') || lm.includes('swaps')) {
+                    seccion = 'repetidas';
+                    return;
+                }
+
+                if (!seccion) return;
+
+                // 2. PARSER FORMATO VIEJO: "ARG: 1, 2, 3 (x2)"
+                if (l.includes(':')) {
+                    let partes = l.split(':');
+                    let eq = limpiarNombreEquipo(partes[0]);
+                    let parteNums = partes.slice(1).join(':');
+                    
                     parteNums.split(',').forEach(token => {
                         token = token.trim();
                         let numMatch = token.match(/^(\d+)/);
@@ -678,21 +694,82 @@
                         if (isNaN(num)) return;
                         let multMatch = token.match(/\([×xX]\s*(\d+)\)/);
                         let cantidad = multMatch ? parseInt(multMatch[1]) : 1;
-                        for (let i = 0; i < cantidad; i++) nums.push(num);
+                        
+                        if (!datos[seccion][eq]) datos[seccion][eq] = [];
+                        for (let i = 0; i < cantidad; i++) datos[seccion][eq].push(num);
                     });
-                    if (!datos[seccion][eq]) datos[seccion][eq] = [];
-                    datos[seccion][eq].push(...nums);
+                }
+                
+                // 3. PARSER FORMATO NUEVO - CABECERAS: "🇲🇽 *MEX* · pg. 8-9" o "*Somos 26*"
+                else if (l.includes('· pg.') || l.startsWith('*') || l.startsWith('🏆')) {
+                    let limpio = l.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+                    equipoActual = null;
+                    
+                    for (let sigla of QR_TEAMS) {
+                        if (limpio.includes(sigla)) { equipoActual = sigla; break; }
+                    }
+                    // Casos especiales para las figuritas FWC y Coca Cola
+                    if (!equipoActual && (lm.includes('somos 26') || lm.includes('copa 2026') || lm.includes('anfitriones') || lm.includes('historia'))) {
+                        equipoActual = 'FWC';
+                    }
+                    if (!equipoActual && lm.includes('coca-cola')) {
+                        equipoActual = 'CC';
+                    }
+                }
+                
+                // 4. PARSER FORMATO NUEVO - ITEMS: "MEX1, MEX3" o "00 (x1)"
+                else {
+                    let tokens = l.split(',');
+                    tokens.forEach(token => {
+                        token = token.trim();
+                        if (!token) return;
+
+                        // Ignorar líneas de publicidad de la app ("Descarga...", "Generado por...", etc.)
+                        if (lm.includes('generado por') || lm.includes('descarga') || lm.includes('http') || lm.includes('intercambiamos')) return;
+
+                        // Expresión Regular Mágica: Separa "MEX12 (x2)", "FWC8", "00 (x1)", o simplemente "15"
+                        let regex = /^([A-Za-z]*)\s*(\d+)(?:\s*\([xX×]\s*(\d+)\))?$/;
+                        let match = token.match(regex);
+
+                        if (match) {
+                            let parsedEq = match[1].toUpperCase();
+                            let parsedNum = parseInt(match[2], 10);
+                            let isZeroZero = match[2] === '00';
+                            let count = match[3] ? parseInt(match[3], 10) : 1;
+
+                            // La figurita 00 siempre pertenece a FWC
+                            if (isZeroZero) {
+                                parsedEq = 'FWC';
+                                parsedNum = 0;
+                            }
+
+                            let finalEq = parsedEq || equipoActual;
+
+                            if (finalEq && QR_TEAMS.includes(finalEq) && !isNaN(parsedNum)) {
+                                if (!datos[seccion][finalEq]) datos[seccion][finalEq] = [];
+                                for(let i = 0; i < count; i++) {
+                                    datos[seccion][finalEq].push(parsedNum);
+                                }
+                            }
+                        }
+                    });
                 }
             });
+
+            // 5. Ordenar y deduplicar faltantes (manteniendo las copias en repetidas)
             for (let s in datos) {
                 for (let e in datos[s]) {
                     if (s === 'faltan') datos[s][e] = [...new Set(datos[s][e])];
                     datos[s][e].sort((a, b) => a - b);
                 }
             }
+            
             return datos;
         }
 
+
+
+        
         function encontrarInterseccion(buscadas, ofrecidas) {
             let matches = {};
             let copiaOfrecidas = JSON.parse(JSON.stringify(ofrecidas));
