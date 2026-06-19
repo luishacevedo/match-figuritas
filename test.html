@@ -383,14 +383,6 @@
         <div id="mercadoGlobalResultados" style="display: none;"><h3>🌐 Triangulación de Grupo</h3><div id="listaMercadoGlobal"></div></div>
 
         <div id="detalleIndividual" style="display: none;">
-            <div id="vistaTexto" style="display:none;">
-                <h3 id="tituloMeSirvenTexto"></h3>
-                <div id="meSirvenTexto"></div>
-                <h3 id="tituloLeSirvenTexto"></h3>
-                <div id="leSirvenTexto"></div>
-                <button id="btnCopiarPortapapeles" style="display:none;"></button>
-                <button id="btnCopiarWhatsApp" style="display:none;"></button>
-            </div>
             <div id="vistaSimulador">
                 <div class="step-box" id="infoPasoRuta" style="display: none; margin-bottom: 15px;"></div>
 
@@ -519,8 +511,6 @@
         document.getElementById('btnCompartirPublico').addEventListener('click', compartirWhatsAppPublico);
         document.getElementById('btnCopiarPrivado').addEventListener('click', () => copiarLink('linkPrivado', 'btnCopiarPrivado', '#6c757d', true));
         document.getElementById('btnInstalar').addEventListener('click', mostrarInstruccionesAndroid);
-        document.getElementById('btnCopiarPortapapeles').addEventListener('click', copiarTextoPortapapeles);
-        document.getElementById('btnCopiarWhatsApp').addEventListener('click', abrirWhatsAppConTexto);
         document.getElementById('btnGuardarAmigoNuevo').addEventListener('click', guardarAmigoNuevo);
         document.getElementById('btnEscanearAmigos').addEventListener('click', escanearMisCambios);
         document.getElementById('btnMercadoGlobal').addEventListener('click', analizarMercadoGlobal);
@@ -866,19 +856,6 @@
             return t;
         }
 
-        function renderizarResultadosTexto(divId, d) {
-            let div = document.getElementById(divId);
-            div.innerHTML = '';
-            let hayMatches = false;
-            let cleanD = {};
-            for (let e in d) { cleanD[e] = [...new Set(d[e])]; }
-            for (let e in cleanD) {
-                hayMatches = true;
-                div.innerHTML += `<div class="team-row" style="display:block;"><b>${e}:</b> ${cleanD[e].join(', ')}</div>`;
-            }
-            if (!hayMatches) div.innerHTML = '<p style="color:#f0c060; background:#2a2000; padding:10px; border-radius:5px; font-size:13px;">No hay coincidencias.</p>';
-        }
-
         function renderizarResultadosInteractivos(divId, d, tipo, diccionarioOriginalDeEseTipo) {
             let div = document.getElementById(divId);
             div.innerHTML = '';
@@ -1065,9 +1042,6 @@
 
             actualizarBotonContactar();
 
-            renderizarResultadosTexto('meSirvenTexto', ultimoMatchMeSirven);
-            renderizarResultadosTexto('leSirvenTexto', ultimoMatchLeSirven);
-
             seleccionesActuales = { recibir: [], dar: [] };
 
             renderizarResultadosInteractivos('meSirvenSim', ultimoMatchMeSirven, 'recibir', oD.repetidas);
@@ -1075,8 +1049,6 @@
             seleccionarPareado();
 
             let esCoop = document.getElementById('checkCoop').checked;
-            document.getElementById('tituloMeSirvenTexto').innerText = esCoop ? `✅ A nosotros (Grupo) nos sirven ${obtenerDesglose(ultimoMatchMeSirven)} de ${conZona(nombre, ultimoZonaAmigo)}` : `✅ Me sirven ${obtenerDesglose(ultimoMatchMeSirven)} de ${conZona(nombre, ultimoZonaAmigo)}`;
-            document.getElementById('tituloLeSirvenTexto').innerText = `🎁 A ${conZona(nombre, ultimoZonaAmigo)} le sirven ${obtenerDesglose(ultimoMatchLeSirven)} tuyas:`;
             
             document.getElementById('tituloMeSirvenSim').innerText = esCoop ? `✅ Nosotros recibimos de ${conZona(nombre, ultimoZonaAmigo)}` : `✅ Vos recibís de ${conZona(nombre, ultimoZonaAmigo)}`;
             document.getElementById('tituloLeSirvenSim').innerText = `🎁 Vos entregás a ${conZona(nombre, ultimoZonaAmigo)}`;
