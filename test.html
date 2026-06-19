@@ -1937,10 +1937,27 @@
 
             try {
                 const base64Image = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = () => resolve(reader.result.split(',')[1]);
-                    reader.onerror = error => reject(error);
+            if (!file) return reject(new Error("No se detectó ninguna imagen."));
+            
+            const reader = new FileReader();
+            
+            // 1. PRIMERO definimos qué hacer cuando el archivo se termine de cargar
+            reader.onload = (e) => {
+                const resultado = e.target.result;
+                // Verificamos que el resultado exista y sea un Base64 válido antes de cortarlo
+                if (resultado && resultado.includes(',')) {
+                    resolve(resultado.split(',')[1]);
+                } else {
+                    reject(new Error("El formato de la imagen no es válido o está vacío."));
+                }
+            };
+            
+            // 2. SEGUNDO definimos qué hacer si el navegador falla al leer
+            reader.onerror = () => reject(new Error("Error interno del navegador al intentar leer la imagen."));
+            
+            // 3. TERCERO (y siempre al final) damos la orden de leer el archivo
+            reader.readAsDataURL(file);
+        });
                 });
 
                 let mimeType = file.type;
