@@ -178,6 +178,7 @@
     </div>
 
     <div class="grid">
+        <!-- PANEL IZQUIERDO: MI PERFIL -->
         <div class="box">
             <h3>👤 Mi Perfil</h3>
             <label>Usuario:</label>
@@ -273,8 +274,17 @@
             </div>
         </div>
 
+        <!-- PANEL DERECHO: INTERCAMBIO -->
         <div class="box">
             <h3>🤝 Intercambio y Estrategia</h3>
+
+            <!-- NUEVO MODO COOPERATIVO -->
+            <div style="background: var(--bg3); border: 1px solid var(--primary); border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+                <label style="margin: 0; color: var(--text); font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="checkCoop" style="width: 16px; height: 16px; margin: 0; accent-color: var(--primary);">
+                    <span>🤝 <b>Modo Cooperativo:</b> Sumar los faltantes de los amigos tildados abajo a mi lista de búsqueda.</span>
+                </label>
+            </div>
 
             <div id="controlesSeleccion" class="controles-seleccion" style="display: none;">
                 <button id="btnSeleccionarTodos" class="btn-mini">☑️ Todos</button>
@@ -325,6 +335,7 @@
 
             <label>✍️ Pegar su lista:</label>
             
+            <!-- CAJA DE CONFIGURACIÓN DE IA -->
             <div style="background: var(--bg2); border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
                 <label style="font-size: 13px; font-weight: bold; color: var(--text2); display: block; margin-bottom: 5px;">🔑 Tu Gemini API Key (Solo para IA):</label>
                 <input type="password" id="geminiApiKey" placeholder="Pegá tu clave generada en Google AI Studio..." style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; box-sizing: border-box; background: var(--bg3); color: var(--text);">
@@ -350,6 +361,7 @@
         </div>
     </div>
 
+    <!-- CARRITO -->
     <div id="areaCarrito" class="resultados" style="border-color: var(--yellow);">
         <h3 style="color:var(--text); border-color: var(--yellow); display: flex; justify-content: space-between; align-items: center;">
             <span>🛒 Tu Simulador / Plan</span>
@@ -371,6 +383,7 @@
         </div>
     </div>
 
+    <!-- RESULTADOS -->
     <div id="resultados" class="resultados">
         <div id="rankingResultados" style="display: none;"><h3>🏆 Ranking de Opciones</h3><div id="zonaFiltroWrap" class="zona-filtro-wrap" style="display:none;"><div class="zona-filtro-label">📍 Filtrar por zona:</div><div class="zona-chips" id="zonaChips"></div></div><div id="listaRanking"></div></div>
         <div id="mercadoGlobalResultados" style="display: none;"><h3>🌐 Triangulación de Grupo</h3><div id="listaMercadoGlobal"></div></div>
@@ -463,6 +476,7 @@
 
     <div class="footer"><p>Contacto: <a href="https://t.me/luishacevedo" target="_blank">Telegram @luishacevedo</a> &nbsp;·&nbsp; <a href="ayuda.html" target="_blank">❓ Ayuda</a></p></div>
 
+    <!-- MODAL CÁMARA QR -->
     <div id="modalQR" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.93); z-index:9999; flex-direction:column; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
         <div style="background:#1e1e1e; border:1px solid #383838; border-radius:14px; padding:20px; max-width:420px; width:100%; text-align:center;">
             <h3 style="color:#e9ecef; margin:0 0 14px 0; font-size:17px;">📷 Apuntá la cámara al QR</h3>
@@ -669,7 +683,6 @@
                 if (!l) return;
                 let lm = l.toLowerCase();
 
-                // 1. Detectar cambio de sección (Faltantes o Repetidas)
                 if (lm.includes('faltan') || lm.includes('need') || lm.includes('faltantes')) {
                     seccion = 'faltan';
                     return;
@@ -677,15 +690,12 @@
                     seccion = 'repetidas';
                     return;
                 }
-
                 if (!seccion) return;
 
-                // 2. PARSER FORMATO VIEJO: "ARG: 1, 2, 3 (x2)"
                 if (l.includes(':')) {
                     let partes = l.split(':');
                     let eq = limpiarNombreEquipo(partes[0]);
                     let parteNums = partes.slice(1).join(':');
-                    
                     parteNums.split(',').forEach(token => {
                         token = token.trim();
                         let numMatch = token.match(/^(\d+)/);
@@ -694,21 +704,16 @@
                         if (isNaN(num)) return;
                         let multMatch = token.match(/\([×xX]\s*(\d+)\)/);
                         let cantidad = multMatch ? parseInt(multMatch[1]) : 1;
-                        
                         if (!datos[seccion][eq]) datos[seccion][eq] = [];
                         for (let i = 0; i < cantidad; i++) datos[seccion][eq].push(num);
                     });
                 }
-                
-                // 3. PARSER FORMATO NUEVO - CABECERAS: "🇲🇽 *MEX* · pg. 8-9" o "*Somos 26*"
                 else if (l.includes('· pg.') || l.startsWith('*') || l.startsWith('🏆')) {
                     let limpio = l.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
                     equipoActual = null;
-                    
                     for (let sigla of QR_TEAMS) {
                         if (limpio.includes(sigla)) { equipoActual = sigla; break; }
                     }
-                    // Casos especiales para las figuritas FWC y Coca Cola
                     if (!equipoActual && (lm.includes('somos 26') || lm.includes('copa 2026') || lm.includes('anfitriones') || lm.includes('historia'))) {
                         equipoActual = 'FWC';
                     }
@@ -716,35 +721,21 @@
                         equipoActual = 'CC';
                     }
                 }
-                
-                // 4. PARSER FORMATO NUEVO - ITEMS: "MEX1, MEX3" o "00 (x1)"
                 else {
                     let tokens = l.split(',');
                     tokens.forEach(token => {
                         token = token.trim();
                         if (!token) return;
-
-                        // Ignorar líneas de publicidad de la app ("Descarga...", "Generado por...", etc.)
                         if (lm.includes('generado por') || lm.includes('descarga') || lm.includes('http') || lm.includes('intercambiamos')) return;
-
-                        // Expresión Regular Mágica: Separa "MEX12 (x2)", "FWC8", "00 (x1)", o simplemente "15"
                         let regex = /^([A-Za-z]*)\s*(\d+)(?:\s*\([xX×]\s*(\d+)\))?$/;
                         let match = token.match(regex);
-
                         if (match) {
                             let parsedEq = match[1].toUpperCase();
                             let parsedNum = parseInt(match[2], 10);
                             let isZeroZero = match[2] === '00';
                             let count = match[3] ? parseInt(match[3], 10) : 1;
-
-                            // La figurita 00 siempre pertenece a FWC
-                            if (isZeroZero) {
-                                parsedEq = 'FWC';
-                                parsedNum = 0;
-                            }
-
+                            if (isZeroZero) { parsedEq = 'FWC'; parsedNum = 0; }
                             let finalEq = parsedEq || equipoActual;
-
                             if (finalEq && QR_TEAMS.includes(finalEq) && !isNaN(parsedNum)) {
                                 if (!datos[seccion][finalEq]) datos[seccion][finalEq] = [];
                                 for(let i = 0; i < count; i++) {
@@ -756,20 +747,39 @@
                 }
             });
 
-            // 5. Ordenar y deduplicar faltantes (manteniendo las copias en repetidas)
             for (let s in datos) {
                 for (let e in datos[s]) {
                     if (s === 'faltan') datos[s][e] = [...new Set(datos[s][e])];
                     datos[s][e].sort((a, b) => a - b);
                 }
             }
-            
             return datos;
         }
 
+        // MOTOR DE MODO COOPERATIVO
+        async function obtenerMisFaltantesCombinados(textoMio) {
+            let mD = parsearTexto(textoMio);
+            if (document.getElementById('checkCoop').checked) {
+                let amigos = obtenerAmigosSeleccionados();
+                for (let amigo of amigos) {
+                    try {
+                        const snap = await get(child(ref(db), `usuarios/${amigo}`));
+                        if (snap.exists()) {
+                            let aDatos = parsearTexto(snap.val().textoOriginal);
+                            for (let eq in aDatos.faltan) {
+                                if (!mD.faltan[eq]) mD.faltan[eq] = [];
+                                mD.faltan[eq].push(...aDatos.faltan[eq]);
+                            }
+                        }
+                    } catch(e) {}
+                }
+                for (let eq in mD.faltan) {
+                    mD.faltan[eq] = [...new Set(mD.faltan[eq])].sort((a,b) => a - b);
+                }
+            }
+            return mD;
+        }
 
-
-        
         function encontrarInterseccion(buscadas, ofrecidas) {
             let matches = {};
             let copiaOfrecidas = JSON.parse(JSON.stringify(ofrecidas));
@@ -985,7 +995,7 @@
             let wrapMia = document.getElementById('barraProgresoMiaSim');
             if (textoAmigo) {
                 let statsAmigo = calcularEstadisticasAlbum(textoAmigo);
-                document.getElementById('labelBarraAmigo').innerText = `📊 Álbum de ${conZona(nombreAmigo, ultimoZonaAmigo)}`;
+                document.getElementById('labelBarraAmigo').innerText = `📊 Álbum del amigo`;
                 renderizarBarraMini(statsAmigo, 'Amigo');
                 wrapAmigo.style.display = 'block';
             } else { wrapAmigo.style.display = 'none'; }
@@ -999,9 +1009,29 @@
         function seleccionarPareado() {
             document.querySelectorAll('#meSirvenSim .sticker-btn').forEach(b => b.classList.remove('selected'));
             document.querySelectorAll('#leSirvenSim .sticker-btn').forEach(b => b.classList.remove('selected'));
-            function getBtnsPorCategoria(selector) {
+
+            function getBtnsPorCategoria(selector, ordenarPorAbundancia = false) {
                 let cats = { esp: [], esc: [], eq: [], cc: [], jug: [] };
-                document.querySelectorAll(selector + ' .sticker-btn').forEach(btn => {
+                let nodes = document.querySelectorAll(selector + ' .sticker-btn');
+                
+                let counts = {};
+                if (ordenarPorAbundancia) {
+                    nodes.forEach(btn => {
+                        let baseId = btn.dataset.id.split('#')[0];
+                        counts[baseId] = (counts[baseId] || 0) + 1;
+                    });
+                }
+
+                let nodesArr = Array.from(nodes);
+                if (ordenarPorAbundancia) {
+                    nodesArr.sort((a, b) => {
+                        let baseA = a.dataset.id.split('#')[0];
+                        let baseB = b.dataset.id.split('#')[0];
+                        return counts[baseB] - counts[baseA];
+                    });
+                }
+
+                nodesArr.forEach(btn => {
                     let parts = btn.dataset.id.split('#')[0].split(' ');
                     let eq = parts[0], num = parseInt(parts[1]);
                     let cat = categorizarFigu(eq, num);
@@ -1013,8 +1043,10 @@
                 });
                 return cats;
             }
-            let recibir = getBtnsPorCategoria('#meSirvenSim');
-            let dar = getBtnsPorCategoria('#leSirvenSim');
+
+            let recibir = getBtnsPorCategoria('#meSirvenSim', false);
+            let dar = getBtnsPorCategoria('#leSirvenSim', true); // Inteligencia: prioriza las que más sobran
+
             let orden = ['esp', 'esc', 'eq', 'cc', 'jug'];
             for (let cat of orden) {
                 let min = Math.min(recibir[cat].length, dar[cat].length);
@@ -1026,12 +1058,15 @@
             actualizarContadoresSeleccion();
         }
 
-        function ejecutarComparacion(mio, otro, nombre, contactoAmigo, zonaAmigo) {
-            let mD = parsearTexto(mio), oD = parsearTexto(otro);
+        function ejecutarComparacion(mD, otroTexto, nombre, contactoAmigo, zonaAmigo, textoMioOriginal) {
+            let oD = parsearTexto(otroTexto);
             ultimoZonaAmigo = zonaAmigo || "";
-            actualizarBarrasSimulador(mio, otro, nombre);
+            actualizarBarrasSimulador(textoMioOriginal, otroTexto, nombre);
+            
             ultimoMatchMeSirven = encontrarInterseccion(mD.faltan, oD.repetidas);
-            ultimoMatchLeSirven = encontrarInterseccion(oD.faltan, mD.repetidas);
+            let mDRepetidasReales = parsearTexto(textoMioOriginal).repetidas; // Solo DOY mis repetidas reales
+            ultimoMatchLeSirven = encontrarInterseccion(oD.faltan, mDRepetidasReales);
+            
             ultimoNombreAmigo = nombre;
             ultimoContactoAmigo = contactoAmigo || { tipo: "", dato: "" };
 
@@ -1043,12 +1078,14 @@
             seleccionesActuales = { recibir: [], dar: [] };
 
             renderizarResultadosInteractivos('meSirvenSim', ultimoMatchMeSirven, 'recibir', oD.repetidas);
-            renderizarResultadosInteractivos('leSirvenSim', ultimoMatchLeSirven, 'dar', mD.repetidas);
+            renderizarResultadosInteractivos('leSirvenSim', ultimoMatchLeSirven, 'dar', mDRepetidasReales);
             seleccionarPareado();
 
-            document.getElementById('tituloMeSirvenTexto').innerText = `✅ Me sirven ${obtenerDesglose(ultimoMatchMeSirven)} de ${conZona(nombre, ultimoZonaAmigo)}`;
+            let esCoop = document.getElementById('checkCoop').checked;
+            document.getElementById('tituloMeSirvenTexto').innerText = esCoop ? `✅ A nosotros (Grupo) nos sirven ${obtenerDesglose(ultimoMatchMeSirven)} de ${conZona(nombre, ultimoZonaAmigo)}` : `✅ Me sirven ${obtenerDesglose(ultimoMatchMeSirven)} de ${conZona(nombre, ultimoZonaAmigo)}`;
             document.getElementById('tituloLeSirvenTexto').innerText = `🎁 A ${conZona(nombre, ultimoZonaAmigo)} le sirven ${obtenerDesglose(ultimoMatchLeSirven)} tuyas:`;
-            document.getElementById('tituloMeSirvenSim').innerText = `✅ Vos recibís de ${conZona(nombre, ultimoZonaAmigo)}`;
+            
+            document.getElementById('tituloMeSirvenSim').innerText = esCoop ? `✅ Nosotros recibimos de ${conZona(nombre, ultimoZonaAmigo)}` : `✅ Vos recibís de ${conZona(nombre, ultimoZonaAmigo)}`;
             document.getElementById('tituloLeSirvenSim').innerText = `🎁 Vos entregás a ${conZona(nombre, ultimoZonaAmigo)}`;
 
             document.getElementById('resultados').style.display = 'block';
@@ -1065,15 +1102,14 @@
 
         function generarTextoOferta(esWhatsApp = false) {
             let miUsuario = (document.getElementById('miUsuario').value.trim() || "YO").toUpperCase();
-            let miZona = document.getElementById('miZona').value.trim();
-            let miTipo = document.getElementById('miContactoTipo').value;
-            let miDato = document.getElementById('miContactoDato').value.trim();
-            let linkPublico = document.getElementById('linkCompartir').value || "https://luishacevedo.github.io/match-figuritas/";
+            let linkPublico = window.location.origin + window.location.pathname;
+            
             let recibirDict = desaplanarArray(seleccionesActuales.recibir);
             let darDict = desaplanarArray(seleccionesActuales.dar);
             let totalRecibir = seleccionesActuales.recibir.length;
             let totalDar = seleccionesActuales.dar.length;
             if (totalRecibir === 0 && totalDar === 0) return null;
+            
             let desgloseRecibir = obtenerDesglosePlano(seleccionesActuales.recibir);
             let desgloseDar = obtenerDesglosePlano(seleccionesActuales.dar);
             let nombreAmigo = conZona(ultimoNombreAmigo, ultimoZonaAmigo) || "tu amigo";
@@ -1081,30 +1117,38 @@
             let ital = esWhatsApp ? "_" : "";
             let lineasRecibir = formatearDiccionario(recibirDict, esWhatsApp);
             let lineasDar = formatearDiccionario(darDict, esWhatsApp);
-            let miId = miZona ? `${miUsuario} (${miZona})` : miUsuario;
+            
+            let textoNosotros = document.getElementById('checkCoop').checked ? "A nosotros (Grupo)" : `A mí (${miUsuario})`;
 
             let txt = `⚽ ${sep}MATCH DE FIGURITAS${sep} ⚽\n\n`;
-            txt += `✅ ${sep}A mí (${miId}) me sirven de ${nombreAmigo}:${sep}\n`;
+            txt += `✅ ${sep}${textoNosotros} nos sirven de ${nombreAmigo}:${sep}\n`;
             txt += `${desgloseRecibir}\n`;
             txt += lineasRecibir.trim() ? lineasRecibir : "Nada seleccionado\n";
             txt += `\n🎁 ${sep}A ${nombreAmigo} le sirven de las mías:${sep}\n`;
             txt += `${desgloseDar}\n`;
             txt += lineasDar.trim() ? lineasDar : "Nada seleccionado\n";
-            if (miDato) txt += `\n📲 ${sep}Contactame${sep}: ${generarTextoContacto(miTipo, miDato)}`;
-            txt += `\n🔍 ${ital}Cruzá tus repetidas conmigo acá:${ital}\n👉 ${linkPublico}`;
+            
+            txt += `\n🔍 ${ital}¿Querés ver si tenemos más cambios o armar tu propia estrategia? Pegá tu lista, foto o código QR de la app acá y fijate al instante:${ital}\n👉 ${linkPublico}`;
             return txt;
         }
 
-        function generarTextoContacto(tipo, dato) {
-            let d = dato.trim();
-            switch (tipo) {
-                case 'telegram':  return `https://t.me/${d.replace(/^@/, '')}`;
-                case 'whatsapp':  return `https://wa.me/${d.replace(/\D/g, '')}`;
-                case 'instagram': return `https://instagram.com/${d.replace(/^@/, '')}`;
-                case 'facebook':  return d.startsWith('http') ? d : `https://www.facebook.com/${d}`;
-                case 'mail':      return `mailto:${d}`;
-                default:          return d;
-            }
+        function generarTextoResultados(esWhatsApp = false) {
+            let miUsuario = document.getElementById('miUsuario').value.trim() || "MÍ";
+            let textoMeSirven = obtenerDesglose(ultimoMatchMeSirven);
+            let textoLeSirven = obtenerDesglose(ultimoMatchLeSirven);
+            let linkPublico = window.location.origin + window.location.pathname;
+            let esCoop = document.getElementById('checkCoop').checked;
+            
+            let headerMeSirven = esCoop ? `A nosotros (Grupo) nos sirven de ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)}` : `A mí (${miUsuario.toUpperCase()}) me sirven de ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)}`;
+            let sep = esWhatsApp ? "*" : "";
+            let ital = esWhatsApp ? "_" : "";
+
+            let texto = `⚽ ${sep}MATCH DE FIGURITAS${sep} ⚽\n\n`;
+            texto += `✅ ${sep}${headerMeSirven}:${sep}\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, esWhatsApp)}\n`;
+            texto += `🎁 ${sep}A ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)} le sirven de las mías:${sep}\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, esWhatsApp)}\n`;
+            texto += `🔍 ${ital}¿Querés ver si tenemos más cambios o armar tu propia estrategia? Pegá tu lista, foto o código QR de la app acá y fijate al instante:${ital}\n👉 ${linkPublico}`;
+
+            return texto;
         }
 
         function generarLinkContacto(tipo, dato) {
@@ -1197,9 +1241,12 @@
                 if (amigosSeleccionados.length === 0) return;
                 document.getElementById('statusAmigo').style.color = "#005c98";
                 document.getElementById('statusAmigo').innerText = "Iniciando Plan Estratégico...";
-                let misDatos = parsearTexto(textoMio);
+                
+                let misDatos = await obtenerMisFaltantesCombinados(textoMio); // Coop Mode ready
+                let misRepetidasReales = parsearTexto(textoMio).repetidas; // Solo Doy de las mías
+                
                 rutaState.misFaltan = aplanarDiccionario(misDatos.faltan);
-                rutaState.misRepetidas = aplanarDiccionario(misDatos.repetidas);
+                rutaState.misRepetidas = aplanarDiccionario(misRepetidasReales);
                 rutaState.amigos = [];
                 rutaState.pasoActual = 0;
                 rutaState.activo = true;
@@ -1259,10 +1306,12 @@
             renderizarResultadosInteractivos('meSirvenSim', dictMeSirven, 'recibir', desaplanarArray(mejorAmigo.repetidas));
             renderizarResultadosInteractivos('leSirvenSim', dictLeSirven, 'dar', desaplanarArray(rutaState.misRepetidas));
             seleccionarPareado();
+            
+            let esCoop = document.getElementById('checkCoop').checked;
             let info = document.getElementById('infoPasoRuta');
             info.style.display = 'block';
             info.innerHTML = `<b style="color:var(--success); font-size:16px;">Paso ${rutaState.pasoActual} de tu Plan:</b><br>Estás analizando a <b>${mejorAmigo.nombre}</b>. Tienen <b>${mejorCantidad}</b> cambios parejos potenciales. Ajustá las opciones abajo y confirmá.`;
-            document.getElementById('tituloMeSirvenSim').innerText = `✅ Vos recibís de ${conZona(mejorAmigo.nombre, ultimoZonaAmigo)}`;
+            document.getElementById('tituloMeSirvenSim').innerText = esCoop ? `✅ Nosotros recibimos de ${conZona(mejorAmigo.nombre, ultimoZonaAmigo)}` : `✅ Vos recibís de ${conZona(mejorAmigo.nombre, ultimoZonaAmigo)}`;
             document.getElementById('tituloLeSirvenSim').innerText = `🎁 Vos entregás a ${conZona(mejorAmigo.nombre, ultimoZonaAmigo)}`;
             document.getElementById('resultados').style.display = 'block';
             document.getElementById('detalleIndividual').style.display = 'block';
@@ -1359,7 +1408,10 @@
                     let contactoAmigo = { tipo: d.contacto_tipo || "", dato: d.contacto_dato || "" };
                     limpiarCamposAmigo();
                     rellenarCamposAmigo(d);
-                    ejecutarComparacion(m, d.textoOriginal, amigo, contactoAmigo, d.zona || "");
+                    
+                    let mD = await obtenerMisFaltantesCombinados(m);
+                    ejecutarComparacion(mD, d.textoOriginal, amigo, contactoAmigo, d.zona || "", m);
+                    
                     document.getElementById('statusAmigo').style.color = "green";
                     document.getElementById('statusAmigo').innerText = "¡Lista cargada!";
                 } else {
@@ -1499,7 +1551,10 @@
                 let status = document.getElementById('statusAmigo');
                 status.style.color = "#005c98";
                 status.innerText = "⚡ Escaneando opciones...";
-                let misDatos = parsearTexto(textoMio);
+                
+                let misDatos = await obtenerMisFaltantesCombinados(textoMio); // Coop Mode
+                let misRepetidasReales = parsearTexto(textoMio).repetidas; 
+
                 let publicosSnap = await get(ref(db, 'usuarios_publicos')).catch(() => null);
                 let publicosNombres = [];
                 if (publicosSnap && publicosSnap.exists()) {
@@ -1543,8 +1598,10 @@
                             let aZona = snap.val().zona || "";
                             let aRegion = snap.val().region || "";
                             let aDatos = parsearTexto(aTexto);
+                            
                             let mMe = encontrarInterseccion(misDatos.faltan, aDatos.repetidas);
-                            let mLe = encontrarInterseccion(aDatos.faltan, misDatos.repetidas);
+                            let mLe = encontrarInterseccion(aDatos.faltan, misRepetidasReales);
+                            
                             let cMe = contarTotal(mMe), cLe = contarTotal(mLe);
                             let pos = Math.min(cMe, cLe);
                             if (cMe > 0 || cLe > 0) return { nombre: amigo, zona: aZona, region: aRegion, me: cMe, le: cLe, pos: pos, txt: aTexto, esAmigo };
@@ -1665,39 +1722,6 @@
             return h ? t : "Nada\n";
         }
 
-        function generarTextoResultados(esWhatsApp = false) {
-            let miUsuario = document.getElementById('miUsuario').value.trim() || "MÍ";
-            let textoMeSirven = obtenerDesglose(ultimoMatchMeSirven);
-            let textoLeSirven = obtenerDesglose(ultimoMatchLeSirven);
-            let linkPublico = document.getElementById('linkCompartir').value || "https://luishacevedo.github.io/match-figuritas/";
-            let texto = "";
-            if (esWhatsApp) {
-                texto = `⚽ *MATCH DE FIGURITAS* ⚽\n\n✅ *A mí (${miUsuario.toUpperCase()}) me sirven de ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)}:*\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, true)}\n🎁 *A ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)} le sirven de las mías:*\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, true)}\n🔍 _Cruzá tus repetidas conmigo acá:_\n👉 ${linkPublico}`;
-            } else {
-                texto = `⚽ MATCH DE FIGURITAS ⚽\n\n✅ A mí (${miUsuario.toUpperCase()}) me sirven de ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)}:\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, false)}\n🎁 A ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)} le sirven de las mías:\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, false)}\n🔍 Cruzá tus repetidas conmigo acá:\n👉 ${linkPublico}`;
-            }
-            return texto;
-        }
-
-        function copiarTextoPortapapeles() {
-            navigator.clipboard.writeText(generarTextoResultados(false)).then(() => {
-                let btn = document.getElementById('btnCopiarPortapapeles');
-                btn.innerText = "¡Copiado! ✅";
-                btn.style.backgroundColor = "#28a745";
-                setTimeout(() => { btn.innerText = "📋 Copiar Texto"; btn.style.backgroundColor = "var(--primary)"; }, 3000);
-            });
-        }
-
-        function abrirWhatsAppConTexto() {
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(generarTextoResultados(true))}`, '_blank');
-        }
-
-        function actualizarLinkDirecto(usuario) {
-            let url = window.location.origin + window.location.pathname;
-            document.getElementById('linkCompartir').value = url + '?buscar=' + encodeURIComponent(usuario);
-            document.getElementById('linkPrivado').value = url + '?u=' + encodeURIComponent(usuario);
-        }
-
         function compartirWhatsAppPublico() {
             let link = document.getElementById('linkCompartir').value;
             if (!link) { alert("Primero guardá tu perfil para generar tu link."); return; }
@@ -1721,11 +1745,12 @@
             alert("Para instalar en Android:\n1. Abrí tu 'Link Privado' en Chrome.\n2. Tocá los 3 puntitos (⋮).\n3. Elegí 'Agregar a la pantalla principal'.");
         }
 
-        function compararListasLocales() {
+        async function compararListasLocales() {
             let textoMio = document.getElementById('miLista').value.trim();
             let textoAmigo = document.getElementById('amigoLista').value.trim();
             if (!textoMio || !textoAmigo) { alert("Faltan listas para comparar."); return; }
-            ejecutarComparacion(textoMio, textoAmigo, document.getElementById('amigoUsuario').value.trim() || "TU AMIGO", { tipo: "", dato: "" }, "");
+            let mD = await obtenerMisFaltantesCombinados(textoMio);
+            ejecutarComparacion(mD, textoAmigo, document.getElementById('amigoUsuario').value.trim() || "TU AMIGO", { tipo: "", dato: "" }, "", textoMio);
             document.getElementById('statusAmigo').innerText = "";
         }
 
@@ -1783,6 +1808,12 @@
                 s.style.color = "red";
                 s.innerText = "Error.";
             }
+        }
+
+        function actualizarLinkDirecto(usuario) {
+            let url = window.location.origin + window.location.pathname;
+            document.getElementById('linkCompartir').value = url + '?buscar=' + encodeURIComponent(usuario);
+            document.getElementById('linkPrivado').value = url + '?u=' + encodeURIComponent(usuario);
         }
 
         async function guardarMisDatos() {
@@ -1868,10 +1899,6 @@
                 s.innerText = "Error.";
             }
         }
-
-        // ================================================
-        // LECTOR QR, IA Y PORTAPAPELES (NUEVO)
-        // ================================================
 
         // Lógica de IA y guardado local de Llave
         function cargarLlaveLocal() {
@@ -2140,7 +2167,6 @@
             e.target.value = '';
         });
 
-        // INTERCEPTOR DE PEGADO (CTRL+V)
         document.getElementById('amigoLista').addEventListener('paste', function (e) {
             let items = (e.clipboardData || window.clipboardData).items;
             let imageFile = null;
