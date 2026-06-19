@@ -1925,7 +1925,7 @@
             const textarea = document.getElementById('amigoLista');
             const apiKey = document.getElementById('geminiApiKey').value.trim();
 
-            statusDiv.innerHTML = "⏳ <b>IA analizando imagen...</b> (Tarda 5 seg aprox)";
+            statusDiv.innerHTML = "⏳ <b>IA analizando imagen...</b> (Puede tardar unos segundos)";
             statusDiv.style.color = "var(--yellow)";
 
             try {
@@ -1945,11 +1945,9 @@
                     reader.readAsDataURL(file);
                 });
 
-              // Parche de seguridad para el tipo de archivo
                 let mimeType = file.type || 'image/jpeg';
                 if (mimeType.includes('jfif')) mimeType = 'image/jpeg';
 
-                // CORRECCIÓN: Usamos la versión estable gemini-1.5-flash
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
                 const prompt = `
@@ -1983,20 +1981,19 @@
                     })
                 });
 
-                // BLINDAJE: Si Google rebota la conexión, capturamos el motivo exacto
                 if (!response.ok) {
                     const errorText = await response.text();
-                    let errMsg = "Revisá que la API Key sea correcta.";
-                    try {
-                        const errJson = JSON.parse(errorText);
-                        if (errJson.error && errJson.error.message) errMsg = errJson.error.message;
-                    } catch(e) {}
+                    let errMsg = `Error de conexión con Google (Código ${response.status}).`;
+                    if (errorText) {
+                        try {
+                            const errJson = JSON.parse(errorText);
+                            if (errJson.error && errJson.error.message) errMsg = errJson.error.message;
+                        } catch(e) {}
+                    }
                     throw new Error(errMsg);
                 }
 
                 const data = await response.json();
-                
-                // Extraemos el texto de la IA
                 const textoFinal = data.candidates[0].content.parts[0].text;
 
                 textarea.value = textoFinal.trim();
@@ -2006,8 +2003,9 @@
                 if (document.getElementById('miLista').value.trim() !== "") {
                     document.getElementById('btnCompararLocal').click();
                 }
+
             } catch (error) {
-                console.error(error);
+                console.error("Error en IA:", error);
                 statusDiv.innerHTML = "❌ <b>Error:</b> " + error.message;
                 statusDiv.style.color = "var(--danger)";
             }
