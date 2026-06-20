@@ -83,6 +83,16 @@
         .sim-panel-title.dar { color: var(--danger); }
         .sim-mini-controls { display: flex; gap: 5px; }
 
+        .fecha-amigo-badge { font-size: 11px; color: var(--text2); background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; margin-bottom: 8px; }
+
+        /* SECCIONES POR ORIGEN EN MODO COOPERATIVO */
+        .coop-origen-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px; margin: 14px 0 6px; padding-bottom: 4px; border-bottom: 1px dashed var(--border); }
+        .coop-origen-header:first-child { margin-top: 0; }
+        .coop-origen-titulo { font-size: 13px; font-weight: bold; }
+        .coop-origen-titulo.mio { color: var(--yellow); }
+        .coop-origen-titulo.amigo { color: var(--success); }
+        .coop-origen-fecha { font-size: 11px; color: var(--text2); }
+
         /* ESTILOS DEL SIMULADOR INTERACTIVO */
         .sticker-btn { background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 5px 9px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; user-select: none; display: inline-flex; align-items: center; gap: 3px; }
         .sticker-badge { font-size: 10px; opacity: 0.75; background: rgba(0,0,0,0.12); border-radius: 4px; padding: 0 3px; }
@@ -109,7 +119,7 @@
         .footer a { color: var(--primary); font-weight: bold; text-decoration: none; }
         .status { font-size: 13px; min-height: 18px; margin-top: 5px; }
 
-        /* TOGGLE PÚBLICO */
+        /* TOGGLE PÚBLICO Y COOPERATIVO */
         .toggle-publico-wrap { display: flex; align-items: center; gap: 10px; background: #1a2e1a; border: 1px solid #2d5a2d; border-radius: 8px; padding: 10px 14px; margin-bottom: 15px; cursor: pointer; }
         .toggle-publico-wrap input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--success); cursor: pointer; flex-shrink: 0; }
         .toggle-publico-label { font-size: 13px; font-weight: bold; color: var(--success); line-height: 1.3; }
@@ -276,6 +286,13 @@
         <div class="box">
             <h3>🤝 Intercambio y Estrategia</h3>
 
+            <div style="background: var(--bg3); border: 1px solid var(--primary); border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+                <label style="margin: 0; color: var(--text); font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="checkCoop" style="width: 16px; height: 16px; margin: 0; accent-color: var(--primary);">
+                    <span>🤝 <b>Modo Cooperativo:</b> Sumar los faltantes de los amigos tildados abajo a mi lista de búsqueda.</span>
+                </label>
+            </div>
+
             <div id="controlesSeleccion" class="controles-seleccion" style="display: none;">
                 <button id="btnSeleccionarTodos" class="btn-mini">☑️ Todos</button>
                 <button id="btnDeseleccionarTodos" class="btn-mini">🔲 Ninguno</button>
@@ -376,14 +393,6 @@
         <div id="mercadoGlobalResultados" style="display: none;"><h3>🌐 Triangulación de Grupo</h3><div id="listaMercadoGlobal"></div></div>
 
         <div id="detalleIndividual" style="display: none;">
-            <div id="vistaTexto" style="display:none;">
-                <h3 id="tituloMeSirvenTexto"></h3>
-                <div id="meSirvenTexto"></div>
-                <h3 id="tituloLeSirvenTexto"></h3>
-                <div id="leSirvenTexto"></div>
-                <button id="btnCopiarPortapapeles" style="display:none;"></button>
-                <button id="btnCopiarWhatsApp" style="display:none;"></button>
-            </div>
             <div id="vistaSimulador">
                 <div class="step-box" id="infoPasoRuta" style="display: none; margin-bottom: 15px;"></div>
 
@@ -408,6 +417,7 @@
                                 <button id="btnSimRecibirNinguna" class="btn-mini">🔲 Ninguna</button>
                             </div>
                         </div>
+                        <div id="fechaAmigoPrincipal" class="fecha-amigo-badge" style="display:none;"></div>
                         <div class="sim-panel-counter" style="font-size:12px; font-weight:bold; color:var(--success); margin-bottom:8px; padding: 4px 6px; background: #1a2e22; border-radius:6px;">
                             📥 Recibir: <span id="countRecibir">0</span> &nbsp;<span class="breakdown-text" id="breakdownRecibir" style="color:var(--text2); font-weight:normal;">0 fig.</span>
                         </div>
@@ -499,6 +509,9 @@
         let ultimoNombreAmigo = "";
         let ultimoZonaAmigo = "";
         let ultimoContactoAmigo = { tipo: "", dato: "" };
+        let ultimoDesgloseOrigenes = {};       // {MIO:{eq:[nums]}, [amigo]:{eq:[nums]}} - quién necesita qué en modo coop
+        let ultimasFechasCoopAmigos = {};       // {[amigo]: "2026-06-15T17:30:00.000Z"} - última actualización de cada amigo coop
+        let ultimaFechaAmigoPrincipal = "";     // última actualización del amigo con el que se está comparando ahora
         window.amigosDataGlobal = [];
         window.carritoSimulador = [];
         let seleccionesActuales = { recibir: [], dar: [] };
@@ -512,8 +525,6 @@
         document.getElementById('btnCompartirPublico').addEventListener('click', compartirWhatsAppPublico);
         document.getElementById('btnCopiarPrivado').addEventListener('click', () => copiarLink('linkPrivado', 'btnCopiarPrivado', '#6c757d', true));
         document.getElementById('btnInstalar').addEventListener('click', mostrarInstruccionesAndroid);
-        document.getElementById('btnCopiarPortapapeles').addEventListener('click', copiarTextoPortapapeles);
-        document.getElementById('btnCopiarWhatsApp').addEventListener('click', abrirWhatsAppConTexto);
         document.getElementById('btnGuardarAmigoNuevo').addEventListener('click', guardarAmigoNuevo);
         document.getElementById('btnEscanearAmigos').addEventListener('click', escanearMisCambios);
         document.getElementById('btnMercadoGlobal').addEventListener('click', analizarMercadoGlobal);
@@ -639,7 +650,7 @@
                 let ct = document.getElementById('miContactoTipo').value;
                 let cd = document.getElementById('miContactoDato').value.trim();
                 let esPublico = document.getElementById('miPublico').checked;
-                let datos = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toLocaleString(), publico: esPublico };
+                let datos = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toISOString(), publico: esPublico };
                 if (z) datos.zona = z;
                 if (r) datos.region = r;
                 if (cd) { datos.contacto_tipo = ct; datos.contacto_dato = cd; }
@@ -669,7 +680,6 @@
                 if (!l) return;
                 let lm = l.toLowerCase();
 
-                // 1. Detectar cambio de sección (Faltantes o Repetidas)
                 if (lm.includes('faltan') || lm.includes('need') || lm.includes('faltantes')) {
                     seccion = 'faltan';
                     return;
@@ -677,15 +687,12 @@
                     seccion = 'repetidas';
                     return;
                 }
-
                 if (!seccion) return;
 
-                // 2. PARSER FORMATO VIEJO: "ARG: 1, 2, 3 (x2)"
                 if (l.includes(':')) {
                     let partes = l.split(':');
                     let eq = limpiarNombreEquipo(partes[0]);
                     let parteNums = partes.slice(1).join(':');
-                    
                     parteNums.split(',').forEach(token => {
                         token = token.trim();
                         let numMatch = token.match(/^(\d+)/);
@@ -694,21 +701,16 @@
                         if (isNaN(num)) return;
                         let multMatch = token.match(/\([×xX]\s*(\d+)\)/);
                         let cantidad = multMatch ? parseInt(multMatch[1]) : 1;
-                        
                         if (!datos[seccion][eq]) datos[seccion][eq] = [];
                         for (let i = 0; i < cantidad; i++) datos[seccion][eq].push(num);
                     });
                 }
-                
-                // 3. PARSER FORMATO NUEVO - CABECERAS: "🇲🇽 *MEX* · pg. 8-9" o "*Somos 26*"
                 else if (l.includes('· pg.') || l.startsWith('*') || l.startsWith('🏆')) {
                     let limpio = l.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
                     equipoActual = null;
-                    
                     for (let sigla of QR_TEAMS) {
                         if (limpio.includes(sigla)) { equipoActual = sigla; break; }
                     }
-                    // Casos especiales para las figuritas FWC y Coca Cola
                     if (!equipoActual && (lm.includes('somos 26') || lm.includes('copa 2026') || lm.includes('anfitriones') || lm.includes('historia'))) {
                         equipoActual = 'FWC';
                     }
@@ -716,35 +718,21 @@
                         equipoActual = 'CC';
                     }
                 }
-                
-                // 4. PARSER FORMATO NUEVO - ITEMS: "MEX1, MEX3" o "00 (x1)"
                 else {
                     let tokens = l.split(',');
                     tokens.forEach(token => {
                         token = token.trim();
                         if (!token) return;
-
-                        // Ignorar líneas de publicidad de la app ("Descarga...", "Generado por...", etc.)
                         if (lm.includes('generado por') || lm.includes('descarga') || lm.includes('http') || lm.includes('intercambiamos')) return;
-
-                        // Expresión Regular Mágica: Separa "MEX12 (x2)", "FWC8", "00 (x1)", o simplemente "15"
                         let regex = /^([A-Za-z]*)\s*(\d+)(?:\s*\([xX×]\s*(\d+)\))?$/;
                         let match = token.match(regex);
-
                         if (match) {
                             let parsedEq = match[1].toUpperCase();
                             let parsedNum = parseInt(match[2], 10);
                             let isZeroZero = match[2] === '00';
                             let count = match[3] ? parseInt(match[3], 10) : 1;
-
-                            // La figurita 00 siempre pertenece a FWC
-                            if (isZeroZero) {
-                                parsedEq = 'FWC';
-                                parsedNum = 0;
-                            }
-
+                            if (isZeroZero) { parsedEq = 'FWC'; parsedNum = 0; }
                             let finalEq = parsedEq || equipoActual;
-
                             if (finalEq && QR_TEAMS.includes(finalEq) && !isNaN(parsedNum)) {
                                 if (!datos[seccion][finalEq]) datos[seccion][finalEq] = [];
                                 for(let i = 0; i < count; i++) {
@@ -756,20 +744,56 @@
                 }
             });
 
-            // 5. Ordenar y deduplicar faltantes (manteniendo las copias en repetidas)
             for (let s in datos) {
                 for (let e in datos[s]) {
                     if (s === 'faltan') datos[s][e] = [...new Set(datos[s][e])];
                     datos[s][e].sort((a, b) => a - b);
                 }
             }
-            
             return datos;
         }
 
+        // MOTOR DE MODO COOPERATIVO
+        // Formatea una fecha guardada (ISO) a "DD/MM HH:mm". Si no se puede parsear, avisa sin romper.
+        function formatearFechaActualizacion(str) {
+            if (!str) return "";
+            let d = new Date(str);
+            if (isNaN(d.getTime())) return "fecha no disponible";
+            let dd = String(d.getDate()).padStart(2, '0');
+            let mm = String(d.getMonth() + 1).padStart(2, '0');
+            let hh = String(d.getHours()).padStart(2, '0');
+            let mi = String(d.getMinutes()).padStart(2, '0');
+            return `${dd}/${mm} ${hh}:${mi}`;
+        }
 
+        async function obtenerMisFaltantesCombinados(textoMio) {
+            let mD = parsearTexto(textoMio);
+            ultimoDesgloseOrigenes = { MIO: JSON.parse(JSON.stringify(mD.faltan)) };
+            ultimasFechasCoopAmigos = {};
+            if (document.getElementById('checkCoop').checked) {
+                let amigos = obtenerAmigosSeleccionados();
+                for (let amigo of amigos) {
+                    try {
+                        const snap = await get(child(ref(db), `usuarios/${amigo}`));
+                        if (snap.exists()) {
+                            let val = snap.val();
+                            let aDatos = parsearTexto(val.textoOriginal);
+                            ultimoDesgloseOrigenes[amigo] = aDatos.faltan;
+                            ultimasFechasCoopAmigos[amigo] = val.ultimaActualizacion || "";
+                            for (let eq in aDatos.faltan) {
+                                if (!mD.faltan[eq]) mD.faltan[eq] = [];
+                                mD.faltan[eq].push(...aDatos.faltan[eq]);
+                            }
+                        }
+                    } catch(e) {}
+                }
+                for (let eq in mD.faltan) {
+                    mD.faltan[eq] = [...new Set(mD.faltan[eq])].sort((a,b) => a - b);
+                }
+            }
+            return mD;
+        }
 
-        
         function encontrarInterseccion(buscadas, ofrecidas) {
             let matches = {};
             let copiaOfrecidas = JSON.parse(JSON.stringify(ofrecidas));
@@ -863,17 +887,34 @@
             return t;
         }
 
-        function renderizarResultadosTexto(divId, d) {
-            let div = document.getElementById(divId);
-            div.innerHTML = '';
-            let hayMatches = false;
-            let cleanD = {};
-            for (let e in d) { cleanD[e] = [...new Set(d[e])]; }
-            for (let e in cleanD) {
-                hayMatches = true;
-                div.innerHTML += `<div class="team-row" style="display:block;"><b>${e}:</b> ${cleanD[e].join(', ')}</div>`;
+        // Crea una fila de equipo con sus botones de figuritas seleccionables (reutilizado por ambas vistas)
+        function crearFilaEquipo(eq, agrupadoEq, claseBtn, diccionarioOriginalDeEseTipo) {
+            let fila = document.createElement('div');
+            fila.className = 'team-row';
+            fila.innerHTML = `<b style="min-width: 38px; display:inline-block;">${eq}:</b>`;
+            for (let num in agrupadoEq) {
+                let totalCopiasOriginal = 1;
+                if (diccionarioOriginalDeEseTipo && diccionarioOriginalDeEseTipo[eq]) {
+                    totalCopiasOriginal = diccionarioOriginalDeEseTipo[eq].filter(x => x == num).length;
+                }
+                let cantidadDeMatches = agrupadoEq[num];
+                for (let i = 0; i < cantidadDeMatches; i++) {
+                    let btn = document.createElement('span');
+                    btn.className = `sticker-btn ${claseBtn}`;
+                    btn.dataset.id = `${eq} ${num}#${i}`;
+                    let badgeHtml = "";
+                    if (totalCopiasOriginal > 1 && i === 0) {
+                        badgeHtml = `<span class="sticker-badge">x${totalCopiasOriginal}</span>`;
+                    }
+                    btn.innerHTML = `${num}${badgeHtml}`;
+                    btn.onclick = function () {
+                        this.classList.toggle('selected');
+                        actualizarContadoresSeleccion();
+                    };
+                    fila.appendChild(btn);
+                }
             }
-            if (!hayMatches) div.innerHTML = '<p style="color:#f0c060; background:#2a2000; padding:10px; border-radius:5px; font-size:13px;">No hay coincidencias.</p>';
+            return fila;
         }
 
         function renderizarResultadosInteractivos(divId, d, tipo, diccionarioOriginalDeEseTipo) {
@@ -888,34 +929,59 @@
             }
             for (let e in agrupado) {
                 hayMatches = true;
-                let fila = document.createElement('div');
-                fila.className = 'team-row';
-                fila.innerHTML = `<b style="min-width: 38px; display:inline-block;">${e}:</b>`;
-                for (let num in agrupado[e]) {
-                    let totalCopiasOriginal = 1;
-                    if (diccionarioOriginalDeEseTipo && diccionarioOriginalDeEseTipo[e]) {
-                        totalCopiasOriginal = diccionarioOriginalDeEseTipo[e].filter(x => x == num).length;
-                    }
-                    let cantidadDeMatches = agrupado[e][num];
-                    for (let i = 0; i < cantidadDeMatches; i++) {
-                        let btn = document.createElement('span');
-                        btn.className = `sticker-btn ${claseBtn}`;
-                        btn.dataset.id = `${e} ${num}#${i}`;
-                        let badgeHtml = "";
-                        if (totalCopiasOriginal > 1 && i === 0) {
-                            badgeHtml = `<span class="sticker-badge">x${totalCopiasOriginal}</span>`;
-                        }
-                        btn.innerHTML = `${num}${badgeHtml}`;
-                        btn.onclick = function () {
-                            this.classList.toggle('selected');
-                            actualizarContadoresSeleccion();
-                        };
-                        fila.appendChild(btn);
-                    }
-                }
-                div.appendChild(fila);
+                div.appendChild(crearFilaEquipo(e, agrupado[e], claseBtn, diccionarioOriginalDeEseTipo));
             }
             if (!hayMatches) div.innerHTML = '<p style="color:#f0c060; font-size:13px;">No hay coincidencias.</p>';
+        }
+
+        // Asigna cada figurita matcheada a UN origen (yo o un amigo), priorizando "MIO" primero
+        // y luego el orden en que se agregaron los amigos. Evita contar una misma figu dos veces.
+        function agruparPorOrigen(matchDict, desgloseOrigenes) {
+            let ordenOrigenes = Object.keys(desgloseOrigenes);
+            let resultado = {};
+            for (let eq in matchDict) {
+                matchDict[eq].forEach(num => {
+                    let dueño = ordenOrigenes.find(o => desgloseOrigenes[o][eq] && desgloseOrigenes[o][eq].includes(num));
+                    if (!dueño) dueño = 'MIO';
+                    if (!resultado[dueño]) resultado[dueño] = {};
+                    if (!resultado[dueño][eq]) resultado[dueño][eq] = [];
+                    resultado[dueño][eq].push(num);
+                });
+            }
+            return resultado;
+        }
+
+        // Renderiza el panel "Vos recibís" separado en secciones: una para mi álbum y una por cada amigo coop
+        function renderizarRecibirAgrupado(matchDict, diccionarioOriginalDeEseTipo, desgloseOrigenes, fechasAmigos) {
+            let div = document.getElementById('meSirvenSim');
+            div.innerHTML = '';
+            let grupos = agruparPorOrigen(matchDict, desgloseOrigenes);
+            let ordenOrigenes = Object.keys(desgloseOrigenes);
+            let hayAlgo = false;
+
+            ordenOrigenes.forEach(origen => {
+                let datosGrupo = grupos[origen];
+                if (!datosGrupo || Object.keys(datosGrupo).length === 0) return;
+                hayAlgo = true;
+
+                let header = document.createElement('div');
+                header.className = 'coop-origen-header';
+                if (origen === 'MIO') {
+                    header.innerHTML = `<span class="coop-origen-titulo mio">📒 Para mi álbum</span>`;
+                } else {
+                    let fechaTxt = formatearFechaActualizacion(fechasAmigos[origen]);
+                    header.innerHTML = `<span class="coop-origen-titulo amigo">👤 Para ${origen}</span><span class="coop-origen-fecha">🕒 Lista actualizada: ${fechaTxt || 'sin fecha registrada'}</span>`;
+                }
+                div.appendChild(header);
+
+                for (let eq in datosGrupo) {
+                    let agrupadoEq = {};
+                    datosGrupo[eq].forEach(num => { agrupadoEq[num] = (agrupadoEq[num] || 0) + 1; });
+                    div.appendChild(crearFilaEquipo(eq, agrupadoEq, 'receive', diccionarioOriginalDeEseTipo));
+                }
+            });
+
+            if (!hayAlgo) div.innerHTML = '<p style="color:#f0c060; font-size:13px;">No hay coincidencias.</p>';
         }
 
         function actualizarContadoresSeleccion() {
@@ -985,7 +1051,7 @@
             let wrapMia = document.getElementById('barraProgresoMiaSim');
             if (textoAmigo) {
                 let statsAmigo = calcularEstadisticasAlbum(textoAmigo);
-                document.getElementById('labelBarraAmigo').innerText = `📊 Álbum de ${conZona(nombreAmigo, ultimoZonaAmigo)}`;
+                document.getElementById('labelBarraAmigo').innerText = `📊 Álbum del amigo`;
                 renderizarBarraMini(statsAmigo, 'Amigo');
                 wrapAmigo.style.display = 'block';
             } else { wrapAmigo.style.display = 'none'; }
@@ -999,9 +1065,24 @@
         function seleccionarPareado() {
             document.querySelectorAll('#meSirvenSim .sticker-btn').forEach(b => b.classList.remove('selected'));
             document.querySelectorAll('#leSirvenSim .sticker-btn').forEach(b => b.classList.remove('selected'));
-            function getBtnsPorCategoria(selector) {
+
+            function getBtnsPorCategoria(selector, ordenarPorAbundancia = false) {
                 let cats = { esp: [], esc: [], eq: [], cc: [], jug: [] };
-                document.querySelectorAll(selector + ' .sticker-btn').forEach(btn => {
+                let nodesArr = Array.from(document.querySelectorAll(selector + ' .sticker-btn'));
+
+                if (ordenarPorAbundancia) {
+                    // La cantidad real de copias que tenés está en el badge "x3"/"x2" ya renderizado
+                    // (viene de mi lista completa de repetidas, no del match). Sin badge = 1 sola copia.
+                    nodesArr.sort((a, b) => {
+                        let badgeA = a.querySelector('.sticker-badge');
+                        let badgeB = b.querySelector('.sticker-badge');
+                        let cantA = badgeA ? (parseInt(badgeA.textContent.replace('x', '')) || 1) : 1;
+                        let cantB = badgeB ? (parseInt(badgeB.textContent.replace('x', '')) || 1) : 1;
+                        return cantB - cantA; // de más repetidas a menos
+                    });
+                }
+
+                nodesArr.forEach(btn => {
                     let parts = btn.dataset.id.split('#')[0].split(' ');
                     let eq = parts[0], num = parseInt(parts[1]);
                     let cat = categorizarFigu(eq, num);
@@ -1013,8 +1094,10 @@
                 });
                 return cats;
             }
-            let recibir = getBtnsPorCategoria('#meSirvenSim');
-            let dar = getBtnsPorCategoria('#leSirvenSim');
+
+            let recibir = getBtnsPorCategoria('#meSirvenSim', false);
+            let dar = getBtnsPorCategoria('#leSirvenSim', true); // Inteligencia: prioriza las que más sobran
+
             let orden = ['esp', 'esc', 'eq', 'cc', 'jug'];
             for (let cat of orden) {
                 let min = Math.min(recibir[cat].length, dar[cat].length);
@@ -1026,30 +1109,45 @@
             actualizarContadoresSeleccion();
         }
 
-        function ejecutarComparacion(mio, otro, nombre, contactoAmigo, zonaAmigo) {
-            let mD = parsearTexto(mio), oD = parsearTexto(otro);
+        function ejecutarComparacion(mD, otroTexto, nombre, contactoAmigo, zonaAmigo, textoMioOriginal, fechaAmigo) {
+            let oD = parsearTexto(otroTexto);
             ultimoZonaAmigo = zonaAmigo || "";
-            actualizarBarrasSimulador(mio, otro, nombre);
+            ultimaFechaAmigoPrincipal = fechaAmigo || "";
+            actualizarBarrasSimulador(textoMioOriginal, otroTexto, nombre);
+            
             ultimoMatchMeSirven = encontrarInterseccion(mD.faltan, oD.repetidas);
-            ultimoMatchLeSirven = encontrarInterseccion(oD.faltan, mD.repetidas);
+            let mDRepetidasReales = parsearTexto(textoMioOriginal).repetidas; // Solo DOY mis repetidas reales
+            ultimoMatchLeSirven = encontrarInterseccion(oD.faltan, mDRepetidasReales);
+            
             ultimoNombreAmigo = nombre;
             ultimoContactoAmigo = contactoAmigo || { tipo: "", dato: "" };
 
             actualizarBotonContactar();
 
-            renderizarResultadosTexto('meSirvenTexto', ultimoMatchMeSirven);
-            renderizarResultadosTexto('leSirvenTexto', ultimoMatchLeSirven);
-
             seleccionesActuales = { recibir: [], dar: [] };
 
-            renderizarResultadosInteractivos('meSirvenSim', ultimoMatchMeSirven, 'recibir', oD.repetidas);
-            renderizarResultadosInteractivos('leSirvenSim', ultimoMatchLeSirven, 'dar', mD.repetidas);
+            let esCoop = document.getElementById('checkCoop').checked;
+            let hayAmigosCoop = esCoop && Object.keys(ultimoDesgloseOrigenes).length > 1;
+
+            if (hayAmigosCoop) {
+                renderizarRecibirAgrupado(ultimoMatchMeSirven, oD.repetidas, ultimoDesgloseOrigenes, ultimasFechasCoopAmigos);
+            } else {
+                renderizarResultadosInteractivos('meSirvenSim', ultimoMatchMeSirven, 'recibir', oD.repetidas);
+            }
+            renderizarResultadosInteractivos('leSirvenSim', ultimoMatchLeSirven, 'dar', mDRepetidasReales);
             seleccionarPareado();
 
-            document.getElementById('tituloMeSirvenTexto').innerText = `✅ Me sirven ${obtenerDesglose(ultimoMatchMeSirven)} de ${conZona(nombre, ultimoZonaAmigo)}`;
-            document.getElementById('tituloLeSirvenTexto').innerText = `🎁 A ${conZona(nombre, ultimoZonaAmigo)} le sirven ${obtenerDesglose(ultimoMatchLeSirven)} tuyas:`;
-            document.getElementById('tituloMeSirvenSim').innerText = `✅ Vos recibís de ${conZona(nombre, ultimoZonaAmigo)}`;
+            document.getElementById('tituloMeSirvenSim').innerText = esCoop ? `✅ Nosotros recibimos de ${conZona(nombre, ultimoZonaAmigo)}` : `✅ Vos recibís de ${conZona(nombre, ultimoZonaAmigo)}`;
             document.getElementById('tituloLeSirvenSim').innerText = `🎁 Vos entregás a ${conZona(nombre, ultimoZonaAmigo)}`;
+
+            let badgeFecha = document.getElementById('fechaAmigoPrincipal');
+            let fechaTxt = formatearFechaActualizacion(ultimaFechaAmigoPrincipal);
+            if (fechaTxt) {
+                badgeFecha.style.display = 'block';
+                badgeFecha.innerHTML = `🕒 Lista de ${nombre} actualizada: ${fechaTxt}`;
+            } else {
+                badgeFecha.style.display = 'none';
+            }
 
             document.getElementById('resultados').style.display = 'block';
             document.getElementById('detalleIndividual').style.display = 'block';
@@ -1065,15 +1163,14 @@
 
         function generarTextoOferta(esWhatsApp = false) {
             let miUsuario = (document.getElementById('miUsuario').value.trim() || "YO").toUpperCase();
-            let miZona = document.getElementById('miZona').value.trim();
-            let miTipo = document.getElementById('miContactoTipo').value;
-            let miDato = document.getElementById('miContactoDato').value.trim();
-            let linkPublico = document.getElementById('linkCompartir').value || "https://luishacevedo.github.io/match-figuritas/";
+            let linkPublico = window.location.origin + window.location.pathname;
+            
             let recibirDict = desaplanarArray(seleccionesActuales.recibir);
             let darDict = desaplanarArray(seleccionesActuales.dar);
             let totalRecibir = seleccionesActuales.recibir.length;
             let totalDar = seleccionesActuales.dar.length;
             if (totalRecibir === 0 && totalDar === 0) return null;
+            
             let desgloseRecibir = obtenerDesglosePlano(seleccionesActuales.recibir);
             let desgloseDar = obtenerDesglosePlano(seleccionesActuales.dar);
             let nombreAmigo = conZona(ultimoNombreAmigo, ultimoZonaAmigo) || "tu amigo";
@@ -1081,30 +1178,38 @@
             let ital = esWhatsApp ? "_" : "";
             let lineasRecibir = formatearDiccionario(recibirDict, esWhatsApp);
             let lineasDar = formatearDiccionario(darDict, esWhatsApp);
-            let miId = miZona ? `${miUsuario} (${miZona})` : miUsuario;
+            
+            let textoNosotros = document.getElementById('checkCoop').checked ? "A nosotros (Grupo)" : `A mí (${miUsuario})`;
 
             let txt = `⚽ ${sep}MATCH DE FIGURITAS${sep} ⚽\n\n`;
-            txt += `✅ ${sep}A mí (${miId}) me sirven de ${nombreAmigo}:${sep}\n`;
+            txt += `✅ ${sep}${textoNosotros} nos sirven de ${nombreAmigo}:${sep}\n`;
             txt += `${desgloseRecibir}\n`;
             txt += lineasRecibir.trim() ? lineasRecibir : "Nada seleccionado\n";
             txt += `\n🎁 ${sep}A ${nombreAmigo} le sirven de las mías:${sep}\n`;
             txt += `${desgloseDar}\n`;
             txt += lineasDar.trim() ? lineasDar : "Nada seleccionado\n";
-            if (miDato) txt += `\n📲 ${sep}Contactame${sep}: ${generarTextoContacto(miTipo, miDato)}`;
-            txt += `\n🔍 ${ital}Cruzá tus repetidas conmigo acá:${ital}\n👉 ${linkPublico}`;
+            
+            txt += `\n🔍 ${ital}¿Querés ver si tenemos más cambios o armar tu propia estrategia? Pegá tu lista, foto o código QR de la app acá y fijate al instante:${ital}\n👉 ${linkPublico}`;
             return txt;
         }
 
-        function generarTextoContacto(tipo, dato) {
-            let d = dato.trim();
-            switch (tipo) {
-                case 'telegram':  return `https://t.me/${d.replace(/^@/, '')}`;
-                case 'whatsapp':  return `https://wa.me/${d.replace(/\D/g, '')}`;
-                case 'instagram': return `https://instagram.com/${d.replace(/^@/, '')}`;
-                case 'facebook':  return d.startsWith('http') ? d : `https://www.facebook.com/${d}`;
-                case 'mail':      return `mailto:${d}`;
-                default:          return d;
-            }
+        function generarTextoResultados(esWhatsApp = false) {
+            let miUsuario = document.getElementById('miUsuario').value.trim() || "MÍ";
+            let textoMeSirven = obtenerDesglose(ultimoMatchMeSirven);
+            let textoLeSirven = obtenerDesglose(ultimoMatchLeSirven);
+            let linkPublico = window.location.origin + window.location.pathname;
+            let esCoop = document.getElementById('checkCoop').checked;
+            
+            let headerMeSirven = esCoop ? `A nosotros (Grupo) nos sirven de ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)}` : `A mí (${miUsuario.toUpperCase()}) me sirven de ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)}`;
+            let sep = esWhatsApp ? "*" : "";
+            let ital = esWhatsApp ? "_" : "";
+
+            let texto = `⚽ ${sep}MATCH DE FIGURITAS${sep} ⚽\n\n`;
+            texto += `✅ ${sep}${headerMeSirven}:${sep}\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, esWhatsApp)}\n`;
+            texto += `🎁 ${sep}A ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)} le sirven de las mías:${sep}\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, esWhatsApp)}\n`;
+            texto += `🔍 ${ital}¿Querés ver si tenemos más cambios o armar tu propia estrategia? Pegá tu lista, foto o código QR de la app acá y fijate al instante:${ital}\n👉 ${linkPublico}`;
+
+            return texto;
         }
 
         function generarLinkContacto(tipo, dato) {
@@ -1197,9 +1302,12 @@
                 if (amigosSeleccionados.length === 0) return;
                 document.getElementById('statusAmigo').style.color = "#005c98";
                 document.getElementById('statusAmigo').innerText = "Iniciando Plan Estratégico...";
-                let misDatos = parsearTexto(textoMio);
+                
+                let misDatos = await obtenerMisFaltantesCombinados(textoMio); // Coop Mode ready
+                let misRepetidasReales = parsearTexto(textoMio).repetidas; // Solo Doy de las mías
+                
                 rutaState.misFaltan = aplanarDiccionario(misDatos.faltan);
-                rutaState.misRepetidas = aplanarDiccionario(misDatos.repetidas);
+                rutaState.misRepetidas = aplanarDiccionario(misRepetidasReales);
                 rutaState.amigos = [];
                 rutaState.pasoActual = 0;
                 rutaState.activo = true;
@@ -1259,10 +1367,12 @@
             renderizarResultadosInteractivos('meSirvenSim', dictMeSirven, 'recibir', desaplanarArray(mejorAmigo.repetidas));
             renderizarResultadosInteractivos('leSirvenSim', dictLeSirven, 'dar', desaplanarArray(rutaState.misRepetidas));
             seleccionarPareado();
+            
+            let esCoop = document.getElementById('checkCoop').checked;
             let info = document.getElementById('infoPasoRuta');
             info.style.display = 'block';
             info.innerHTML = `<b style="color:var(--success); font-size:16px;">Paso ${rutaState.pasoActual} de tu Plan:</b><br>Estás analizando a <b>${mejorAmigo.nombre}</b>. Tienen <b>${mejorCantidad}</b> cambios parejos potenciales. Ajustá las opciones abajo y confirmá.`;
-            document.getElementById('tituloMeSirvenSim').innerText = `✅ Vos recibís de ${conZona(mejorAmigo.nombre, ultimoZonaAmigo)}`;
+            document.getElementById('tituloMeSirvenSim').innerText = esCoop ? `✅ Nosotros recibimos de ${conZona(mejorAmigo.nombre, ultimoZonaAmigo)}` : `✅ Vos recibís de ${conZona(mejorAmigo.nombre, ultimoZonaAmigo)}`;
             document.getElementById('tituloLeSirvenSim').innerText = `🎁 Vos entregás a ${conZona(mejorAmigo.nombre, ultimoZonaAmigo)}`;
             document.getElementById('resultados').style.display = 'block';
             document.getElementById('detalleIndividual').style.display = 'block';
@@ -1359,7 +1469,10 @@
                     let contactoAmigo = { tipo: d.contacto_tipo || "", dato: d.contacto_dato || "" };
                     limpiarCamposAmigo();
                     rellenarCamposAmigo(d);
-                    ejecutarComparacion(m, d.textoOriginal, amigo, contactoAmigo, d.zona || "");
+                    
+                    let mD = await obtenerMisFaltantesCombinados(m);
+                    ejecutarComparacion(mD, d.textoOriginal, amigo, contactoAmigo, d.zona || "", m, d.ultimaActualizacion || "");
+                    
                     document.getElementById('statusAmigo').style.color = "green";
                     document.getElementById('statusAmigo').innerText = "¡Lista cargada!";
                 } else {
@@ -1380,7 +1493,7 @@
                     let z = document.getElementById('miZona').value.trim();
                     let ct = document.getElementById('miContactoTipo').value;
                     let cd = document.getElementById('miContactoDato').value.trim();
-                    let datos = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toLocaleString() };
+                    let datos = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toISOString() };
                     if (z) datos.zona = z;
                     if (cd) { datos.contacto_tipo = ct; datos.contacto_dato = cd; }
                     set(ref(db, `usuarios/${u}`), datos).then(() => renderizarBotonesAmigos());
@@ -1499,7 +1612,10 @@
                 let status = document.getElementById('statusAmigo');
                 status.style.color = "#005c98";
                 status.innerText = "⚡ Escaneando opciones...";
-                let misDatos = parsearTexto(textoMio);
+                
+                let misDatos = await obtenerMisFaltantesCombinados(textoMio); // Coop Mode
+                let misRepetidasReales = parsearTexto(textoMio).repetidas; 
+
                 let publicosSnap = await get(ref(db, 'usuarios_publicos')).catch(() => null);
                 let publicosNombres = [];
                 if (publicosSnap && publicosSnap.exists()) {
@@ -1543,8 +1659,10 @@
                             let aZona = snap.val().zona || "";
                             let aRegion = snap.val().region || "";
                             let aDatos = parsearTexto(aTexto);
+                            
                             let mMe = encontrarInterseccion(misDatos.faltan, aDatos.repetidas);
-                            let mLe = encontrarInterseccion(aDatos.faltan, misDatos.repetidas);
+                            let mLe = encontrarInterseccion(aDatos.faltan, misRepetidasReales);
+                            
                             let cMe = contarTotal(mMe), cLe = contarTotal(mLe);
                             let pos = Math.min(cMe, cLe);
                             if (cMe > 0 || cLe > 0) return { nombre: amigo, zona: aZona, region: aRegion, me: cMe, le: cLe, pos: pos, txt: aTexto, esAmigo };
@@ -1665,39 +1783,6 @@
             return h ? t : "Nada\n";
         }
 
-        function generarTextoResultados(esWhatsApp = false) {
-            let miUsuario = document.getElementById('miUsuario').value.trim() || "MÍ";
-            let textoMeSirven = obtenerDesglose(ultimoMatchMeSirven);
-            let textoLeSirven = obtenerDesglose(ultimoMatchLeSirven);
-            let linkPublico = document.getElementById('linkCompartir').value || "https://luishacevedo.github.io/match-figuritas/";
-            let texto = "";
-            if (esWhatsApp) {
-                texto = `⚽ *MATCH DE FIGURITAS* ⚽\n\n✅ *A mí (${miUsuario.toUpperCase()}) me sirven de ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)}:*\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, true)}\n🎁 *A ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)} le sirven de las mías:*\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, true)}\n🔍 _Cruzá tus repetidas conmigo acá:_\n👉 ${linkPublico}`;
-            } else {
-                texto = `⚽ MATCH DE FIGURITAS ⚽\n\n✅ A mí (${miUsuario.toUpperCase()}) me sirven de ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)}:\n${textoMeSirven}\n${formatearDiccionario(ultimoMatchMeSirven, false)}\n🎁 A ${conZona(ultimoNombreAmigo, ultimoZonaAmigo)} le sirven de las mías:\n${textoLeSirven}\n${formatearDiccionario(ultimoMatchLeSirven, false)}\n🔍 Cruzá tus repetidas conmigo acá:\n👉 ${linkPublico}`;
-            }
-            return texto;
-        }
-
-        function copiarTextoPortapapeles() {
-            navigator.clipboard.writeText(generarTextoResultados(false)).then(() => {
-                let btn = document.getElementById('btnCopiarPortapapeles');
-                btn.innerText = "¡Copiado! ✅";
-                btn.style.backgroundColor = "#28a745";
-                setTimeout(() => { btn.innerText = "📋 Copiar Texto"; btn.style.backgroundColor = "var(--primary)"; }, 3000);
-            });
-        }
-
-        function abrirWhatsAppConTexto() {
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(generarTextoResultados(true))}`, '_blank');
-        }
-
-        function actualizarLinkDirecto(usuario) {
-            let url = window.location.origin + window.location.pathname;
-            document.getElementById('linkCompartir').value = url + '?buscar=' + encodeURIComponent(usuario);
-            document.getElementById('linkPrivado').value = url + '?u=' + encodeURIComponent(usuario);
-        }
-
         function compartirWhatsAppPublico() {
             let link = document.getElementById('linkCompartir').value;
             if (!link) { alert("Primero guardá tu perfil para generar tu link."); return; }
@@ -1721,11 +1806,12 @@
             alert("Para instalar en Android:\n1. Abrí tu 'Link Privado' en Chrome.\n2. Tocá los 3 puntitos (⋮).\n3. Elegí 'Agregar a la pantalla principal'.");
         }
 
-        function compararListasLocales() {
+        async function compararListasLocales() {
             let textoMio = document.getElementById('miLista').value.trim();
             let textoAmigo = document.getElementById('amigoLista').value.trim();
             if (!textoMio || !textoAmigo) { alert("Faltan listas para comparar."); return; }
-            ejecutarComparacion(textoMio, textoAmigo, document.getElementById('amigoUsuario').value.trim() || "TU AMIGO", { tipo: "", dato: "" }, "");
+            let mD = await obtenerMisFaltantesCombinados(textoMio);
+            ejecutarComparacion(mD, textoAmigo, document.getElementById('amigoUsuario').value.trim() || "TU AMIGO", { tipo: "", dato: "" }, "", textoMio);
             document.getElementById('statusAmigo').innerText = "";
         }
 
@@ -1785,6 +1871,12 @@
             }
         }
 
+        function actualizarLinkDirecto(usuario) {
+            let url = window.location.origin + window.location.pathname;
+            document.getElementById('linkCompartir').value = url + '?buscar=' + encodeURIComponent(usuario);
+            document.getElementById('linkPrivado').value = url + '?u=' + encodeURIComponent(usuario);
+        }
+
         async function guardarMisDatos() {
             let u = document.getElementById('miUsuario').value.trim();
             let t = document.getElementById('miLista').value.trim();
@@ -1799,7 +1891,7 @@
             let r = document.getElementById('miRegion').value;
             let esPublico = document.getElementById('miPublico').checked;
             try {
-                let datos = { textoOriginal: t, amigos: a, ultimaActualizacion: new Date().toLocaleString(), publico: esPublico === true ? true : false };
+                let datos = { textoOriginal: t, amigos: a, ultimaActualizacion: new Date().toISOString(), publico: esPublico === true ? true : false };
                 if (z) datos.zona = z;
                 if (r) datos.region = r;
                 if (cd) { datos.contacto_tipo = ct; datos.contacto_dato = cd; }
@@ -1809,7 +1901,7 @@
                 if (esPublico) {
                     try {
                         await set(ref(db, `usuarios_publicos/${u}`), {
-                            nombre: u, zona: z || "", region: r || "", contacto_tipo: ct || "", contacto_dato: cd || "", tengo: statsPublico.tengo, faltan: statsPublico.faltan, repes: statsPublico.repes, ultimaActualizacion: new Date().toLocaleString()
+                            nombre: u, zona: z || "", region: r || "", contacto_tipo: ct || "", contacto_dato: cd || "", tengo: statsPublico.tengo, faltan: statsPublico.faltan, repes: statsPublico.repes, ultimaActualizacion: new Date().toISOString()
                         });
                     } catch(e3) {}
                 } else {
@@ -1842,7 +1934,7 @@
             s.style.color = "#005c98";
             s.innerText = "Guardando...";
             try {
-                let datosAmigo = { textoOriginal: at, amigos: "", ultimaActualizacion: new Date().toLocaleString() };
+                let datosAmigo = { textoOriginal: at, amigos: "", ultimaActualizacion: new Date().toISOString() };
                 if (aZona) datosAmigo.zona = aZona;
                 if (aRegion) datosAmigo.region = aRegion;
                 if (aCD) { datosAmigo.contacto_tipo = aCT; datosAmigo.contacto_dato = aCD; }
@@ -1855,7 +1947,7 @@
                     let z2 = document.getElementById('miZona').value.trim();
                     let ct2 = document.getElementById('miContactoTipo').value;
                     let cd2 = document.getElementById('miContactoDato').value.trim();
-                    let datosMios = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toLocaleString() };
+                    let datosMios = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toISOString() };
                     if (z2) datosMios.zona = z2;
                     if (cd2) { datosMios.contacto_tipo = ct2; datosMios.contacto_dato = cd2; }
                     await set(ref(db, `usuarios/${mu}`), datosMios);
@@ -1868,10 +1960,6 @@
                 s.innerText = "Error.";
             }
         }
-
-        // ================================================
-        // LECTOR QR, IA Y PORTAPAPELES (NUEVO)
-        // ================================================
 
         // Lógica de IA y guardado local de Llave
         function cargarLlaveLocal() {
@@ -1905,21 +1993,32 @@
             const textarea = document.getElementById('amigoLista');
             const apiKey = document.getElementById('geminiApiKey').value.trim();
 
-            statusDiv.innerHTML = "⏳ <b>IA analizando imagen...</b> (Tarda 5 seg aprox)";
+            statusDiv.innerHTML = "⏳ <b>IA analizando imagen...</b> (Puede tardar unos segundos)";
             statusDiv.style.color = "var(--yellow)";
 
             try {
+                if (!file) throw new Error("No se detectó ninguna imagen válida.");
+                
                 const base64Image = await new Promise((resolve, reject) => {
                     const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const resultado = e.target.result;
+                        if (resultado && typeof resultado === 'string' && resultado.includes(',')) {
+                            resolve(resultado.split(',')[1]);
+                        } else {
+                            reject(new Error("Formato de imagen inválido o vacío."));
+                        }
+                    };
+                    reader.onerror = () => reject(new Error("Error interno del navegador al leer el archivo."));
                     reader.readAsDataURL(file);
-                    reader.onload = () => resolve(reader.result.split(',')[1]);
-                    reader.onerror = error => reject(error);
                 });
 
-                let mimeType = file.type;
-                if (!mimeType || mimeType.includes('jfif')) mimeType = 'image/jpeg';
+                let mimeType = file.type || 'image/jpeg';
+                if (mimeType.includes('jfif')) mimeType = 'image/jpeg';
 
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                // Usamos el alias "gemini-flash-latest" (mantenido por Google) en vez de fijar una versión
+                // exacta como "gemini-1.5-flash", que Google puede dar de baja sin previo aviso prolongado.
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
 
                 const prompt = `
                 Sos un asistente experto en extraer datos de álbumes de figuritas. Analizá esta imagen.
@@ -1952,7 +2051,17 @@
                     })
                 });
 
-                if (!response.ok) throw new Error("Clave de Gemini inválida o límite excedido.");
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    let errMsg = `Error de conexión con Google (Código ${response.status}).`;
+                    if (errorText) {
+                        try {
+                            const errJson = JSON.parse(errorText);
+                            if (errJson.error && errJson.error.message) errMsg = errJson.error.message;
+                        } catch(e) {}
+                    }
+                    throw new Error(errMsg);
+                }
 
                 const data = await response.json();
                 const textoFinal = data.candidates[0].content.parts[0].text;
@@ -1966,8 +2075,12 @@
                 }
 
             } catch (error) {
-                console.error(error);
-                statusDiv.innerHTML = "❌ <b>Error:</b> " + error.message;
+                console.error("Error en IA:", error);
+                let msg = error.message || "";
+                if (msg.toLowerCase().includes('is not found') || msg.toLowerCase().includes('not supported for generatecontent')) {
+                    msg += " — Esto suele pasar cuando Google da de baja un modelo. Si vuelve a ocurrir, avisame para actualizar el nombre del modelo en el código.";
+                }
+                statusDiv.innerHTML = "❌ <b>Error:</b> " + msg;
                 statusDiv.style.color = "var(--danger)";
             }
         }
@@ -2140,34 +2253,40 @@
             e.target.value = '';
         });
 
-        // INTERCEPTOR DE PEGADO (CTRL+V)
         document.getElementById('amigoLista').addEventListener('paste', function (e) {
-            let items = (e.clipboardData || window.clipboardData).items;
-            let imageFile = null;
-            for (let item of items) {
-                if (item.type.startsWith('image/')) {
-                    imageFile = item.getAsFile();
-                    break;
-                }
-            }
-            if (imageFile) {
-                e.preventDefault();
-                if (confirm("📸 Detectamos una imagen pegada.\n\n¿Querés analizarla con IA? (Infografías / Capturas)\n\n[Aceptar] = Leer con IA\n[Cancelar] = Es un código QR oficial de la app")) {
-                    const apiKey = document.getElementById('geminiApiKey').value.trim();
-                    if (!apiKey) {
-                        alert("Necesitás pegar tu API Key arriba para usar la IA.");
-                        document.getElementById('geminiApiKey').focus();
-                        return;
+            try {
+                let items = (e.clipboardData || window.clipboardData).items;
+                if (!items) return;
+                
+                let imageFile = null;
+                for (let item of items) {
+                    if (item.type && item.type.startsWith('image/')) {
+                        imageFile = item.getAsFile();
+                        break;
                     }
-                    localStorage.setItem('gemini_api_key', apiKey);
-                    procesarImagenConIA(imageFile);
-                } else {
-                    cargarLibsQR(() => {
-                        let reader = new FileReader();
-                        reader.onload = ev => procesarImagenComoQR(ev.target.result);
-                        reader.readAsDataURL(imageFile);
-                    });
                 }
+                
+                if (imageFile) {
+                    e.preventDefault();
+                    if (confirm("📸 Detectamos una imagen pegada.\n\n¿Querés analizarla con IA? (Infografías / Capturas)\n\n[Aceptar] = Leer con IA\n[Cancelar] = Es un código QR oficial de la app")) {
+                        const apiKey = document.getElementById('geminiApiKey').value.trim();
+                        if (!apiKey) {
+                            alert("Necesitás pegar tu API Key arriba para usar la IA.");
+                            document.getElementById('geminiApiKey').focus();
+                            return;
+                        }
+                        localStorage.setItem('gemini_api_key', apiKey);
+                        procesarImagenConIA(imageFile);
+                    } else {
+                        cargarLibsQR(() => {
+                            let reader = new FileReader();
+                            reader.onload = ev => procesarImagenComoQR(ev.target.result);
+                            reader.readAsDataURL(imageFile);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Error al procesar el portapapeles:", error);
             }
         });
 
