@@ -1068,22 +1068,17 @@
 
             function getBtnsPorCategoria(selector, ordenarPorAbundancia = false) {
                 let cats = { esp: [], esc: [], eq: [], cc: [], jug: [] };
-                let nodes = document.querySelectorAll(selector + ' .sticker-btn');
-                
-                let counts = {};
-                if (ordenarPorAbundancia) {
-                    nodes.forEach(btn => {
-                        let baseId = btn.dataset.id.split('#')[0];
-                        counts[baseId] = (counts[baseId] || 0) + 1;
-                    });
-                }
+                let nodesArr = Array.from(document.querySelectorAll(selector + ' .sticker-btn'));
 
-                let nodesArr = Array.from(nodes);
                 if (ordenarPorAbundancia) {
+                    // La cantidad real de copias que tenés está en el badge "x3"/"x2" ya renderizado
+                    // (viene de mi lista completa de repetidas, no del match). Sin badge = 1 sola copia.
                     nodesArr.sort((a, b) => {
-                        let baseA = a.dataset.id.split('#')[0];
-                        let baseB = b.dataset.id.split('#')[0];
-                        return counts[baseB] - counts[baseA];
+                        let badgeA = a.querySelector('.sticker-badge');
+                        let badgeB = b.querySelector('.sticker-badge');
+                        let cantA = badgeA ? (parseInt(badgeA.textContent.replace('x', '')) || 1) : 1;
+                        let cantB = badgeB ? (parseInt(badgeB.textContent.replace('x', '')) || 1) : 1;
+                        return cantB - cantA; // de más repetidas a menos
                     });
                 }
 
