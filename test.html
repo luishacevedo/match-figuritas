@@ -83,6 +83,16 @@
         .sim-panel-title.dar { color: var(--danger); }
         .sim-mini-controls { display: flex; gap: 5px; }
 
+        .fecha-amigo-badge { font-size: 11px; color: var(--text2); background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; margin-bottom: 8px; }
+
+        /* SECCIONES POR ORIGEN EN MODO COOPERATIVO */
+        .coop-origen-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px; margin: 14px 0 6px; padding-bottom: 4px; border-bottom: 1px dashed var(--border); }
+        .coop-origen-header:first-child { margin-top: 0; }
+        .coop-origen-titulo { font-size: 13px; font-weight: bold; }
+        .coop-origen-titulo.mio { color: var(--yellow); }
+        .coop-origen-titulo.amigo { color: var(--success); }
+        .coop-origen-fecha { font-size: 11px; color: var(--text2); }
+
         /* ESTILOS DEL SIMULADOR INTERACTIVO */
         .sticker-btn { background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 5px 9px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; user-select: none; display: inline-flex; align-items: center; gap: 3px; }
         .sticker-badge { font-size: 10px; opacity: 0.75; background: rgba(0,0,0,0.12); border-radius: 4px; padding: 0 3px; }
@@ -407,6 +417,7 @@
                                 <button id="btnSimRecibirNinguna" class="btn-mini">🔲 Ninguna</button>
                             </div>
                         </div>
+                        <div id="fechaAmigoPrincipal" class="fecha-amigo-badge" style="display:none;"></div>
                         <div class="sim-panel-counter" style="font-size:12px; font-weight:bold; color:var(--success); margin-bottom:8px; padding: 4px 6px; background: #1a2e22; border-radius:6px;">
                             📥 Recibir: <span id="countRecibir">0</span> &nbsp;<span class="breakdown-text" id="breakdownRecibir" style="color:var(--text2); font-weight:normal;">0 fig.</span>
                         </div>
@@ -498,6 +509,9 @@
         let ultimoNombreAmigo = "";
         let ultimoZonaAmigo = "";
         let ultimoContactoAmigo = { tipo: "", dato: "" };
+        let ultimoDesgloseOrigenes = {};       // {MIO:{eq:[nums]}, [amigo]:{eq:[nums]}} - quién necesita qué en modo coop
+        let ultimasFechasCoopAmigos = {};       // {[amigo]: "2026-06-15T17:30:00.000Z"} - última actualización de cada amigo coop
+        let ultimaFechaAmigoPrincipal = "";     // última actualización del amigo con el que se está comparando ahora
         window.amigosDataGlobal = [];
         window.carritoSimulador = [];
         let seleccionesActuales = { recibir: [], dar: [] };
@@ -636,7 +650,7 @@
                 let ct = document.getElementById('miContactoTipo').value;
                 let cd = document.getElementById('miContactoDato').value.trim();
                 let esPublico = document.getElementById('miPublico').checked;
-                let datos = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toLocaleString(), publico: esPublico };
+                let datos = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toISOString(), publico: esPublico };
                 if (z) datos.zona = z;
                 if (r) datos.region = r;
                 if (cd) { datos.contacto_tipo = ct; datos.contacto_dato = cd; }
@@ -740,15 +754,32 @@
         }
 
         // MOTOR DE MODO COOPERATIVO
+        // Formatea una fecha guardada (ISO) a "DD/MM HH:mm". Si no se puede parsear, avisa sin romper.
+        function formatearFechaActualizacion(str) {
+            if (!str) return "";
+            let d = new Date(str);
+            if (isNaN(d.getTime())) return "fecha no disponible";
+            let dd = String(d.getDate()).padStart(2, '0');
+            let mm = String(d.getMonth() + 1).padStart(2, '0');
+            let hh = String(d.getHours()).padStart(2, '0');
+            let mi = String(d.getMinutes()).padStart(2, '0');
+            return `${dd}/${mm} ${hh}:${mi}`;
+        }
+
         async function obtenerMisFaltantesCombinados(textoMio) {
             let mD = parsearTexto(textoMio);
+            ultimoDesgloseOrigenes = { MIO: JSON.parse(JSON.stringify(mD.faltan)) };
+            ultimasFechasCoopAmigos = {};
             if (document.getElementById('checkCoop').checked) {
                 let amigos = obtenerAmigosSeleccionados();
                 for (let amigo of amigos) {
                     try {
                         const snap = await get(child(ref(db), `usuarios/${amigo}`));
                         if (snap.exists()) {
-                            let aDatos = parsearTexto(snap.val().textoOriginal);
+                            let val = snap.val();
+                            let aDatos = parsearTexto(val.textoOriginal);
+                            ultimoDesgloseOrigenes[amigo] = aDatos.faltan;
+                            ultimasFechasCoopAmigos[amigo] = val.ultimaActualizacion || "";
                             for (let eq in aDatos.faltan) {
                                 if (!mD.faltan[eq]) mD.faltan[eq] = [];
                                 mD.faltan[eq].push(...aDatos.faltan[eq]);
@@ -856,6 +887,36 @@
             return t;
         }
 
+        // Crea una fila de equipo con sus botones de figuritas seleccionables (reutilizado por ambas vistas)
+        function crearFilaEquipo(eq, agrupadoEq, claseBtn, diccionarioOriginalDeEseTipo) {
+            let fila = document.createElement('div');
+            fila.className = 'team-row';
+            fila.innerHTML = `<b style="min-width: 38px; display:inline-block;">${eq}:</b>`;
+            for (let num in agrupadoEq) {
+                let totalCopiasOriginal = 1;
+                if (diccionarioOriginalDeEseTipo && diccionarioOriginalDeEseTipo[eq]) {
+                    totalCopiasOriginal = diccionarioOriginalDeEseTipo[eq].filter(x => x == num).length;
+                }
+                let cantidadDeMatches = agrupadoEq[num];
+                for (let i = 0; i < cantidadDeMatches; i++) {
+                    let btn = document.createElement('span');
+                    btn.className = `sticker-btn ${claseBtn}`;
+                    btn.dataset.id = `${eq} ${num}#${i}`;
+                    let badgeHtml = "";
+                    if (totalCopiasOriginal > 1 && i === 0) {
+                        badgeHtml = `<span class="sticker-badge">x${totalCopiasOriginal}</span>`;
+                    }
+                    btn.innerHTML = `${num}${badgeHtml}`;
+                    btn.onclick = function () {
+                        this.classList.toggle('selected');
+                        actualizarContadoresSeleccion();
+                    };
+                    fila.appendChild(btn);
+                }
+            }
+            return fila;
+        }
+
         function renderizarResultadosInteractivos(divId, d, tipo, diccionarioOriginalDeEseTipo) {
             let div = document.getElementById(divId);
             div.innerHTML = '';
@@ -868,34 +929,59 @@
             }
             for (let e in agrupado) {
                 hayMatches = true;
-                let fila = document.createElement('div');
-                fila.className = 'team-row';
-                fila.innerHTML = `<b style="min-width: 38px; display:inline-block;">${e}:</b>`;
-                for (let num in agrupado[e]) {
-                    let totalCopiasOriginal = 1;
-                    if (diccionarioOriginalDeEseTipo && diccionarioOriginalDeEseTipo[e]) {
-                        totalCopiasOriginal = diccionarioOriginalDeEseTipo[e].filter(x => x == num).length;
-                    }
-                    let cantidadDeMatches = agrupado[e][num];
-                    for (let i = 0; i < cantidadDeMatches; i++) {
-                        let btn = document.createElement('span');
-                        btn.className = `sticker-btn ${claseBtn}`;
-                        btn.dataset.id = `${e} ${num}#${i}`;
-                        let badgeHtml = "";
-                        if (totalCopiasOriginal > 1 && i === 0) {
-                            badgeHtml = `<span class="sticker-badge">x${totalCopiasOriginal}</span>`;
-                        }
-                        btn.innerHTML = `${num}${badgeHtml}`;
-                        btn.onclick = function () {
-                            this.classList.toggle('selected');
-                            actualizarContadoresSeleccion();
-                        };
-                        fila.appendChild(btn);
-                    }
-                }
-                div.appendChild(fila);
+                div.appendChild(crearFilaEquipo(e, agrupado[e], claseBtn, diccionarioOriginalDeEseTipo));
             }
             if (!hayMatches) div.innerHTML = '<p style="color:#f0c060; font-size:13px;">No hay coincidencias.</p>';
+        }
+
+        // Asigna cada figurita matcheada a UN origen (yo o un amigo), priorizando "MIO" primero
+        // y luego el orden en que se agregaron los amigos. Evita contar una misma figu dos veces.
+        function agruparPorOrigen(matchDict, desgloseOrigenes) {
+            let ordenOrigenes = Object.keys(desgloseOrigenes);
+            let resultado = {};
+            for (let eq in matchDict) {
+                matchDict[eq].forEach(num => {
+                    let dueño = ordenOrigenes.find(o => desgloseOrigenes[o][eq] && desgloseOrigenes[o][eq].includes(num));
+                    if (!dueño) dueño = 'MIO';
+                    if (!resultado[dueño]) resultado[dueño] = {};
+                    if (!resultado[dueño][eq]) resultado[dueño][eq] = [];
+                    resultado[dueño][eq].push(num);
+                });
+            }
+            return resultado;
+        }
+
+        // Renderiza el panel "Vos recibís" separado en secciones: una para mi álbum y una por cada amigo coop
+        function renderizarRecibirAgrupado(matchDict, diccionarioOriginalDeEseTipo, desgloseOrigenes, fechasAmigos) {
+            let div = document.getElementById('meSirvenSim');
+            div.innerHTML = '';
+            let grupos = agruparPorOrigen(matchDict, desgloseOrigenes);
+            let ordenOrigenes = Object.keys(desgloseOrigenes);
+            let hayAlgo = false;
+
+            ordenOrigenes.forEach(origen => {
+                let datosGrupo = grupos[origen];
+                if (!datosGrupo || Object.keys(datosGrupo).length === 0) return;
+                hayAlgo = true;
+
+                let header = document.createElement('div');
+                header.className = 'coop-origen-header';
+                if (origen === 'MIO') {
+                    header.innerHTML = `<span class="coop-origen-titulo mio">📒 Para mi álbum</span>`;
+                } else {
+                    let fechaTxt = formatearFechaActualizacion(fechasAmigos[origen]);
+                    header.innerHTML = `<span class="coop-origen-titulo amigo">👤 Para ${origen}</span><span class="coop-origen-fecha">🕒 Lista actualizada: ${fechaTxt || 'sin fecha registrada'}</span>`;
+                }
+                div.appendChild(header);
+
+                for (let eq in datosGrupo) {
+                    let agrupadoEq = {};
+                    datosGrupo[eq].forEach(num => { agrupadoEq[num] = (agrupadoEq[num] || 0) + 1; });
+                    div.appendChild(crearFilaEquipo(eq, agrupadoEq, 'receive', diccionarioOriginalDeEseTipo));
+                }
+            });
+
+            if (!hayAlgo) div.innerHTML = '<p style="color:#f0c060; font-size:13px;">No hay coincidencias.</p>';
         }
 
         function actualizarContadoresSeleccion() {
@@ -1028,9 +1114,10 @@
             actualizarContadoresSeleccion();
         }
 
-        function ejecutarComparacion(mD, otroTexto, nombre, contactoAmigo, zonaAmigo, textoMioOriginal) {
+        function ejecutarComparacion(mD, otroTexto, nombre, contactoAmigo, zonaAmigo, textoMioOriginal, fechaAmigo) {
             let oD = parsearTexto(otroTexto);
             ultimoZonaAmigo = zonaAmigo || "";
+            ultimaFechaAmigoPrincipal = fechaAmigo || "";
             actualizarBarrasSimulador(textoMioOriginal, otroTexto, nombre);
             
             ultimoMatchMeSirven = encontrarInterseccion(mD.faltan, oD.repetidas);
@@ -1044,14 +1131,28 @@
 
             seleccionesActuales = { recibir: [], dar: [] };
 
-            renderizarResultadosInteractivos('meSirvenSim', ultimoMatchMeSirven, 'recibir', oD.repetidas);
+            let esCoop = document.getElementById('checkCoop').checked;
+            let hayAmigosCoop = esCoop && Object.keys(ultimoDesgloseOrigenes).length > 1;
+
+            if (hayAmigosCoop) {
+                renderizarRecibirAgrupado(ultimoMatchMeSirven, oD.repetidas, ultimoDesgloseOrigenes, ultimasFechasCoopAmigos);
+            } else {
+                renderizarResultadosInteractivos('meSirvenSim', ultimoMatchMeSirven, 'recibir', oD.repetidas);
+            }
             renderizarResultadosInteractivos('leSirvenSim', ultimoMatchLeSirven, 'dar', mDRepetidasReales);
             seleccionarPareado();
 
-            let esCoop = document.getElementById('checkCoop').checked;
-            
             document.getElementById('tituloMeSirvenSim').innerText = esCoop ? `✅ Nosotros recibimos de ${conZona(nombre, ultimoZonaAmigo)}` : `✅ Vos recibís de ${conZona(nombre, ultimoZonaAmigo)}`;
             document.getElementById('tituloLeSirvenSim').innerText = `🎁 Vos entregás a ${conZona(nombre, ultimoZonaAmigo)}`;
+
+            let badgeFecha = document.getElementById('fechaAmigoPrincipal');
+            let fechaTxt = formatearFechaActualizacion(ultimaFechaAmigoPrincipal);
+            if (fechaTxt) {
+                badgeFecha.style.display = 'block';
+                badgeFecha.innerHTML = `🕒 Lista de ${nombre} actualizada: ${fechaTxt}`;
+            } else {
+                badgeFecha.style.display = 'none';
+            }
 
             document.getElementById('resultados').style.display = 'block';
             document.getElementById('detalleIndividual').style.display = 'block';
@@ -1375,7 +1476,7 @@
                     rellenarCamposAmigo(d);
                     
                     let mD = await obtenerMisFaltantesCombinados(m);
-                    ejecutarComparacion(mD, d.textoOriginal, amigo, contactoAmigo, d.zona || "", m);
+                    ejecutarComparacion(mD, d.textoOriginal, amigo, contactoAmigo, d.zona || "", m, d.ultimaActualizacion || "");
                     
                     document.getElementById('statusAmigo').style.color = "green";
                     document.getElementById('statusAmigo').innerText = "¡Lista cargada!";
@@ -1397,7 +1498,7 @@
                     let z = document.getElementById('miZona').value.trim();
                     let ct = document.getElementById('miContactoTipo').value;
                     let cd = document.getElementById('miContactoDato').value.trim();
-                    let datos = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toLocaleString() };
+                    let datos = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toISOString() };
                     if (z) datos.zona = z;
                     if (cd) { datos.contacto_tipo = ct; datos.contacto_dato = cd; }
                     set(ref(db, `usuarios/${u}`), datos).then(() => renderizarBotonesAmigos());
@@ -1795,7 +1896,7 @@
             let r = document.getElementById('miRegion').value;
             let esPublico = document.getElementById('miPublico').checked;
             try {
-                let datos = { textoOriginal: t, amigos: a, ultimaActualizacion: new Date().toLocaleString(), publico: esPublico === true ? true : false };
+                let datos = { textoOriginal: t, amigos: a, ultimaActualizacion: new Date().toISOString(), publico: esPublico === true ? true : false };
                 if (z) datos.zona = z;
                 if (r) datos.region = r;
                 if (cd) { datos.contacto_tipo = ct; datos.contacto_dato = cd; }
@@ -1805,7 +1906,7 @@
                 if (esPublico) {
                     try {
                         await set(ref(db, `usuarios_publicos/${u}`), {
-                            nombre: u, zona: z || "", region: r || "", contacto_tipo: ct || "", contacto_dato: cd || "", tengo: statsPublico.tengo, faltan: statsPublico.faltan, repes: statsPublico.repes, ultimaActualizacion: new Date().toLocaleString()
+                            nombre: u, zona: z || "", region: r || "", contacto_tipo: ct || "", contacto_dato: cd || "", tengo: statsPublico.tengo, faltan: statsPublico.faltan, repes: statsPublico.repes, ultimaActualizacion: new Date().toISOString()
                         });
                     } catch(e3) {}
                 } else {
@@ -1838,7 +1939,7 @@
             s.style.color = "#005c98";
             s.innerText = "Guardando...";
             try {
-                let datosAmigo = { textoOriginal: at, amigos: "", ultimaActualizacion: new Date().toLocaleString() };
+                let datosAmigo = { textoOriginal: at, amigos: "", ultimaActualizacion: new Date().toISOString() };
                 if (aZona) datosAmigo.zona = aZona;
                 if (aRegion) datosAmigo.region = aRegion;
                 if (aCD) { datosAmigo.contacto_tipo = aCT; datosAmigo.contacto_dato = aCD; }
@@ -1851,7 +1952,7 @@
                     let z2 = document.getElementById('miZona').value.trim();
                     let ct2 = document.getElementById('miContactoTipo').value;
                     let cd2 = document.getElementById('miContactoDato').value.trim();
-                    let datosMios = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toLocaleString() };
+                    let datosMios = { textoOriginal: document.getElementById('miLista').value.trim(), amigos: input.value, ultimaActualizacion: new Date().toISOString() };
                     if (z2) datosMios.zona = z2;
                     if (cd2) { datosMios.contacto_tipo = ct2; datosMios.contacto_dato = cd2; }
                     await set(ref(db, `usuarios/${mu}`), datosMios);
